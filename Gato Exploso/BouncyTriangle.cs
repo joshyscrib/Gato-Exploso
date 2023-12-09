@@ -8,10 +8,10 @@ namespace Gato_Exploso
   {
   int x;
   int y;
-  int width;
-  int height;
-  int health;
-  bool good;
+  int width = 32;
+  int height = 32;
+  int health = 40;
+  bool good = true;
     public int attack(){
       return 2 * (Math.Random() * 10);
     }
