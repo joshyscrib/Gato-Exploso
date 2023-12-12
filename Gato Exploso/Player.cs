@@ -10,10 +10,24 @@ namespace Gato_Exploso
 {
     internal class Player
     {
-        int x = 0;
-        int y = 0;
+        public int x = 50;
+        public int y = 50;
         int speed = 5;
+        private ContentManager Content;
+        Texture2D playerTexture;
+        public Player(ContentManager context)
+        {
+            Content = context;
+        }
 
+        public Player()
+        {
+        }
+
+        public void Load()
+        {
+            playerTexture = Content.Load<Texture2D>("gato");
+        }
         public void Move(KeyboardState keyState)
         {
             if (keyState.IsKeyDown(Keys.W))
@@ -36,6 +50,9 @@ namespace Gato_Exploso
         public void Draw(SpriteBatch spriteBatch)
         {
 
+            Vector2 playerLocation = new Vector2(1230, 650);
+            Rectangle playerRect = new Rectangle(10,10,32,32);
+            spriteBatch.Draw(playerTexture,playerLocation,Color.White);
         }
 
     }
