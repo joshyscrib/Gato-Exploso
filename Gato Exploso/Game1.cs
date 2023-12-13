@@ -68,5 +68,18 @@ namespace Gato_Exploso
             base.Draw(gameTime);
             _spriteBatch.End();
         }
-    }
+        public bool IsPointInRect(int x, int y, int width, int height, Vector2 point)
+        {
+            if(point.x >= x && point.x <= x + width && point.y >= y && point.y <= y){
+                return true;
+            }
+            else{
+            return false;
+            }
+        
+        }
+        public bool AreRectsInEachOther(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+        {
+        if()
+        }
 }
