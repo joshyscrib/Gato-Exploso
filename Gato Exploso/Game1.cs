@@ -80,6 +80,10 @@ namespace Gato_Exploso
         }
         public bool AreRectsInEachOther(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
         {
-        if()
+        Vector2 TL1 = new Vector2(x1,y1);
+        Vector2 TL2 = new Vector2(x2,y2);
+        if(IsPointInRect(TL2.x,TL2.y,width2, height2, TL1)){
+        
+        }
         }
 }
