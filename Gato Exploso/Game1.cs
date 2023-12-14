@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Numerics;
 
 namespace Gato_Exploso
 {
@@ -60,7 +59,7 @@ namespace Gato_Exploso
             var topLeftPixel = new Microsoft.Xna.Framework.Vector2(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
             _spriteBatch.Begin();
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            
+
             level1.Draw(_spriteBatch, topLeftPixel, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, gato.x, gato.y);
             gato.Draw(_spriteBatch);
             // TODO: Add your drawing code here
@@ -70,20 +69,38 @@ namespace Gato_Exploso
         }
         public bool IsPointInRect(int x, int y, int width, int height, Vector2 point)
         {
-            if(point.x >= x && point.x <= x + width && point.y >= y && point.y <= y){
+            if (point.X >= x && point.X <= x + width && point.Y >= y && point.Y <= y)
+            {
                 return true;
             }
-            else{
-            return false;
+            else
+            {
+                return false;
             }
-        
+
         }
+        // checks if 2 rectangles are touching each other
         public bool AreRectsInEachOther(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
         {
-        Vector2 TL1 = new Vector2(x1,y1);
-        Vector2 TL2 = new Vector2(x2,y2);
-        if(IsPointInRect(TL2.x,TL2.y,width2, height2, TL1)){
-        
+            Vector2 TL1 = new Vector2(x1, y1);
+            Vector2 TL2 = new Vector2(x2, y2);
+                // checks 1st rectangle to 2nd rectangle
+            if ((IsPointInRect((int)TL2.X, (int)TL2.Y, width2, height2, TL1) || 
+                IsPointInRect((int)TL2.X, (int)TL2.Y, width2, height2, new Vector2(TL1.X + width1, TL1.Y)) ||
+                IsPointInRect((int)TL2.X, (int)TL2.Y, width2, height2, new Vector2(TL1.X, TL1.Y + height1)) || 
+                IsPointInRect((int)TL2.X, (int)TL2.Y, width2, height2, new Vector2(TL1.X + width1, TL1.Y + height1))) || 
+                // checks 2nd rectangle to first rectangle
+                IsPointInRect((int)TL1.X, (int)TL1.Y, width1, height1, TL2) ||
+                IsPointInRect((int)TL1.X, (int)TL1.Y, width1, height1, new Vector2(TL2.X + width2, TL2.Y)) ||
+                IsPointInRect((int)TL1.X, (int)TL1.Y, width1, height1, new Vector2(TL2.X, TL2.Y + height2)) ||
+                IsPointInRect((int)TL1.X, (int)TL1.Y, width1, height1, new Vector2(TL2.X + width2, TL1.Y + height2)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        }
+    }
 }

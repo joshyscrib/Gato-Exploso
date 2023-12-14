@@ -47,6 +47,7 @@ namespace Gato_Exploso
                 x += speed;
             }
         }
+        // draws the player in the middle of the screen, no matter where they are in the world
         public void Draw(SpriteBatch spriteBatch)
         {
 

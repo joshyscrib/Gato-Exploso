@@ -9,7 +9,10 @@ namespace Gato_Exploso
 {
     internal abstract class Tile
     {
+        // variables
         protected Texture2D tileTexture;
+
+        // methods
         public abstract void Load();
         public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
 

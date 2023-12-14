@@ -10,6 +10,8 @@ namespace DigCraft
 {
     internal class GrassTile : Tile
     {
+
+        // methods
         public override void Load()
         {
             tileTexture = Game1.GameContent.Load<Texture2D>("TemporaryGrassTile");
