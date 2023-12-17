@@ -7,8 +7,10 @@ using System.Net.Mime;
 
 namespace Gato_Exploso
 {
-    internal abstract class Tile
+    internal abstract class Tile : Entity
     {
+        public int width = 32;
+        public int height = 32;
         // variables
         protected Texture2D tileTexture;
 

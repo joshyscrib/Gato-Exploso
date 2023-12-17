@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Gato_Exploso
 {
-    internal class Bomb
+    internal class Bomb : Entity
     {
         int damage;
-        int x;
-        int y;
         int blastRadius;
         public Bomb()
         {

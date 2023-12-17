@@ -5,7 +5,7 @@ using System;
 
 namespace Gato_Exploso
 {
-  class BouncyTriangle
+  class BouncyTriangle : Entity
   {
     // variables
     int x;
