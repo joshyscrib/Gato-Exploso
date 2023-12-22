@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.Xna.Framework.Input;
 namespace Gato_Exploso
 {
     internal class Level
@@ -69,29 +69,42 @@ namespace Gato_Exploso
                 }
             }
         }
-            // two overloads to find which tile the pixel is in
-            Vector2 GetTilePosition(int x, int y)
-            {
-                return new Vector2(x / 32, y / 32);
-            }
+        // places a new rock tile if 'E' is pressed
+        public void PlaceRock(int offsetX, int offsetY)
+        {
 
-            Vector2 GetTilePosition(Vector2 vec)
-            {
-                return new Vector2((int)vec.X / 32, (int)vec.Y / 32);
-            }
+            MouseState cursor = new MouseState();
+            cursor = Mouse.GetState();
+            RockTile rock = new RockTile();
+            int placeX = cursor.X / 32;
+            int placeY = cursor.Y / 32;
+            tiles[placeX, placeY] = rock;
+//            tiles[(cursor.X / 32) - offsetX, (cursor.Y / 32) - offsetY] = rock;
 
-            // Checks if the tile is currently shown on screen
-            public bool isTileOnScreen(int tileX, int tileY, int width, int height, float XPixel, float YPixel)
+        }
+        // two overloads to find which tile the pixel is in
+        Vector2 GetTilePosition(int x, int y)
+        {
+            return new Vector2(x / 32, y / 32);
+        }
+
+        Vector2 GetTilePosition(Vector2 vec)
+        {
+            return new Vector2((int)vec.X / 32, (int)vec.Y / 32);
+        }
+
+        // Checks if the tile is currently shown on screen
+        public bool isTileOnScreen(int tileX, int tileY, int width, int height, float XPixel, float YPixel)
+        {
+            if ((tileX * 32 > XPixel && tileX * 32 < XPixel + width && tileY * 32 > YPixel && tileY * 32 < YPixel + height) ||
+                (tileX * 32 + 32 > XPixel && tileX * 32 + 32 < XPixel + width && tileY * 32 > YPixel && tileY < YPixel + height) ||
+                (tileX * 32 > XPixel && tileX * 32 < XPixel + width && tileY * 32 + 32 > YPixel && tileY * 32 + 32 < YPixel + height) ||
+                (tileX * 32 + 32 > XPixel && tileX * 32 + 32 < XPixel + width && tileY * 32 + 32 > YPixel && tileY * 32 + 32 < YPixel + height))
             {
-                if ((tileX * 32 > XPixel && tileX * 32 < XPixel + width && tileY * 32 > YPixel && tileY * 32 < YPixel + height) ||
-                    (tileX * 32 + 32 > XPixel && tileX * 32 + 32 < XPixel + width && tileY * 32 > YPixel && tileY < YPixel + height) ||
-                    (tileX * 32 > XPixel && tileX * 32 < XPixel + width && tileY * 32 + 32 > YPixel && tileY * 32 + 32 < YPixel + height) ||
-                    (tileX * 32 + 32 > XPixel && tileX * 32 + 32 < XPixel + width && tileY * 32 + 32 > YPixel && tileY * 32 + 32 < YPixel + height))
-                {
-                    return true;
-                }
-                else { return false; }
+                return true;
             }
-        
+            else { return false; }
+        }
+
     }
 }

@@ -47,7 +47,10 @@ namespace Gato_Exploso
             gato.Move(state);
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
+            if (state.IsKeyDown(Keys.E))
+            {
+                level1.PlaceRock((gato.x + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2)) / 32, (gato.y + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2)) / 32);
+            }
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -67,6 +70,6 @@ namespace Gato_Exploso
             base.Draw(gameTime);
             _spriteBatch.End();
         }
-     
+
     }
 }

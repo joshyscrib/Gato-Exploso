@@ -10,11 +10,13 @@ namespace Gato_Exploso
 {
     internal class Player : Entity
     {
-        public int x = 500;
-        public int y = 500;
+        public int x = 300;
+        public int y = 300;
         public int width = 32;
         public int height = 64;
-        int speed = 5;
+        int targetX = 300;
+        int targetY = 300;
+        int speed = 10;
         private ContentManager Content;
         Texture2D playerTexture;
         public Player(ContentManager context)
@@ -25,15 +27,16 @@ namespace Gato_Exploso
         public Player()
         {
         }
-        
+        // loads player texture
         public void Load()
         {
             playerTexture = Content.Load<Texture2D>("gato");
         }
+        // checks if the new locatin collides with an object and decides whether or not to move the player
         public void Move(KeyboardState keyState)
         {
-            int targetX = 0;
-            int targetY = 0;
+            targetX = x;
+            targetY = y;
             if (keyState.IsKeyDown(Keys.W))
             {
                 targetY -= speed;
@@ -50,13 +53,14 @@ namespace Gato_Exploso
             {
                 targetX += speed;
             }
-            if (keyState.IsKeyDown(Keys.E))
+            if (targetX >= 32 && targetX <= 31968)
             {
-                x = 400;
-                y = 400;
+                x = targetX;
             }
-            x = targetX;
-            y = targetY;
+            if (targetY >= 64 && targetY <= 31936)
+            {
+                y = targetY;
+            }
         }
         // draws the player in the middle of the screen, no matter where they are in the world
         public void Draw(SpriteBatch spriteBatch)
