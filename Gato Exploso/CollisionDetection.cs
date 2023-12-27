@@ -15,7 +15,7 @@ namespace Gato_Exploso
 
         }
         // checks if a single point is in a rectangle
-        static bool IsPointInRect(int x, int y, int width, int height, Vector2 point)
+        public static bool IsPointInRect(int x, int y, int width, int height, Vector2 point)
         {
             if (point.X >= x && point.X <= x + width && point.Y >= y && point.Y <= y)
             {
@@ -28,7 +28,7 @@ namespace Gato_Exploso
 
         }
         // checks if 2 rectangles are touching each other
-        static bool AreRectsInEachOther(int x1, int y1, int width1, int height1, Entity entity)
+        public static bool AreRectsInEachOther(int x1, int y1, int width1, int height1, Entity entity)
         {
             Vector2 TL1 = new Vector2(x1, y1);
             Vector2 TL2 = new Vector2(entity.x, entity.y);

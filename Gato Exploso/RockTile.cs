@@ -6,15 +6,18 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Net.Mime;
 
-namespace DigCraft
+namespace Gato_Exploso
 {
     internal class RockTile : Tile
     {
-
-        // methods
+        // variables
+        public bool solid = true;
+        
+        // methods 
         public override void Load()
         {
             tileTexture = Game1.GameContent.Load<Texture2D>("TemporaryRockTile");
+
         }
         public RockTile()
         {

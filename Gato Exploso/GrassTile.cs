@@ -6,11 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Net.Mime;
 
-namespace DigCraft
+namespace Gato_Exploso
 {
     internal class GrassTile : Tile
     {
-
+        // variables
+        public bool solid = false;
         // methods
         public override void Load()
         {

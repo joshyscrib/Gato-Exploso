@@ -14,9 +14,7 @@ namespace Gato_Exploso
         public int y = 300;
         public int width = 32;
         public int height = 64;
-        int targetX = 300;
-        int targetY = 300;
-        int speed = 10;
+        public int speed = 3;
         private ContentManager Content;
         Texture2D playerTexture;
         public Player(ContentManager context)
@@ -30,44 +28,24 @@ namespace Gato_Exploso
         // loads player texture
         public void Load()
         {
-            playerTexture = Content.Load<Texture2D>("gato");
+            playerTexture = Content.Load<Texture2D>("TestGato");
         }
-        // checks if the new locatin collides with an object and decides whether or not to move the player
-        public void Move(KeyboardState keyState)
+
+        // moves player to an X or Y
+        // there is a seperate function for each so that the player can still move horizontally  if they are touching a wall above them, or vice-versa
+        public void MoveX(int locX)
         {
-            targetX = x;
-            targetY = y;
-            if (keyState.IsKeyDown(Keys.W))
-            {
-                targetY -= speed;
-            }
-            if (keyState.IsKeyDown(Keys.A))
-            {
-                targetX -= speed;
-            }
-            if (keyState.IsKeyDown(Keys.S))
-            {
-                targetY += speed;
-            }
-            if (keyState.IsKeyDown(Keys.D))
-            {
-                targetX += speed;
-            }
-            if (targetX >= 32 && targetX <= 31968)
-            {
-                x = targetX;
-            }
-            if (targetY >= 64 && targetY <= 31936)
-            {
-                y = targetY;
-            }
+            x = locX;
+        }
+        public void MoveY(int locY)
+        {
+            y = locY;
         }
         // draws the player in the middle of the screen, no matter where they are in the world
         public void Draw(SpriteBatch spriteBatch)
         {
 
-            Vector2 playerLocation = new Vector2(1230, 650);
-            Rectangle playerRect = new Rectangle(10,10,32,32);
+            Vector2 playerLocation = new Vector2((GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/2), (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
             spriteBatch.Draw(playerTexture,playerLocation,Color.White);
         }
 
