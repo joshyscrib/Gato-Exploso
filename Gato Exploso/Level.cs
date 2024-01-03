@@ -26,10 +26,13 @@ namespace Gato_Exploso
         // matrix of tiles
         public Tile[,] tiles = new Tile[xTiles, yTiles];
 
+        // offset for screen to world coordinates
         int offsetX = 0;
         int offsetY = 0;
-
+ 
+        // variable for total time that has passed
         double gameTime = 0;
+        
         // constructor
         public Level()
         {
@@ -37,12 +40,14 @@ namespace Gato_Exploso
         }
         // methods
 
+        // updates the offset x&y
         public void UpdateOffset(int x, int y)
         {
             offsetX = x;
             offsetY = y;
         }
 
+        // updates the total game time variable
         public void UpdateTime(double time)
         {
             gameTime = time;
@@ -117,7 +122,7 @@ namespace Gato_Exploso
                 }
             }
         }
-        // places a new rock tile on left click
+        // places a new rock tile
         public void PlaceRock()
         {
 
@@ -125,7 +130,6 @@ namespace Gato_Exploso
             if (vec.X < 0 || vec.Y < 0) { return; }
             RockTile rock = new RockTile();
             tiles[(int)vec.X, (int)vec.Y] = rock;
-//            tiles[(cursor.X / 32) - offsetX, (cursor.Y / 32) - offsetY] = rock;
 
         }
 
@@ -160,9 +164,10 @@ namespace Gato_Exploso
             return new Vector2(x / tileSide, y / tileSide);
         }
 
+        // gets the tile at a certain point
         Vector2 GetTilePosition(Vector2 vec)
         {
-            return new Vector2((int)vec.X / tileSide, (int)vec.Y / tileSide);
+            return new Vector2((int)vec.X / tileSide, (int)vec.y / tileside);
         }
 
         // Checks if the tile is currently shown on screen
