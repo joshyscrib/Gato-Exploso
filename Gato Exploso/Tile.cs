@@ -15,7 +15,6 @@ namespace Gato_Exploso
         public int width = tileSide;
         public int height = tileSide;
         public bool solid;
-        public int tickCount;
         public List<TileObject> objects = new List<TileObject>();
         // variables
         protected Texture2D tileTexture;
@@ -32,15 +31,19 @@ namespace Gato_Exploso
                 obj.Draw(spriteBatch, x, y);
             }
         }
-        public void Tick()
+        public void UpdateGameTime(double curTime)
         {
-            tickCount++;
+            HashSet<Bomb> bombsToDelete = new HashSet<Bomb>();
             foreach (Bomb bmb in objects)
             {
-                if(bmb.createTime + tickCount >= 3000)
+                if(curTime - 3000 > bmb.createTime)
                 {
-                    objects.Remove(bmb);
+                    bombsToDelete.Add(bmb);
                 }
+            }
+            foreach (Bomb bmb in bombsToDelete)
+            {
+                objects.Remove(bmb);
             }
         }
 

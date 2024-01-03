@@ -10,9 +10,9 @@ namespace Gato_Exploso.TileObjects
 {
     internal class Bomb : TileObject
     {
-        public int createTime = 0;
+        public double createTime = 0;
         protected Texture2D bombTexture;
-        public Bomb(int ticks)
+        public Bomb(double ticks)
         {
             Load();
             createTime = ticks;

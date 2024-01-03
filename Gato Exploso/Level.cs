@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 using Gato_Exploso.TileObjects;
 using Microsoft.Xna.Framework.Content;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Gato_Exploso
 {
@@ -18,13 +19,17 @@ namespace Gato_Exploso
         // variables
 
         // amount of tiles per row/column
-        public const int xTiles = 1000;
-        public const int yTiles = 1000;
+        public const int xTiles = 100;
+        public const int yTiles = 100;
         // width/height of each tile
         public const int tileSide = 32;
         // matrix of tiles
         public Tile[,] tiles = new Tile[xTiles, yTiles];
 
+        int offsetX = 0;
+        int offsetY = 0;
+
+        double gameTime = 0;
         // constructor
         public Level()
         {
@@ -32,6 +37,31 @@ namespace Gato_Exploso
         }
         // methods
 
+        public void UpdateOffset(int x, int y)
+        {
+            offsetX = x;
+            offsetY = y;
+        }
+
+        public void UpdateTime(double time)
+        {
+            gameTime = time;
+            for(int i = 0; i < xTiles; i++)
+            {
+                for(int j = 0; j < yTiles; j++)
+                {
+                    if (IsTileOnScreen(i,j,GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,offsetX,offsetY))
+                    {
+                        tiles[i, j].UpdateGameTime(time);
+                    }
+                    else
+                    {
+                        int pop = 9;
+                    }
+                }
+            }
+
+        }
         // Assigns each tile a type
         public void InitTiles()
         {
@@ -45,6 +75,7 @@ namespace Gato_Exploso
                 }
             }
         }
+
         // Draws all of the tiles relative to the player's position
         public void Draw(SpriteBatch spritebatch, Vector2 TLPixel, int SWidth, int SHeight, int playerX, int playerY)
         {
@@ -74,10 +105,12 @@ namespace Gato_Exploso
                         continue;
                     }
                     // draws the on-screen tiles
-                    if (isTileOnScreen(i, j, SWidth, SHeight, TLPixel.X, TLPixel.Y))
+                    if (IsTileOnScreen(i, j, SWidth, SHeight, TLPixel.X, TLPixel.Y))
                     {
-                        tiles[i, j].Draw(spritebatch, (i * tileSide) + tileXOffset, (j * tileSide) + tileYOffset);
-                        tiles[i, j].DrawTileObjects(spritebatch, (i * tileSide) + (playerX - (SWidth/2)), (j * tileSide) + (playerY - (SHeight / 2)));
+                        int drawX = (i * tileSide) + tileXOffset;
+                        int drawY = (j * tileSide) + tileYOffset;
+                        tiles[i, j].Draw           (spritebatch, drawX, drawY);
+                        tiles[i, j].DrawTileObjects(spritebatch, drawX, drawY);
                     }
                     
                     
@@ -85,25 +118,41 @@ namespace Gato_Exploso
             }
         }
         // places a new rock tile on left click
-        public void PlaceRock(int offsetX, int offsetY)
+        public void PlaceRock()
         {
 
-            MouseState cursor = new MouseState();
-            cursor = Mouse.GetState();
+            Vector2 vec = GetTileUnderMouse();
+            if (vec.X < 0 || vec.Y < 0) { return; }
             RockTile rock = new RockTile();
-            int placeX = (cursor.X-16) / tileSide;
-            int placeY = (cursor.Y - 16) / tileSide;
-            tiles[placeX + offsetX, placeY + offsetY] = rock;
+            tiles[(int)vec.X, (int)vec.Y] = rock;
 //            tiles[(cursor.X / 32) - offsetX, (cursor.Y / 32) - offsetY] = rock;
 
         }
+
+        // Places a bomb where the mouse is at when space is pressed
         public void PlaceBomb()
+        {
+            Vector2 vec = GetTileUnderMouse();
+            if(vec.X < 0 || vec.Y < 0) { return; }
+            Bomb b = new Bomb(gameTime);
+            Tile curTile = tiles[(int)vec.X, (int)vec.Y];
+            curTile.objects.Add(b);
+            
+        }
+
+        // finds what tile the mouse is on
+        public Vector2 GetTileUnderMouse()
         {
             MouseState cursor = new MouseState();
             cursor = Mouse.GetState();
-            Bomb b = new Bomb(tiles[(int)GetTilePosition(cursor.X, cursor.Y).X, (int)GetTilePosition(cursor.X, cursor.Y).Y].tickCount);
-            tiles[(int)GetTilePosition(cursor.X, cursor.Y).X, (int)GetTilePosition(cursor.X, cursor.Y).Y].objects.Add(b);
-            
+            int tileX = (cursor.X + offsetX) / tileSide;
+            int tileY = (cursor.Y + offsetY) / tileSide;
+            if ( tileX < 0 || tileX >= tiles.Length || tileY < 0 || tileY >= tiles.Length)
+            {
+                return new Vector2( -1, -1 );
+            }
+            return new Vector2( tileX, tileY );
+
         }
         // two overloads to find which tile the pixel is in
         Vector2 GetTilePosition(int x, int y)
@@ -117,7 +166,7 @@ namespace Gato_Exploso
         }
 
         // Checks if the tile is currently shown on screen
-        public bool isTileOnScreen(int tileX, int tileY, int width, int height, float XPixel, float YPixel)
+        public bool IsTileOnScreen(int tileX, int tileY, int width, int height, float XPixel, float YPixel)
         {
             if ((tileX * tileSide > XPixel && tileX * tileSide < XPixel + width && tileY * tileSide > YPixel && tileY * tileSide < YPixel + height) ||
                 (tileX * tileSide + tileSide > XPixel && tileX * tileSide + tileSide < XPixel + width && tileY * tileSide > YPixel && tileY < YPixel + height) ||

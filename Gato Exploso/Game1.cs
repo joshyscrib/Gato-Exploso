@@ -15,6 +15,7 @@ namespace Gato_Exploso
         int targetY = 300;
         public const int tileSide = 32;
         Level level1 = new Level();
+        int tickCount = 0;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -29,7 +30,6 @@ namespace Gato_Exploso
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
 
             base.Initialize();
             level1.InitTiles();
@@ -40,7 +40,6 @@ namespace Gato_Exploso
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             gato.Load();
-            // TODO: use this.Content to load your game content here
         }
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(KeyboardState keyState)
@@ -89,13 +88,13 @@ namespace Gato_Exploso
                     gato.MoveX(targetX);
                 }
             }
+
+            level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+
             if(keyState.IsKeyDown(Keys.Space))
             {
                 level1.PlaceBomb();
             }
-            
-
-
             
         }
 
@@ -111,13 +110,14 @@ namespace Gato_Exploso
             return null;
         }
 
-        public Vector2 screenPointToWorldPoint(Vector2 oldPoint)
+        public Vector2 screenToWorldPoint(Vector2 oldPoint)
         {
-            return new Vector2(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+            return new Vector2(oldPoint.X + gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
         }
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
+            level1.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
             var state = Keyboard.GetState();
             MouseState cursor = new MouseState();
             cursor = Mouse.GetState();
@@ -127,10 +127,10 @@ namespace Gato_Exploso
                 Exit();
             if (cursor.LeftButton == ButtonState.Pressed)
             {
-                level1.PlaceRock((gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2)) / tileSide, (gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2)) / tileSide);
+                level1.PlaceRock();
             }
             // TODO: Add your update logic here
-
+            
             base.Update(gameTime);
         }
 
