@@ -10,11 +10,14 @@ namespace Gato_Exploso.TileObjects
 {
     internal class Bomb : TileObject
     {
+    
         public double createTime = 0;
         protected Texture2D bombTexture;
         public Bomb(double ticks)
         {
             Load();
+
+            // sets the time that the bomb was created
             createTime = ticks;
         }
         public void Load()
@@ -23,6 +26,7 @@ namespace Gato_Exploso.TileObjects
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
+            // draws the bomb
             var pos = new Vector2(x, y);
             spriteBatch.Draw(bombTexture, pos, null, Color.White);
 
