@@ -11,12 +11,15 @@ namespace Gato_Exploso
 {
     internal abstract class Tile : Entity
     {
+        // variables
+
+        // sets variables for the height and width of tiles
         public const int tileSide = 32;
         public int width = tileSide;
         public int height = tileSide;
         public bool solid;
         public List<TileObject> objects = new List<TileObject>();
-        // variables
+        
         protected Texture2D tileTexture;
 
         // methods
@@ -31,8 +34,10 @@ namespace Gato_Exploso
                 obj.Draw(spriteBatch, x, y);
             }
         }
+        // updates current game time and updates time based objects
         public void UpdateGameTime(double curTime)
         {
+            // uses a HashSet to remove every bomb that is past his life time
             HashSet<Bomb> bombsToDelete = new HashSet<Bomb>();
             foreach (Bomb bmb in objects)
             {
@@ -43,6 +48,7 @@ namespace Gato_Exploso
             }
             foreach (Bomb bmb in bombsToDelete)
             {
+            `` 
                 objects.Remove(bmb);
             }
         }
