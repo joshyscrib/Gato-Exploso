@@ -11,6 +11,8 @@ namespace Gato_Exploso
         private SpriteBatch _spriteBatch;
         private Player gato;
         public static ContentManager GameContent;
+
+        // Move position for collision detection
         int targetX = 300;
         int targetY = 300;
         public const int tileSide = 32;
@@ -88,18 +90,17 @@ namespace Gato_Exploso
                     gato.MoveX(targetX);
                 }
             }
-
+            // updates the offset between screen and world coordinates
             level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
-
+            // places bomb when space is pressed
             if(keyState.IsKeyDown(Keys.Space))
             {
                 level1.PlaceBomb();
             }
             
         }
-
+        // gets the tile at a position
         private Tile getTileAt(int x, int y)
-        {// TODO add boundary checks
             int tileX = x / 32;
             int tileY = y / 32;
             if (tileX >= 0 && tileY >= 0 && tileX < 1000 && tileY < 1000)
@@ -110,10 +111,12 @@ namespace Gato_Exploso
             return null;
         }
 
-        public Vector2 screenToWorldPoint(Vector2 oldPoint)
+        // converts a point on the screen to a location in the world
+        public Vector2 ScreenToWorldPoint(Vector2 oldPoint)
         {
             return new Vector2(oldPoint.X + gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
         }
+    
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
@@ -134,6 +137,7 @@ namespace Gato_Exploso
             base.Update(gameTime);
         }
 
+        // tells each class to draw themselves
         protected override void Draw(GameTime gameTime)
         {
             // finding top-left pixel of the screen
