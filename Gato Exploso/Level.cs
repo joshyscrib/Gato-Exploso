@@ -167,7 +167,7 @@ namespace Gato_Exploso
         // gets the tile at a certain point
         Vector2 GetTilePosition(Vector2 vec)
         {
-            return new Vector2((int)vec.X / tileSide, (int)vec.y / tileside);
+            return new Vector2((int)vec.X / tileSide, (int)vec.Y / tileSide);
         }
 
         // Checks if the tile is currently shown on screen
