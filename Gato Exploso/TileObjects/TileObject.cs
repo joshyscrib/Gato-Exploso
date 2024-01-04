@@ -9,6 +9,7 @@ namespace Gato_Exploso.TileObjects
 {
     internal abstract class TileObject
     {
+        // sets a variable for if the variable exists
         protected bool deleted = false;
 
         public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
