@@ -48,7 +48,7 @@ namespace Gato_Exploso
             }
             foreach (Bomb bmb in bombsToDelete)
             {
-            `` 
+            
                 objects.Remove(bmb);
             }
         }

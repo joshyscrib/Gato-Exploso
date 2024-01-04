@@ -18,6 +18,9 @@ namespace Gato_Exploso
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
+
+        // makes a new webserver
+        WebServer server = new WebServer();
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -35,6 +38,7 @@ namespace Gato_Exploso
 
             base.Initialize();
             level1.InitTiles();
+            server.Start();
         }
 
         // loads images for different classes
@@ -100,7 +104,7 @@ namespace Gato_Exploso
             
         }
         // gets the tile at a position
-        private Tile getTileAt(int x, int y)
+        private Tile getTileAt(int x, int y) {
             int tileX = x / 32;
             int tileY = y / 32;
             if (tileX >= 0 && tileY >= 0 && tileX < 1000 && tileY < 1000)
