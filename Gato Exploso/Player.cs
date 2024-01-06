@@ -15,8 +15,10 @@ namespace Gato_Exploso
         public int width = 32;
         public int height = 64;
         public int speed = 3;
+        public MoveDirection facing = new MoveDirection();
         private ContentManager Content;
-        Texture2D playerTexture;
+        Texture2D PTextureUp;
+        Texture2D PTextureRight;
         public Player(ContentManager context)
         {
             Content = context;
@@ -28,7 +30,8 @@ namespace Gato_Exploso
         // loads player texture
         public void Load()
         {
-            playerTexture = Content.Load<Texture2D>("TestGato");
+            PTextureUp = Content.Load<Texture2D>("TempGatoUp");
+            PTextureRight = Content.Load<Texture2D>("TempGatoRight");
         }
 
         // moves player to an X or Y
@@ -44,9 +47,19 @@ namespace Gato_Exploso
         // draws the player in the middle of the screen, no matter where they are in the world
         public void Draw(SpriteBatch spriteBatch)
         {
-
+            Texture2D curTexture;
+            if (facing.Up || facing.Down) { curTexture = PTextureUp; }
+            else if (facing.Right || facing.Left) { curTexture = PTextureRight; }
+            else
+            {
+                curTexture = PTextureUp;
+            }
+            if(facing.Left || facing.Down)
+            {
+                
+            }
             Vector2 playerLocation = new Vector2((GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/2), (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
-            spriteBatch.Draw(playerTexture,playerLocation,Color.White);
+            spriteBatch.Draw(curTexture,playerLocation,Color.White);
         }
 
     }

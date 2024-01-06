@@ -18,6 +18,7 @@ namespace Gato_Exploso
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
+        MoveDirection lastNetDirection = new MoveDirection();
 
         // makes a new webserver
         WebServer server = new WebServer();
@@ -45,6 +46,7 @@ namespace Gato_Exploso
         private void Server_PlayerAction(object sender, PlayerActionArgs args)
         {
             MovePlayer(args.direction);
+            lastNetDirection = args.direction;
         }
 
         // loads images for different classes
@@ -67,6 +69,7 @@ namespace Gato_Exploso
                 {
                     gato.MoveY(targetY);
                 }
+                gato.facing = dir;
             }
             if (dir.Left)
             {
@@ -78,6 +81,7 @@ namespace Gato_Exploso
                 {
                     gato.MoveX(targetX);
                 }
+                gato.facing = dir;
             }
             if (dir.Down)
             {
@@ -87,7 +91,8 @@ namespace Gato_Exploso
                 if (l is not RockTile && r is not RockTile)
                 {
                     gato.MoveY(targetY);
-                };
+                }
+                gato.facing = dir;
             }
             if (dir.Right)
             {
@@ -99,6 +104,7 @@ namespace Gato_Exploso
                 {
                     gato.MoveX(targetX);
                 }
+                gato.facing = dir;
             }
             // updates the offset between screen and world coordinates
             level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
@@ -147,7 +153,10 @@ namespace Gato_Exploso
                 level1.PlaceRock();
             }
             MovePlayer(direction);
+            MovePlayer(lastNetDirection);
             ExexutePlayerAction(actionArgs);
+
+
             base.Update(gameTime);
         }
         public void ExexutePlayerAction(PlayerActionArgs act)
