@@ -10,18 +10,16 @@
         $.get("/move?action=" + dir);
     }
 </script>
-<body>
-    <h1>Gato Exploso!</h1>
+<body style="background-color:#a39161">
+    <h1>
+        Gato Exploso!
+    </h1>
     <button onclick="sendMove('up')">Up</button>
     <br />
     <button onclick="sendMove('left')">Left</button>
+    <button onclick="sendMove('down')">Down</button>
     <button onclick="sendMove('right')">Right</button>
     <button onclick="sendMove('stop')">Stop</button>
-    <br />
-    <button onclick="sendMove('down')">Down</button>
-
-
-
 </body>
 
 
