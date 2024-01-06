@@ -1,0 +1,28 @@
+<html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
+
+
+<script>
+
+    function sendMove(dir) {
+        // this is how you call a url
+        $.get("/move?action=" + dir);
+    }
+</script>
+<body>
+    <h1>Gato Exploso!</h1>
+    <button onclick="sendMove('up')">Up</button>
+    <br />
+    <button onclick="sendMove('left')">Left</button>
+    <button onclick="sendMove('right')">Right</button>
+    <button onclick="sendMove('stop')">Stop</button>
+    <br />
+    <button onclick="sendMove('down')">Down</button>
+
+
+
+</body>
+
+
+</html>

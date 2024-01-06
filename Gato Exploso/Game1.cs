@@ -39,6 +39,12 @@ namespace Gato_Exploso
             base.Initialize();
             level1.InitTiles();
             server.Start();
+            server.PlayerAction += Server_PlayerAction;
+        }
+
+        private void Server_PlayerAction(object sender, PlayerActionArgs args)
+        {
+            MovePlayer(args.direction);
         }
 
         // loads images for different classes
@@ -48,21 +54,21 @@ namespace Gato_Exploso
             gato.Load();
         }
         // checks if the new location collides with an object and decides whether or not to move the player
-        public void MovePlayer(KeyboardState keyState)
+        public void MovePlayer(MoveDirection dir)
         {
             targetX = gato.x;
             targetY = gato.y;
-            if (keyState.IsKeyDown(Keys.W))
+            if (dir.Up)
             {
                 targetY -= gato.speed;
                 Tile l = getTileAt(gato.x, targetY - 1);
                 Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
-                if(l is not RockTile && r is not RockTile)
+                if (l is not RockTile && r is not RockTile)
                 {
                     gato.MoveY(targetY);
                 }
             }
-            if (keyState.IsKeyDown(Keys.A))
+            if (dir.Left)
             {
                 targetX -= gato.speed;
                 Tile t = getTileAt(targetX, gato.y);
@@ -73,17 +79,17 @@ namespace Gato_Exploso
                     gato.MoveX(targetX);
                 }
             }
-            if (keyState.IsKeyDown(Keys.S))
+            if (dir.Down)
             {
                 targetY += gato.speed;
                 Tile l = getTileAt(gato.x, targetY + gato.height - 1);
-                Tile r = getTileAt(gato.x + gato.width -1, targetY + gato.height - 1);
+                Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
                 if (l is not RockTile && r is not RockTile)
                 {
                     gato.MoveY(targetY);
                 };
             }
-            if (keyState.IsKeyDown(Keys.D))
+            if (dir.Right)
             {
                 targetX += gato.speed;
                 Tile t = getTileAt(targetX + gato.width - 1, gato.y);
@@ -96,15 +102,12 @@ namespace Gato_Exploso
             }
             // updates the offset between screen and world coordinates
             level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
-            // places bomb when space is pressed
-            if(keyState.IsKeyDown(Keys.Space))
-            {
-                level1.PlaceBomb();
-            }
-            
+
+
         }
         // gets the tile at a position
-        private Tile getTileAt(int x, int y) {
+        private Tile getTileAt(int x, int y)
+        {
             int tileX = x / 32;
             int tileY = y / 32;
             if (tileX >= 0 && tileY >= 0 && tileX < 1000 && tileY < 1000)
@@ -120,15 +123,22 @@ namespace Gato_Exploso
         {
             return new Vector2(oldPoint.X + gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
         }
-    
+
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
             level1.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
             var state = Keyboard.GetState();
             MouseState cursor = new MouseState();
+            MoveDirection direction = new MoveDirection();
             cursor = Mouse.GetState();
-            MovePlayer(state);
+            PlayerActionArgs actionArgs = new PlayerActionArgs();
+
+            if (state.IsKeyDown(Keys.W)) { direction.Up = true; }
+            if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
+            if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
+            if (state.IsKeyDown(Keys.D)) { direction.Right = true; }
+            if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -136,9 +146,17 @@ namespace Gato_Exploso
             {
                 level1.PlaceRock();
             }
-            // TODO: Add your update logic here
-            
+            MovePlayer(direction);
+            ExexutePlayerAction(actionArgs);
             base.Update(gameTime);
+        }
+        public void ExexutePlayerAction(PlayerActionArgs act)
+        {
+            // places bomb when space is pressed
+            if (act.placeBomb)
+            {
+                level1.PlaceBomb();
+            }
         }
 
         // tells each class to draw themselves
@@ -154,7 +172,7 @@ namespace Gato_Exploso
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
-            
+
             _spriteBatch.End();
         }
 

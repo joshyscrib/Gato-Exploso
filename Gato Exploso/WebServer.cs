@@ -20,6 +20,10 @@ namespace Gato_Exploso
             ReceiveData();
         }
 
+        public delegate void PlayerActionHandler(object sender, PlayerActionArgs args);
+
+        public event PlayerActionHandler PlayerAction;
+
         private void ReceiveData()
         {
             listener.BeginGetContext(new AsyncCallback(Callback), listener);
@@ -34,35 +38,51 @@ namespace Gato_Exploso
                 var response = context.Response;
 
                 Console.WriteLine("data received.");
-                string html = "<html>  <h1>hello peeps</h1>  </html>";
-                if (request.Url.PathAndQuery.Contains("cat"))
-                {
-                    html = File.ReadAllText("Content/Cats.html");
-                }
-                if (request.Url.PathAndQuery.Contains("dog"))
-                {
-                    html = File.ReadAllText("Content/Dogs.html");
-                }
+                string html = File.ReadAllText("Content/GatoControl.html");
+                
 
-                String name = request.QueryString["name"];
-                if (name != null)
+                String direct = request.QueryString["action"];
+                if (direct != null)
                 {
-                    html = html.Replace("{name}", name);
-                }
-                String age = request.QueryString["age"];
-                if (age != null)
-                {
-                    html = html.Replace("{age}", age);
+                    MoveDirection dir = new MoveDirection();
+                    switch (direct)
+                    {
+                        case "up":
+                            dir.Up = true;
+                            break;
+                        case "left":
+                            dir.Left = true;
+                            break;
+                        case "down":
+                            dir.Down = true;
+                            break;
+                        case "right":
+                            dir.Right = true;
+                            break;
+                        case "stop":
+
+                            break;
+
+                    }
+                    ReportPlayerMoved(dir);
                 }
 
                 String url = request.Url.PathAndQuery;
                 byte[] bytes = Encoding.ASCII.GetBytes(html);
-                response.StatusCode = 404;
                 response.OutputStream.Write(bytes, 0, bytes.Length);
                 response.OutputStream.Close();
                 ReceiveData();
             }
 
+        }
+            private void ReportPlayerMoved(MoveDirection direction)
+        {
+            if(PlayerAction != null)
+            {
+                PlayerActionArgs actionArgs = new PlayerActionArgs();
+                actionArgs.direction = direction;
+                PlayerAction(this, actionArgs);
+            }
         }
     }
 }
