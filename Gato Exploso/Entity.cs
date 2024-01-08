@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gato_Exploso
 {
-    internal class Entity
+    public class Entity
     {
         // variables
         public int x = 0;

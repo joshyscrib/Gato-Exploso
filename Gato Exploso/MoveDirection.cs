@@ -12,5 +12,13 @@ namespace Gato_Exploso
         public bool Left { get; set; }
         public bool Right { get; set; }
         public bool Down { get; set; }
+        public bool IsDirectionSet()
+        {
+            if (Up || Left || Right || Down)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

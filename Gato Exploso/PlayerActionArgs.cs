@@ -10,6 +10,7 @@ namespace Gato_Exploso
     {
         public MoveDirection direction { get; set; }
         public bool placeBomb { get; set; }
+        public string name { get; set; }
 
     }
 }

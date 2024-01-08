@@ -2,24 +2,141 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
 
-
+<style type="text/css">
+    body {
+        margin: 0;
+        overflow: hidden;
+        user-select: none;
+    }
+    canvas {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+    
+</style>
 <script>
-
+    var playerName = "";
     function sendMove(dir) {
+        console.log("Move : " + dir);
         // this is how you call a url
-        $.get("/move?action=" + dir);
+        $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
+        _absorbEvent();
+    }
+    function registerPlayer() {
+        var name = $("#playerName").val();
+        playerName = encodeURIComponent(name);
+        $.get("/action?command=join&name=" + playerName);
+
+    //    $("#registration").hide();
+      //  displayCanvas();
+    }
+    function sendJoin(name) {
+
+    }
+
+    var canvas;
+    var ctx;
+
+    function setupCanvas() {
+        canvas = document.getElementById("myCanvas");
+        ctx = canvas.getContext("2d");
+
+        canvas.onmousedown = function (e) {
+            onPress(e.clientX, e.clientY);
+        };
+
+        canvas.onmouseup = function (e) {
+            stopMovement();
+        };
+
+        canvas.ontouchdown = function (e) {
+            onPress(e.clientX, e.clientY);
+        };
+
+        canvas.ontouchup = function (e) {
+            stopMovement();
+        };
+
+
+    }
+
+    function onPress(x, y) {
+        if (x >= 120 && x <= 220 && y >= 100 && y < 200) {
+            sendMove('up');
+        }
+
+        if (x >= 120 && x <= 220 && y >= 300 && y < 400) {
+            sendMove('down');
+        }
+
+        if (x >= 20 && x <= 120 && y >= 200 && y < 300) {
+            sendMove('left');
+        }
+
+        if (x >= 220 && x <= 320 && y >= 200 && y < 300) {
+            sendMove('right');
+        }
+        console.log("Press: " + x + " : " + y);
+    }
+
+    function stopMovement() {
+        sendMove('stop');
+    }
+
+    function displayCanvas() {
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+
+        ctx.fillStyle = "gray";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "lime";
+
+        ctx.fillRect(120, 100, 100, 100);
+        ctx.fillRect(20, 200, 100, 100);
+        ctx.fillRect(220, 200, 100, 100);
+        ctx.fillRect(120, 300, 100, 100);
+
     }
 </script>
-<body style="background-color:#a39161">
-    <h1>
-        Gato Exploso!
-    </h1>
-    <button onclick="sendMove('up')">Up</button>
-    <br />
-    <button onclick="sendMove('left')">Left</button>
-    <button onclick="sendMove('down')">Down</button>
-    <button onclick="sendMove('right')">Right</button>
-    <button onclick="sendMove('stop')">Stop</button>
+<body style="background-color:#a39161" ">
+
+    <canvas id="myCanvas">
+    </canvas>
+
+
+    <div id="registration">
+        <div style="margin-left:50px;background-color:red;width:100px;height:100px" ontouchstart="sendMove('up');" ontouchend="sendMove('stop');" onmousedown="sendMove('up');" onmouseup="sendMove('stop');">
+
+        </div>
+        <div>
+            <span style="display:inline-block;background-color:lawngreen; width: 100px; height: 100px" ontouchstart="sendMove('left');" ontouchend="sendMove('stop');" onmousedown="sendMove('left');" onmouseup="sendMove('stop');">
+
+            </span>
+            <span style="display:inline-block;background-color:aquamarine; width: 100px; height: 100px" ontouchstart="sendMove('right');" ontouchend="sendMove('stop');" onmousedown="sendMove('right');" onmouseup="sendMove('stop');">
+
+            </span>
+        </div>
+        <div style="margin-left: 50px; background-color: mediumpurple; width: 100px; height: 100px" ontouchstart="sendMove('down');" ontouchend="sendMove('stop');" onmousedown="sendMove('down');" onmouseup="sendMove('stop');">
+
+        </div>
+        <button onclick="sendMove('up')">Up</button>
+        <br />
+        <button onclick="sendMove('left')">Left</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button onclick="sendMove('down')">Down</button>
+        <button onclick="sendMove('right')">Right</button>
+        <button onclick="sendMove('stop')" style="margin-left: 70px;">Stop</button>
+        <br />
+
+
+        <input id="playerName" />
+        <button onclick="registerPlayer()">Join!!!!!!!!!</button>
+    </div>
 </body>
 
 

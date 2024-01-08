@@ -8,7 +8,7 @@ using System.Net.Mime;
 
 namespace Gato_Exploso
 {
-    internal class Player : Entity
+    public abstract class Player : Entity
     {
         public int x = 300;
         public int y = 300;
@@ -16,17 +16,16 @@ namespace Gato_Exploso
         public int height = 64;
         public int speed = 3;
         public MoveDirection facing = new MoveDirection();
-        private ContentManager Content;
-        Texture2D PTextureUp;
-        Texture2D PTextureRight;
+        protected ContentManager Content;
+        protected Texture2D PTextureUp;
+        protected Texture2D PTextureRight;
+        public bool moving = false;
         public Player(ContentManager context)
         {
             Content = context;
         }
 
-        public Player()
-        {
-        }
+
         // loads player texture
         public void Load()
         {
@@ -44,23 +43,23 @@ namespace Gato_Exploso
         {
             y = locY;
         }
-        // draws the player in the middle of the screen, no matter where they are in the world
-        public void Draw(SpriteBatch spriteBatch)
+        public void FacePlayer(MoveDirection face)
         {
-            Texture2D curTexture;
-            if (facing.Up || facing.Down) { curTexture = PTextureUp; }
-            else if (facing.Right || facing.Left) { curTexture = PTextureRight; }
-            else
-            {
-                curTexture = PTextureUp;
-            }
-            if(facing.Left || facing.Down)
-            {
-                
-            }
-            Vector2 playerLocation = new Vector2((GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/2), (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
-            spriteBatch.Draw(curTexture,playerLocation,Color.White);
+            facing = face;
         }
+        public void StartMoving()
+        {
+            moving = true;
+        }
+        public void StopMoving()
+        {
+            moving = false;
+        }
+        // draws the player in the middle of the screen, no matter where they are in the world
+        public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
+
+
+
 
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Gato_Exploso
 {
@@ -9,7 +10,9 @@ namespace Gato_Exploso
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Player gato;
+        // private Player gato;
+        private Dictionary<string, Player> _players = new Dictionary<string, Player>();
+        private string mainPlayerName = "gato";
         public static ContentManager GameContent;
 
         // Move position for collision detection
@@ -30,8 +33,13 @@ namespace Gato_Exploso
             _graphics.ApplyChanges();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            gato = new Player(Content);
             GameContent = Content;
+            _players.Add(mainPlayerName, new MainPlayer(Content));
+        }
+
+        protected Player GetMainPlayer()
+        {
+            return _players[mainPlayerName];
         }
 
         protected override void Initialize()
@@ -41,25 +49,57 @@ namespace Gato_Exploso
             level1.InitTiles();
             server.Start();
             server.PlayerAction += Server_PlayerAction;
+            server.PlayerRegister += Server_PlayerRegister;
+        }
+
+        private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
+        {
+            string playerName = args.Name;
+            if (_players.ContainsKey(playerName))
+            {
+                return;
+            }
+            Ostrich ost = new Ostrich(Content);
+            ost.Load();
+            _players.Add(playerName, ost);
+
         }
 
         private void Server_PlayerAction(object sender, PlayerActionArgs args)
         {
-            MovePlayer(args.direction);
-            lastNetDirection = args.direction;
+            if (_players.ContainsKey(args.name))
+            {
+                Player pl = _players[args.name];
+                if(args.direction.IsDirectionSet())
+                {
+                    pl.StartMoving();
+                    pl.FacePlayer(args.direction);
+                }
+                else
+                {
+                    pl.StopMoving();
+                }
+                MovePlayer(pl);
+            }
         }
+
 
         // loads images for different classes
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            gato.Load();
+            GetMainPlayer().Load();
         }
         // checks if the new location collides with an object and decides whether or not to move the player
-        public void MovePlayer(MoveDirection dir)
+        public void MovePlayer(Player gato)
         {
+            if(!gato.moving)
+            {
+                return;
+            }
             targetX = gato.x;
             targetY = gato.y;
+            MoveDirection dir = gato.facing;
             if (dir.Up)
             {
                 targetY -= gato.speed;
@@ -107,7 +147,10 @@ namespace Gato_Exploso
                 gato.facing = dir;
             }
             // updates the offset between screen and world coordinates
-            level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+            if (gato is MainPlayer)
+            {
+                level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+            }
 
 
         }
@@ -127,7 +170,13 @@ namespace Gato_Exploso
         // converts a point on the screen to a location in the world
         public Vector2 ScreenToWorldPoint(Vector2 oldPoint)
         {
-            return new Vector2(oldPoint.X + gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+            Player p = GetMainPlayer();
+            return new Vector2(oldPoint.X + p.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + p.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+        }
+        public Vector2 WorldToScreenPoint(Vector2 oldPoint)
+        {
+            Player p = GetMainPlayer();
+            return new Vector2(oldPoint.X + p.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + p.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
         }
 
         // main update function, gets called about every 30 milliseconds
@@ -139,6 +188,7 @@ namespace Gato_Exploso
             MoveDirection direction = new MoveDirection();
             cursor = Mouse.GetState();
             PlayerActionArgs actionArgs = new PlayerActionArgs();
+            Player player = GetMainPlayer();
 
             if (state.IsKeyDown(Keys.W)) { direction.Up = true; }
             if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
@@ -152,8 +202,19 @@ namespace Gato_Exploso
             {
                 level1.PlaceRock();
             }
-            MovePlayer(direction);
-            MovePlayer(lastNetDirection);
+            if (direction.IsDirectionSet())
+            {
+                player.FacePlayer(direction);
+                player.StartMoving();
+            }
+            else
+            {
+                player.StopMoving();
+            }
+            foreach(Player p in _players.Values)
+            {
+                MovePlayer(p);
+            }
             ExexutePlayerAction(actionArgs);
 
 
@@ -171,14 +232,25 @@ namespace Gato_Exploso
         // tells each class to draw themselves
         protected override void Draw(GameTime gameTime)
         {
+            Player p = GetMainPlayer();
             // finding top-left pixel of the screen
-            var topLeftPixel = new Vector2(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+            var topLeftPixel = new Vector2(p.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), p.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
             _spriteBatch.Begin();
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-            level1.Draw(_spriteBatch, topLeftPixel, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, gato.x, gato.y);
-            gato.Draw(_spriteBatch);
-            // TODO: Add your drawing code here
+            level1.Draw(_spriteBatch, topLeftPixel, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, p.x, p.y);
+
+            foreach (Player play in _players.Values)
+            {
+                if(play is Ostrich)
+                {
+                    play.Draw(_spriteBatch, play.x - (int)topLeftPixel.X, play.y - (int)topLeftPixel.Y);
+                }
+                else
+                {
+                    play.Draw(_spriteBatch, play.x, play.y);
+                }
+            }
 
             base.Draw(gameTime);
 
