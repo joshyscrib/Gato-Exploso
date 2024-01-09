@@ -124,3 +124,4 @@ namespace Gato_Exploso
         }
     }
 }
+// kool kid koment kfor kgithub
