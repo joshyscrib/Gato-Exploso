@@ -11,6 +11,7 @@ namespace Gato_Exploso
 {
     internal class Ostrich : Player
     {
+        public int speed = 1;
         public Ostrich(ContentManager context) : base(context)
         {
 
@@ -29,7 +30,7 @@ namespace Gato_Exploso
 
             }
             Vector2 playerLocation = new Vector2(x, y);
-            spriteBatch.Draw(curTexture, playerLocation, Color.White);
+            spriteBatch.Draw(curTexture, playerLocation, Color.Red);
         }
     }
     }

@@ -74,6 +74,11 @@ namespace Gato_Exploso
 
                 Console.WriteLine("data received.");
                 string html = "ok";
+
+                if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
+                {
+                    html = File.ReadAllText("Content/Joy.js");
+                }
                 if (request.Url.PathAndQuery.Contains("home"))
                 {
                     html = File.ReadAllText("Content/GatoControl.html");
