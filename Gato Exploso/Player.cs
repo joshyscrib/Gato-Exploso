@@ -10,8 +10,8 @@ namespace Gato_Exploso
 {
     public abstract class Player : Entity
     {
-        public int x = 300;
-        public int y = 300;
+        public int x = 2000;
+        public int y = 2000;
         public int width = 32;
         public int height = 64;
         public int speed = 3;

@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace Gato_Exploso
 {
@@ -83,6 +84,9 @@ namespace Gato_Exploso
                 {
                     html = File.ReadAllText("Content/GatoControl.html");
                 }
+                if (request.Url.PathAndQuery.Contains("playerinfo")){
+                    html = HandleGetPlayers();
+                }
                 if (request.Url.PathAndQuery.Contains("action"))
                 {
                     string command = request.QueryString["command"];
@@ -116,6 +120,12 @@ namespace Gato_Exploso
                 ReceiveData();
             }
 
+        }
+        public string HandleGetPlayers()
+        {
+            var players = Game1.Instance.GetPlayerInfos();
+            string json = JsonSerializer.Serialize(players);
+            return json;
         }
             private void ReportPlayerMoved(MoveDirection direction, string name)
         {

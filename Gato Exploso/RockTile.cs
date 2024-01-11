@@ -12,7 +12,7 @@ namespace Gato_Exploso
     {
         // variables
         public bool solid = true;
-        
+        public int tileID = 2;
         // methods 
         public override void Load()
         {

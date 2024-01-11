@@ -18,6 +18,9 @@ namespace Gato_Exploso
         public int width = tileSide;
         public int height = tileSide;
         public bool solid;
+        public bool bombExploded = false;
+        // Id for each different tile type(e.g. grass=1,forest=1, etc)
+        public int tileID;
         public List<TileObject> objects = new List<TileObject>();
         
         protected Texture2D tileTexture;
@@ -25,7 +28,10 @@ namespace Gato_Exploso
         // methods
         public abstract void Load();
         public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
-
+        public void BombExplode()
+        {
+            bombExploded = true;
+        }
         public void DrawTileObjects(SpriteBatch spriteBatch, int x, int y)
         {
             // draw each object
@@ -48,7 +54,7 @@ namespace Gato_Exploso
             }
             foreach (Bomb bmb in bombsToDelete)
             {
-            
+                BombExplode();
                 objects.Remove(bmb);
             }
         }

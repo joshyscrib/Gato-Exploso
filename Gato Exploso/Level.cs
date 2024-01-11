@@ -29,14 +29,14 @@ namespace Gato_Exploso
         // offset for screen to world coordinates
         int offsetX = 0;
         int offsetY = 0;
- 
+
         // variable for total time that has passed
         double gameTime = 0;
-        
+
         // constructor
         public Level()
         {
-            
+
         }
         // methods
 
@@ -51,11 +51,26 @@ namespace Gato_Exploso
         public void UpdateTime(double time)
         {
             gameTime = time;
-            for(int i = 0; i < xTiles; i++)
+            for (int i = 0; i < xTiles; i++)
             {
-                for(int j = 0; j < yTiles; j++)
+                for (int j = 0; j < yTiles; j++)
                 {
-                    if (IsTileOnScreen(i,j,GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height,offsetX,offsetY))
+                    if (tiles[i, j].bombExploded)
+                    {
+                        tiles[i - 1, j - 1] = new GrassTile();
+                        tiles[i, j - 1] = new GrassTile();
+                        tiles[i + 1, j - 1] = new GrassTile();
+
+                        tiles[i - 1, j] = new GrassTile();
+                        tiles[i, j] = new GrassTile();
+                        tiles[i + 1, j] = new GrassTile();
+
+                        tiles[i - 1, j + 1] = new GrassTile();
+                        tiles[i, j + 1] = new GrassTile();
+                        tiles[i + 1, j + 1] = new GrassTile();
+                        tiles[i, j].bombExploded = false;
+                    }
+                    if (IsTileOnScreen(i, j, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, offsetX, offsetY))
                     {
                         tiles[i, j].UpdateGameTime(time);
                     }
@@ -70,7 +85,7 @@ namespace Gato_Exploso
         // Assigns each tile a type
         public void InitTiles()
         {
-            
+
             for (int i = 0; i < xTiles; i++)
             {
                 for (int j = 0; j < yTiles; j++)
@@ -114,11 +129,11 @@ namespace Gato_Exploso
                     {
                         int drawX = (i * tileSide) + tileXOffset;
                         int drawY = (j * tileSide) + tileYOffset;
-                        tiles[i, j].Draw           (spritebatch, drawX, drawY);
+                        tiles[i, j].Draw(spritebatch, drawX, drawY);
                         tiles[i, j].DrawTileObjects(spritebatch, drawX, drawY);
                     }
-                    
-                    
+
+
                 }
             }
         }
@@ -134,14 +149,14 @@ namespace Gato_Exploso
         }
 
         // Places a bomb where the mouse is at when space is pressed
-        public void PlaceBomb()
+        public void PlaceBomb(int x, int y)
         {
-            Vector2 vec = GetTileUnderMouse();
-            if(vec.X < 0 || vec.Y < 0) { return; }
+            Vector2 vec = GetTilePosition(x + 48, y + 48);
+            if (vec.X < 0 || vec.Y < 0) { return; }
             Bomb b = new Bomb(gameTime);
             Tile curTile = tiles[(int)vec.X, (int)vec.Y];
             curTile.objects.Add(b);
-            
+
         }
 
         // finds what tile the mouse is on
@@ -151,11 +166,11 @@ namespace Gato_Exploso
             cursor = Mouse.GetState();
             int tileX = (cursor.X + offsetX) / tileSide;
             int tileY = (cursor.Y + offsetY) / tileSide;
-            if ( tileX < 0 || tileX >= tiles.Length || tileY < 0 || tileY >= tiles.Length)
+            if (tileX < 0 || tileX >= tiles.Length || tileY < 0 || tileY >= tiles.Length)
             {
-                return new Vector2( -1, -1 );
+                return new Vector2(-1, -1);
             }
-            return new Vector2( tileX, tileY );
+            return new Vector2(tileX, tileY);
 
         }
         // two overloads to find which tile the pixel is in

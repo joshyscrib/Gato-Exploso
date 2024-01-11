@@ -40,7 +40,11 @@
     function sendJoin(name) {
 
     }
+    var canvas;
+    var ctx;
     function init() {
+        canvas = $("#myCanvas");
+        ctx = canvas.getContext("2d");
         $("#gamePanel").hide();
         joystick = new JoyStick("joystick", {
             height: 200,
@@ -76,8 +80,7 @@
         
         
     }
-    var canvas;
-    var ctx;
+    
 
   
 

@@ -14,6 +14,7 @@ namespace Gato_Exploso
         private Dictionary<string, Player> _players = new Dictionary<string, Player>();
         private string mainPlayerName = "gato";
         public static ContentManager GameContent;
+        public static Game1 Instance;
 
         // Move position for collision detection
         int targetX = 300;
@@ -22,11 +23,13 @@ namespace Gato_Exploso
         Level level1 = new Level();
         int tickCount = 0;
         MoveDirection lastNetDirection = new MoveDirection();
-
+        // Makes a Heads-Up Display
+        Hud hud = new Hud();
         // makes a new webserver
         WebServer server = new WebServer();
         public Game1()
         {
+            Instance = this;
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
@@ -35,6 +38,21 @@ namespace Gato_Exploso
             IsMouseVisible = true;
             GameContent = Content;
             _players.Add(mainPlayerName, new MainPlayer(Content));
+        }
+        public List<PlayerInfo> GetPlayerInfos()
+        {
+            var list = new List<PlayerInfo>();
+            foreach(var name in _players.Keys)
+            {
+                var player = _players[name];
+                var curPlayer = new PlayerInfo();
+                curPlayer.Name = name;
+                curPlayer.X = player.x;
+                curPlayer.Y = player.y;
+                list.Add (curPlayer);
+
+            }
+            return list;
         }
 
         protected Player GetMainPlayer()
@@ -89,6 +107,7 @@ namespace Gato_Exploso
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             GetMainPlayer().Load();
+            hud.Load(_graphics);
         }
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(Player gato)
@@ -225,7 +244,24 @@ namespace Gato_Exploso
             // places bomb when space is pressed
             if (act.placeBomb)
             {
-                level1.PlaceBomb();
+                if (_players[mainPlayerName].facing.Up)
+                {
+                    level1.PlaceBomb(_players[mainPlayerName].x, _players[mainPlayerName].y - 32);
+                }
+                if (_players[mainPlayerName].facing.Left)
+                {
+                    level1.PlaceBomb(_players[mainPlayerName].x - 32, _players[mainPlayerName].y);
+
+                }
+                if (_players[mainPlayerName].facing.Down)
+                {
+                    level1.PlaceBomb(_players[mainPlayerName].x - 24, _players[mainPlayerName].y + 32);
+                }
+                if (_players[mainPlayerName].facing.Right)
+                {
+                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y);
+                }
+                
             }
         }
 
@@ -251,7 +287,7 @@ namespace Gato_Exploso
                     play.Draw(_spriteBatch, play.x, play.y);
                 }
             }
-
+            hud.Draw(_spriteBatch);
             base.Draw(gameTime);
 
             _spriteBatch.End();
