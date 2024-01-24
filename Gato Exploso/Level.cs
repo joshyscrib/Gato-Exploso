@@ -27,8 +27,8 @@ namespace Gato_Exploso
         public Tile[,] tiles = new Tile[xTiles, yTiles];
 
         // offset for screen to world coordinates
-        int offsetX = 0;
-        int offsetY = 0;
+        public int offsetX = 0;
+        public int offsetY = 0;
 
         // variable for total time that has passed
         double gameTime = 0;
@@ -76,7 +76,7 @@ namespace Gato_Exploso
                     }
                     else
                     {
-                        int pop = 9;
+
                     }
                 }
             }
@@ -85,6 +85,7 @@ namespace Gato_Exploso
         // Assigns each tile a type
         public void InitTiles()
         {
+            Random random = new Random(100);
 
             for (int i = 0; i < xTiles; i++)
             {
@@ -92,7 +93,16 @@ namespace Gato_Exploso
                 {
                     GrassTile tile = new GrassTile();
                     tiles[i, j] = tile;
+                    
                 }
+            }
+            for (int r = 0; r < 50; r++)
+            {
+                
+                int rockTileX = random.Next(0, 100);
+                int rockTileY = random.Next(0, 100);
+                tiles[rockTileX, rockTileY] = new RockTile();
+
             }
         }
 
@@ -132,7 +142,7 @@ namespace Gato_Exploso
                         tiles[i, j].Draw(spritebatch, drawX, drawY);
                         tiles[i, j].DrawTileObjects(spritebatch, drawX, drawY);
                     }
-
+                    
 
                 }
             }
@@ -151,7 +161,7 @@ namespace Gato_Exploso
         // Places a bomb where the mouse is at when space is pressed
         public void PlaceBomb(int x, int y)
         {
-            Vector2 vec = GetTilePosition(x + 48, y + 48);
+            Vector2 vec = GetTilePosition(x, y);
             if (vec.X < 0 || vec.Y < 0) { return; }
             Bomb b = new Bomb(gameTime);
             Tile curTile = tiles[(int)vec.X, (int)vec.Y];
@@ -174,7 +184,7 @@ namespace Gato_Exploso
 
         }
         // two overloads to find which tile the pixel is in
-        Vector2 GetTilePosition(int x, int y)
+        public Vector2 GetTilePosition(int x, int y)
         {
             return new Vector2(x / tileSide, y / tileSide);
         }

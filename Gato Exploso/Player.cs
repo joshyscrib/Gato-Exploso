@@ -20,6 +20,7 @@ namespace Gato_Exploso
         protected Texture2D PTextureUp;
         protected Texture2D PTextureRight;
         public bool moving = false;
+        public int hp = 83;
         public Player(ContentManager context)
         {
             Content = context;

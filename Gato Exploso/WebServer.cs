@@ -58,7 +58,7 @@ namespace Gato_Exploso
         }
         public void HandleJoin(string name)
         {
-            if(PlayerRegister != null)
+            if (PlayerRegister != null)
             {
                 RegisterPlayerArgs registerPlayerArgs = new RegisterPlayerArgs();
                 registerPlayerArgs.Name = name;
@@ -78,14 +78,19 @@ namespace Gato_Exploso
 
                 if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
                 {
-                    html = File.ReadAllText("Content/Joy.js");
+                    html = File.ReadAllText("../../../Content/Joy.js");
                 }
                 if (request.Url.PathAndQuery.Contains("home"))
                 {
-                    html = File.ReadAllText("Content/GatoControl.html");
+                    html = File.ReadAllText("../../../Content/GatoControl.html");
                 }
-                if (request.Url.PathAndQuery.Contains("playerinfo")){
+                if (request.Url.PathAndQuery.Contains("playerinfo"))
+                {
                     html = HandleGetPlayers();
+                }
+                if (request.Url.PathAndQuery.Contains("gameworld"))
+                {
+                    html = Game1.Instance.GetGameWorld();
                 }
                 if (request.Url.PathAndQuery.Contains("action"))
                 {
@@ -98,20 +103,20 @@ namespace Gato_Exploso
                             case "move":
                                 HandleMove(request.QueryString["direction"], request.QueryString["name"]);
                                 break;
-                            case"join":
+                            case "join":
                                 HandleJoin(name);
                                 break;
 
                         }
                     }
                 }
-                
-                
-                
-                
+
+
+
+
                 String direct = request.QueryString["action"];
 
-               
+
 
                 String url = request.Url.PathAndQuery;
                 byte[] bytes = Encoding.ASCII.GetBytes(html);
@@ -121,15 +126,16 @@ namespace Gato_Exploso
             }
 
         }
+
         public string HandleGetPlayers()
         {
             var players = Game1.Instance.GetPlayerInfos();
             string json = JsonSerializer.Serialize(players);
             return json;
         }
-            private void ReportPlayerMoved(MoveDirection direction, string name)
+        private void ReportPlayerMoved(MoveDirection direction, string name)
         {
-            if(PlayerAction != null)
+            if (PlayerAction != null)
             {
                 PlayerActionArgs actionArgs = new PlayerActionArgs();
                 actionArgs.name = name;
@@ -139,4 +145,3 @@ namespace Gato_Exploso
         }
     }
 }
-// kool kid koment kfor kgithub

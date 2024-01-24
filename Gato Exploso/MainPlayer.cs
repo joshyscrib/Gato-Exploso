@@ -11,6 +11,7 @@ namespace Gato_Exploso
 {
     internal class MainPlayer : Player
     {
+        public int hp = 83;
         public MainPlayer(ContentManager context) : base(context)
         {
         }

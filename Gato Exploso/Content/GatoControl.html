@@ -1,6 +1,6 @@
 <html>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="joy.js"></script>
 <style type="text/css">
     body {
@@ -8,6 +8,7 @@
         overflow: hidden;
         user-select: none;
     }
+
     canvas {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
@@ -17,13 +18,31 @@
         user-select: none;
         outline: none;
         -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
-    
 </style>
 <script>
+    class Tile {
+        tileID;
+    };
+    class PlayerInfo {
+        Name;
+        Type;
+        X;
+        Y;
+        Health;
+    };
     var joystick;
     var playerName = "";
+    var tiles = new Array();
+    var tileRows = 100;
+    var tileData = "";
+    // this player's location
+    var mainPlayerX = 0;
+    var mainPlayerY = 0;
+    // Map of all players
+    const playerMap = new Map();
+    // size of tiles to draw on browser
+    var browserTileSize = 32;
     function sendMove(dir) {
-        console.log("Move : " + dir);
         // this is how you call a url
         $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
     }
@@ -33,29 +52,68 @@
         var name = $("#playerName").val();
         playerName = encodeURIComponent(name);
         $.get("/action?command=join&name=" + playerName);
-
-    //    $("#registration").hide();
-      //  displayCanvas();
+        $.get("/gameworld", function (data) {
+            for (var i = 0; i < data.length; i++) {
+                var c = data.charAt(i);
+                var rowNum = Math.floor(i / 100);
+                var colNum = i % 100;
+                tileData = data;
+                tiles[rowNum][colNum].tileID = c;
+            }
+        }
+        );
+        setInterval(checkJoystick, 30);
+        setInterval(getPlayerLocations, 30);
     }
+    function getPlayerLocations()
+    {
+        $.get("/playerinfo", parsePlayers);
+        
+    }
+
+    function parsePlayers(data) {
+      //  console.log(data);
+        var playerList = JSON.parse(data);
+        for (var i = 0; i < playerList.length; i++) {
+            var player = playerList[i];
+            if (player.Name == playerName) {
+                mainPlayerX = player.X;
+                mainPlayerY = player.Y;
+            }
+        
+            playerMap.set(player.Name, player);
+            
+        }
+    }
+    
     function sendJoin(name) {
 
     }
     var canvas;
     var ctx;
     function init() {
-        canvas = $("#myCanvas");
+        canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext("2d");
         $("#gamePanel").hide();
         joystick = new JoyStick("joystick", {
-            height: 200,
-            width: 200
+            height: 600,
+            width: 600
         });
-        setInterval(checkJoystick,30);
 
-        
+        for (var i = 0; i < tileRows; i++) {
+            var rowArray = new Array();
+            tiles.push(rowArray);
+            for (var j = 0; j < tileRows; j++) {
+                var tile = new Tile();
+                tile.tileID = 0;
+                rowArray.push(tile);
+            }
+        }
+
     }
     function checkJoystick() {
-        console.log(joystick.GetX());
+        drawWorld();
+        //  console.log(joystick.GetX());
         if (joystick.GetX() == 0) {
             sendMove("stop");
         }
@@ -77,12 +135,43 @@
                 }
             }
         }
-        
-        
-    }
-    
 
-  
+
+    }
+
+    function drawWorld() {
+        // Offset Function: 0 - (int)TLPixel.X
+        var offsetX = 0 - (mainPlayerX - 216) + 12;
+        var offsetY = 0 - (mainPlayerY - 216) - 1;
+        for (var i = 0; i < 100; i++) {
+            for (var j = 0; j < 100; j++) {
+
+                if (tiles[i][j].tileID == '1') {
+                    ctx.fillStyle = 'lime';
+                }
+                else {
+                    ctx.fillStyle = 'gray';
+                }
+
+                ctx.fillRect((100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
+              
+            }
+        }
+        
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(330,315,32,64);
+        ctx.fillStyle = 'red';
+
+        for (var [curPlayerName, curPlayer] of playerMap) {
+            if (curPlayer.Name != playerName) {
+                var playerOffsetX = 0 - (curPlayer.X - 216) + 12;
+                var playerOffsetY = 0 - (curPlayer.Y - 216) - 1;
+                ctx.fillRect(100 + playerOffsetX, playerOffsetY, 32, 64);
+            }
+            
+        }
+    }
+
 
     function stopMovement() {
         sendMove('stop');
@@ -93,29 +182,16 @@
 <body style="background-color:#a39161" " onload="init()">
 
     <div id="gamePanel">
-        <table width="100%">
-            <tr>
-                <td>
-                    <div id="joystick">
 
-                    </div>
-                </td>
-                <td>
-                    <canvas id="myCanvas">
+        <canvas id="myCanvas" height="900" width="900">
+        </canvas>
+        <div style="margin-left: 225px;margin-top: 100px;" id="joystick" ></div>
 
-                    </canvas>
-                </td>
-                <td>
-                    ATTACK!!!!!
-                </td>
-            </tr>
-        </table>
-        
     </div>
 
 
     <div id="registration">
-        
+
         <br />
         <input id="playerName" />
 

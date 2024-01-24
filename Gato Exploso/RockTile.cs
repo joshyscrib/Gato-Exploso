@@ -12,7 +12,7 @@ namespace Gato_Exploso
     {
         // variables
         public bool solid = true;
-        public int tileID = 2;
+        
         // methods 
         public override void Load()
         {
@@ -22,7 +22,7 @@ namespace Gato_Exploso
         public RockTile()
         {
             Load();
-
+            tileID = 2;
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {

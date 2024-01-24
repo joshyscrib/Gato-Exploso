@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Gato_Exploso
 {
@@ -19,6 +20,8 @@ namespace Gato_Exploso
         // Move position for collision detection
         int targetX = 300;
         int targetY = 300;
+        // Number for how many rows of tiles there are
+        const int tileRows = 100;
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
@@ -42,14 +45,14 @@ namespace Gato_Exploso
         public List<PlayerInfo> GetPlayerInfos()
         {
             var list = new List<PlayerInfo>();
-            foreach(var name in _players.Keys)
+            foreach (var name in _players.Keys)
             {
                 var player = _players[name];
                 var curPlayer = new PlayerInfo();
                 curPlayer.Name = name;
                 curPlayer.X = player.x;
                 curPlayer.Y = player.y;
-                list.Add (curPlayer);
+                list.Add(curPlayer);
 
             }
             return list;
@@ -88,7 +91,7 @@ namespace Gato_Exploso
             if (_players.ContainsKey(args.name))
             {
                 Player pl = _players[args.name];
-                if(args.direction.IsDirectionSet())
+                if (args.direction.IsDirectionSet())
                 {
                     pl.StartMoving();
                     pl.FacePlayer(args.direction);
@@ -112,7 +115,7 @@ namespace Gato_Exploso
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(Player gato)
         {
-            if(!gato.moving)
+            if (!gato.moving)
             {
                 return;
             }
@@ -178,7 +181,7 @@ namespace Gato_Exploso
         {
             int tileX = x / 32;
             int tileY = y / 32;
-            if (tileX >= 0 && tileY >= 0 && tileX < 1000 && tileY < 1000)
+            if (tileX >= 0 && tileY >= 0 && tileX < tileRows && tileY < tileRows)
             {
                 return level1.tiles[tileX, tileY];
             }
@@ -230,7 +233,7 @@ namespace Gato_Exploso
             {
                 player.StopMoving();
             }
-            foreach(Player p in _players.Values)
+            foreach (Player p in _players.Values)
             {
                 MovePlayer(p);
             }
@@ -246,23 +249,37 @@ namespace Gato_Exploso
             {
                 if (_players[mainPlayerName].facing.Up)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x, _players[mainPlayerName].y - 32);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 16);
                 }
                 if (_players[mainPlayerName].facing.Left)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x - 32, _players[mainPlayerName].y);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 48);
 
                 }
                 if (_players[mainPlayerName].facing.Down)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x - 24, _players[mainPlayerName].y + 32);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 24, _players[mainPlayerName].y + 80);
                 }
                 if (_players[mainPlayerName].facing.Right)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 64, _players[mainPlayerName].y + 48);
                 }
-                
+
             }
+        }
+        public string GetGameWorld()
+        {
+            StringBuilder world = new StringBuilder();
+
+            for (int i = 0; i < Level.xTiles; i++)
+            {
+                for (int j = 0; j < Level.xTiles; j++)
+                {
+                    world.Append(level1.tiles[i, j].tileID.ToString());
+                }
+            }
+            return world.ToString();
+
         }
 
         // tells each class to draw themselves
@@ -278,7 +295,7 @@ namespace Gato_Exploso
 
             foreach (Player play in _players.Values)
             {
-                if(play is Ostrich)
+                if (play is Ostrich)
                 {
                     play.Draw(_spriteBatch, play.x - (int)topLeftPixel.X, play.y - (int)topLeftPixel.Y);
                 }
@@ -287,9 +304,38 @@ namespace Gato_Exploso
                     play.Draw(_spriteBatch, play.x, play.y);
                 }
             }
-            hud.Draw(_spriteBatch);
-            base.Draw(gameTime);
 
+
+            base.Draw(gameTime);
+            int placeBombX = 0;
+            int placeBombY = 0;
+            Vector2 placeBombVec = new Vector2();
+            if (_players[mainPlayerName].facing.Up)
+            {
+                placeBombX = _players[mainPlayerName].x + 48;
+                placeBombY = _players[mainPlayerName].y + 16;
+
+
+            }
+            if (_players[mainPlayerName].facing.Left)
+            {
+                placeBombX = _players[mainPlayerName].x + 16;
+                placeBombY = _players[mainPlayerName].y + 48;
+
+            }
+            if (_players[mainPlayerName].facing.Down)
+            {
+                placeBombX = _players[mainPlayerName].x + 24;
+                placeBombY = _players[mainPlayerName].y + 80;
+            }
+            if (_players[mainPlayerName].facing.Right)
+            {
+                placeBombX = _players[mainPlayerName].x + 64;
+                placeBombY = _players[mainPlayerName].y + 48;
+            }
+            // draws HUD
+            placeBombVec = level1.GetTilePosition(placeBombX, placeBombY);
+            hud.Draw(_spriteBatch, _players[mainPlayerName].hp, placeBombX + level1.offsetX, placeBombY + level1.offsetY);
             _spriteBatch.End();
         }
 
