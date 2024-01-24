@@ -17,7 +17,7 @@ namespace Gato_Exploso
     internal class Level
     {
         // variables
-
+        public bool playerBombed = false;
         // amount of tiles per row/column
         public const int xTiles = 100;
         public const int yTiles = 100;
@@ -58,6 +58,7 @@ namespace Gato_Exploso
                     if (tiles[i, j].bombExploded)
                     {
                         tiles[i - 1, j - 1] = new GrassTile();
+                        
                         tiles[i, j - 1] = new GrassTile();
                         tiles[i + 1, j - 1] = new GrassTile();
 
