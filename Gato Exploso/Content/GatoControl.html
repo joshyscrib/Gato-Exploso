@@ -140,7 +140,8 @@
     }
 
     function drawWorld() {
-        // Offset Function: 0 - (int)TLPixel.X
+        // Offset to draw the tiles in the correct position
+        // Offset Function: 0 - TLPixel.X
         var offsetX = 0 - (mainPlayerX - 216) + 12;
         var offsetY = 0 - (mainPlayerY - 216) - 1;
         for (var i = 0; i < 100; i++) {
@@ -160,14 +161,21 @@
         
         ctx.fillStyle = 'blue';
         ctx.fillRect(330,315,32,64);
-        ctx.fillStyle = 'red';
+        
 
+        ctx.font = "30px serif";
         for (var [curPlayerName, curPlayer] of playerMap) {
             if (curPlayer.Name != playerName) {
-                var playerOffsetX = 0 - (curPlayer.X - 216) + 12;
-                var playerOffsetY = 0 - (curPlayer.Y - 216) - 1;
-                ctx.fillRect(100 + playerOffsetX, playerOffsetY, 32, 64);
+                if (curPlayer.Name == "gato") {
+                    ctx.fillStyle = 'red';
+                }
+                else {
+                    ctx.fillStyle = 'blue';
+                }
+                ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 32, 64);
+                
             }
+            ctx.fillText(curPlayer.Name, 100 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 90, 500);
             
         }
     }
