@@ -312,28 +312,29 @@ namespace Gato_Exploso
             Vector2 placeBombVec = new Vector2();
             if (_players[mainPlayerName].facing.Up)
             {
-                placeBombX = _players[mainPlayerName].x + 48;
-                placeBombY = _players[mainPlayerName].y + 16;
+                placeBombX = _players[mainPlayerName].x;
+                placeBombY = _players[mainPlayerName].y + 32;
 
 
             }
             if (_players[mainPlayerName].facing.Left)
             {
-                placeBombX = _players[mainPlayerName].x + 16;
-                placeBombY = _players[mainPlayerName].y + 48;
+                placeBombX = _players[mainPlayerName].x - 32;
+                placeBombY = _players[mainPlayerName].y + 32;
 
             }
             if (_players[mainPlayerName].facing.Down)
             {
-                placeBombX = _players[mainPlayerName].x + 24;
-                placeBombY = _players[mainPlayerName].y + 80;
+                placeBombX = _players[mainPlayerName].x;
+                placeBombY = _players[mainPlayerName].y + 64;
             }
             if (_players[mainPlayerName].facing.Right)
             {
-                placeBombX = _players[mainPlayerName].x + 64;
-                placeBombY = _players[mainPlayerName].y + 48;
+                placeBombX = _players[mainPlayerName].x + 32;
+                placeBombY = _players[mainPlayerName].y + 32;
             }
-            // draws HUD
+            
+            // draws HUDF
             placeBombVec = level1.GetTilePosition(placeBombX, placeBombY);
             hud.Draw(_spriteBatch, _players[mainPlayerName].hp, placeBombX + level1.offsetX, placeBombY + level1.offsetY);
             _spriteBatch.End();
