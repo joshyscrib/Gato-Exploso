@@ -19,7 +19,10 @@
         outline: none;
         -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
 </style>
+
 <script>
+    // put above script:
+    //      <meta name="viewport" content="width=500, initial-scale=1" />
     class Tile {
         tileID;
     };
@@ -42,6 +45,11 @@
     const playerMap = new Map();
     // size of tiles to draw on browser
     var browserTileSize = 32;
+    // Key down detector booleans
+    var wDown = false;
+    var aDown = false;
+    var sDown = false;
+    var dDown = false;
     function sendMove(dir) {
         // this is how you call a url
         $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
@@ -99,8 +107,9 @@
             height: 600,
             width: 600
         });
-
-        for (var i = 0; i < tileRows; i++) {
+        window.addEventListener("keydown", onKeyDown);
+        window.addEventListener("keyup", onKeyUp);
+        for (var i = 0; i < tileRows; i++) {;
             var rowArray = new Array();
             tiles.push(rowArray);
             for (var j = 0; j < tileRows; j++) {
@@ -111,13 +120,57 @@
         }
 
     }
+    function onKeyDown() {
+        switch (event.keyCode) {
+            case 87:
+                wDown = true;
+                break;
+            case 65:
+                aDown = true;
+                break;
+            case 83:
+                sDown = true;
+                break;
+            case 68:
+                dDown = true;
+                break;
+        }
+    }
+    function onKeyUp() {
+        switch (event.keyCode) {
+            case 87:
+                wDown = false;
+                break;
+            case 65:
+                aDown = false;
+                break;
+            case 83:
+                sDown = false;
+                break;
+            case 68:
+                dDown = false;
+                break;
+        }
+    }
     function checkJoystick() {
-        drawWorld();
+        
         //  console.log(joystick.GetX());
-        if (joystick.GetX() == 0) {
+        if (joystick.GetX() == 0 && !wDown && !aDown && !sDown && !dDown) {
             sendMove("stop");
         }
         else {
+            if (wDown) {
+                sendMove("up");
+            }
+            if (aDown) {
+                sendMove("left");
+            }
+            if (sDown) {
+                sendMove("down");
+            }
+            if (dDown) {
+                sendMove("right");
+            }
             if (Math.abs(joystick.GetX()) > Math.abs(joystick.GetY())) {
                 if (joystick.GetX() < 0) {
                     sendMove("left");
@@ -136,7 +189,7 @@
             }
         }
 
-
+        drawWorld();
     }
 
     function drawWorld() {

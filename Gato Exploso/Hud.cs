@@ -24,8 +24,8 @@ namespace Gato_Exploso
         }
         public void Draw(SpriteBatch spriteBatch, int health, int bombX, int bombY)
         {
-            spriteBatch.Draw(texture, new Rectangle(1110, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 350, 408, 128), Color.Gray);
-            spriteBatch.Draw(texture, new Rectangle(1114, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 346, health * 4, 120), Color.Lime);
+            spriteBatch.Draw(texture, new Rectangle(1100, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 290, 408, 100), Color.Gray);
+            spriteBatch.Draw(texture, new Rectangle(1104, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 286, health * 4, 92), Color.Lime);
             spriteBatch.Draw(texture, new Rectangle(bombX, bombY, 32, 32), Color.Red);
         }
     }

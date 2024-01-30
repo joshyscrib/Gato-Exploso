@@ -13,6 +13,7 @@ namespace Gato_Exploso.TileObjects
     
         public double createTime = 0;
         protected Texture2D bombTexture;
+        public int range = 2;
         public Bomb(double ticks)
         {
             Load();

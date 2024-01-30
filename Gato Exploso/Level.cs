@@ -67,7 +67,7 @@ namespace Gato_Exploso
                         tiles[i + 1, j] = new GrassTile();
 
                         tiles[i - 1, j + 1] = new GrassTile();
-                        tiles[i, j + 1] = new GrassTile();
+                        tiles[i, j + 1] = new GrassTile();     
                         tiles[i + 1, j + 1] = new GrassTile();
                         tiles[i, j].bombExploded = false;
                     }
@@ -97,7 +97,7 @@ namespace Gato_Exploso
                     
                 }
             }
-            for (int r = 0; r < 50; r++)
+            for (int r = 0; r < 75; r++)
             {
                 
                 int rockTileX = random.Next(0, 100);
@@ -150,7 +150,7 @@ namespace Gato_Exploso
         }
         // places a new rock tile
         public void PlaceRock()
-        {
+        { 
 
             Vector2 vec = GetTileUnderMouse();
             if (vec.X < 0 || vec.Y < 0) { return; }
