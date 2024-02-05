@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,7 +17,9 @@ namespace Gato_Exploso
         private string mainPlayerName = "gato";
         public static ContentManager GameContent;
         public static Game1 Instance;
-
+        // Location for the bomb placement indicator
+        public int bombIndX = 0;
+        public int bombIndY = 0;
         // Move position for collision detection
         int targetX = 300;
         int targetY = 300;
@@ -30,6 +33,7 @@ namespace Gato_Exploso
         Hud hud = new Hud();
         // makes a new webserver
         WebServer server = new WebServer();
+        
         public Game1()
         {
             Instance = this;
@@ -41,7 +45,14 @@ namespace Gato_Exploso
             IsMouseVisible = true;
             GameContent = Content;
             _players.Add(mainPlayerName, new MainPlayer(Content));
+            this.Exiting += Game1_Exiting;
         }
+
+        private void Game1_Exiting(object sender, EventArgs e)
+        {
+            server.Stop();
+        }
+
         public List<PlayerInfo> GetPlayerInfos()
         {
             var list = new List<PlayerInfo>();
@@ -127,7 +138,7 @@ namespace Gato_Exploso
                 targetY -= gato.speed;
                 Tile l = getTileAt(gato.x, targetY - 1);
                 Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
-                if (l is not RockTile && r is not RockTile)
+                if (l is not RockTile && r is not RockTile && gato.y > 0)
                 {
                     gato.MoveY(targetY);
                 }
@@ -139,7 +150,7 @@ namespace Gato_Exploso
                 Tile t = getTileAt(targetX, gato.y);
                 Tile b = getTileAt(targetX, gato.y + gato.height - 1);
                 Tile m = getTileAt(targetX, gato.y + 32);
-                if (t is not RockTile && b is not RockTile && m is not RockTile)
+                if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x > 0)
                 {
                     gato.MoveX(targetX);
                 }
@@ -150,7 +161,7 @@ namespace Gato_Exploso
                 targetY += gato.speed;
                 Tile l = getTileAt(gato.x, targetY + gato.height - 1);
                 Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
-                if (l is not RockTile && r is not RockTile)
+                if (l is not RockTile && r is not RockTile && gato.y < 3168)
                 {
                     gato.MoveY(targetY);
                 }
@@ -162,7 +173,7 @@ namespace Gato_Exploso
                 Tile t = getTileAt(targetX + gato.width - 1, gato.y);
                 Tile b = getTileAt(targetX + gato.width - 1, gato.y + gato.height - 1);
                 Tile m = getTileAt(targetX + gato.width - 1, gato.y + 32);
-                if (t is not RockTile && b is not RockTile && m is not RockTile)
+                if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x < 3168)
                 {
                     gato.MoveX(targetX);
                 }
@@ -172,6 +183,29 @@ namespace Gato_Exploso
             if (gato is MainPlayer)
             {
                 level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+                if (gato.facing.Up)
+                {
+                    bombIndX = (_players[mainPlayerName].x + 16) / 32;
+                    bombIndY = (_players[mainPlayerName].y - 16) / 32;
+
+
+                }
+                if (gato.facing.Left)
+                {
+                    bombIndX = (_players[mainPlayerName].x - 16) / 32;
+                    bombIndY = (_players[mainPlayerName].y + 48) / 32;
+
+                }
+                if (gato.facing.Down)
+                {
+                    bombIndX = (_players[mainPlayerName].x + 16) / 32;
+                    bombIndY = (_players[mainPlayerName].y + 80) / 32;
+                }
+                if (gato.facing.Right)
+                {
+                    bombIndX = (_players[mainPlayerName].x + 48) / 32;
+                    bombIndY = (_players[mainPlayerName].y + 48) / 32;
+                }
             }
 
 
@@ -238,9 +272,18 @@ namespace Gato_Exploso
                 MovePlayer(p);
             }
             ExexutePlayerAction(actionArgs);
-
+            HashSet<Vector2>tilesWBombs = level1.GetActiveTileCoords();
+            foreach(Vector2 coord in tilesWBombs)
+            {
+                Tile curTile = level1.tiles[(int)coord.X,(int)coord.Y];
+                if (curTile.bombExploded)
+                {
+                    Console.WriteLine("baboom");
+                }
+            }
 
             base.Update(gameTime);
+
         }
         public void ExexutePlayerAction(PlayerActionArgs act)
         {
@@ -249,20 +292,20 @@ namespace Gato_Exploso
             {
                 if (_players[mainPlayerName].facing.Up)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 16);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y - 16);
                 }
-                if (_players[mainPlayerName].facing.Left)
+                else if (_players[mainPlayerName].facing.Left)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 48);
+                    level1.PlaceBomb(_players[mainPlayerName].x - 16, _players[mainPlayerName].y + 48);
 
                 }
-                if (_players[mainPlayerName].facing.Down)
+                else if (_players[mainPlayerName].facing.Down)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 24, _players[mainPlayerName].y + 80);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 80);
                 }
-                if (_players[mainPlayerName].facing.Right)
+                else if (_players[mainPlayerName].facing.Right)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 64, _players[mainPlayerName].y + 48);
+                    level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48);
                 }
 
             }
@@ -307,36 +350,10 @@ namespace Gato_Exploso
 
 
             base.Draw(gameTime);
-            int placeBombX = 0;
-            int placeBombY = 0;
-            Vector2 placeBombVec = new Vector2();
-            if (_players[mainPlayerName].facing.Up)
-            {
-                placeBombX = _players[mainPlayerName].x;
-                placeBombY = _players[mainPlayerName].y + 32;
-
-
-            }
-            if (_players[mainPlayerName].facing.Left)
-            {
-                placeBombX = _players[mainPlayerName].x - 32;
-                placeBombY = _players[mainPlayerName].y + 32;
-
-            }
-            if (_players[mainPlayerName].facing.Down)
-            {
-                placeBombX = _players[mainPlayerName].x;
-                placeBombY = _players[mainPlayerName].y + 64;
-            }
-            if (_players[mainPlayerName].facing.Right)
-            {
-                placeBombX = _players[mainPlayerName].x + 32;
-                placeBombY = _players[mainPlayerName].y + 32;
-            }
             
-            // draws HUDF
-            placeBombVec = level1.GetTilePosition(placeBombX, placeBombY);
-            hud.Draw(_spriteBatch, _players[mainPlayerName].hp, placeBombX + level1.offsetX, placeBombY + level1.offsetY);
+
+            // draws HUD
+            hud.Draw(_spriteBatch, _players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX) , (bombIndY * 32) - (level1.offsetY) );
             _spriteBatch.End();
         }
 

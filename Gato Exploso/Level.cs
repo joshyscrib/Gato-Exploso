@@ -11,13 +11,16 @@ using Microsoft.Xna.Framework.Input;
 using Gato_Exploso.TileObjects;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics.CodeAnalysis;
+using System.Data;
 
 namespace Gato_Exploso
 {
     internal class Level
     {
         // variables
+
         public bool playerBombed = false;
+
         // amount of tiles per row/column
         public const int xTiles = 100;
         public const int yTiles = 100;
@@ -32,6 +35,8 @@ namespace Gato_Exploso
 
         // variable for total time that has passed
         double gameTime = 0;
+        // list of tiles that have bombs on them
+        private HashSet<Vector2> activeTileCoords = new HashSet<Vector2>();
 
         // constructor
         public Level()
@@ -40,46 +45,79 @@ namespace Gato_Exploso
         }
         // methods
 
+        public HashSet<Vector2> GetActiveTileCoords()
+        {
+            return activeTileCoords;
+        }
         // updates the offset x&y
         public void UpdateOffset(int x, int y)
         {
             offsetX = x;
             offsetY = y;
         }
-
-        // updates the total game time variable
+        // gets coords around a tile
+        public HashSet<Vector2> getCoordsAroundTile(int x, int y, int radius)
+        {
+            HashSet<Vector2> coords = new HashSet<Vector2>();
+            int startX = x - radius;
+            int startY = y - radius;
+            for (int i = startX; i <= x + radius; i++)
+            {
+                for (int j = startY; j <= y + radius; j++)
+                {
+                    coords.Add(new Vector2(i, j));
+                }
+            }
+            return coords;
+        }
+        // updates the total gametime variable
         public void UpdateTime(double time)
         {
             gameTime = time;
-            for (int i = 0; i < xTiles; i++)
+            List<Vector2> coordsToRemove = new List<Vector2>();
+            List<Vector2> coordsToAdd = new List<Vector2>();
+            foreach (Vector2 coord in activeTileCoords)
             {
-                for (int j = 0; j < yTiles; j++)
+                int i = (int)coord.X;
+                int j = (int)coord.Y;
+                if (tiles[i, j].bombExploded)
                 {
-                    if (tiles[i, j].bombExploded)
+                    var nearbyCoords = getCoordsAroundTile(i, j, 100);
+                    foreach (Vector2 coord2 in nearbyCoords)
                     {
-                        tiles[i - 1, j - 1] = new GrassTile();
-                        
-                        tiles[i, j - 1] = new GrassTile();
-                        tiles[i + 1, j - 1] = new GrassTile();
-
-                        tiles[i - 1, j] = new GrassTile();
-                        tiles[i, j] = new GrassTile();
-                        tiles[i + 1, j] = new GrassTile();
-
-                        tiles[i - 1, j + 1] = new GrassTile();
-                        tiles[i, j + 1] = new GrassTile();     
-                        tiles[i + 1, j + 1] = new GrassTile();
-                        tiles[i, j].bombExploded = false;
-                    }
-                    if (IsTileOnScreen(i, j, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, offsetX, offsetY))
-                    {
-                        tiles[i, j].UpdateGameTime(time);
-                    }
-                    else
-                    {
+                        if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= 100 || coord2.Y >= 100) continue;
+                        var tile = new GrassTile((int)time);
+                        tiles[(int)coord2.X, (int)coord2.Y] = new GrassTile((int)time);
+                        tiles[(int)coord2.X, (int)coord2.Y].startExplosion();
+                        coordsToAdd.Add(coord2);
 
                     }
+
+                    tiles[i, j].bombExploded = false;
+                    if (tiles[i, j].isActive())
+                    {
+                        coordsToRemove.Add(new Vector2(i, j));
+                    }
+                    
                 }
+
+                if (IsTileOnScreen(i, j, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, offsetX, offsetY))
+                {
+                    tiles[i, j].UpdateGameTime(time);
+                }
+                else
+                {
+
+                }
+            }
+
+            foreach (Vector2 vec in coordsToRemove)
+            {
+                activeTileCoords.Remove(vec);
+            }
+            foreach(Vector2 vec in coordsToAdd)
+            {
+                activeTileCoords.Add(vec);
             }
 
         }
@@ -94,12 +132,12 @@ namespace Gato_Exploso
                 {
                     GrassTile tile = new GrassTile();
                     tiles[i, j] = tile;
-                    
+
                 }
             }
             for (int r = 0; r < 75; r++)
             {
-                
+
                 int rockTileX = random.Next(0, 100);
                 int rockTileY = random.Next(0, 100);
                 tiles[rockTileX, rockTileY] = new RockTile();
@@ -143,14 +181,14 @@ namespace Gato_Exploso
                         tiles[i, j].Draw(spritebatch, drawX, drawY);
                         tiles[i, j].DrawTileObjects(spritebatch, drawX, drawY);
                     }
-                    
+
 
                 }
             }
         }
         // places a new rock tile
         public void PlaceRock()
-        { 
+        {
 
             Vector2 vec = GetTileUnderMouse();
             if (vec.X < 0 || vec.Y < 0) { return; }
@@ -159,14 +197,15 @@ namespace Gato_Exploso
 
         }
 
-        // Places a bomb where the mouse is at when space is pressed
+        // Places a bomb when space is pressed
         public void PlaceBomb(int x, int y)
         {
             Vector2 vec = GetTilePosition(x, y);
             if (vec.X < 0 || vec.Y < 0) { return; }
             Bomb b = new Bomb(gameTime);
             Tile curTile = tiles[(int)vec.X, (int)vec.Y];
-            curTile.objects.Add(b);
+            curTile.AddBomb(b);
+            activeTileCoords.Add(vec);
 
         }
 

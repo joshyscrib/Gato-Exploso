@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Gato_Exploso
-{
+{ 
     public class Hud
     {
         GraphicsDevice context;

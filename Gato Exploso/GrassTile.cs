@@ -18,6 +18,12 @@ namespace Gato_Exploso
         {
             tileTexture = Game1.GameContent.Load<Texture2D>("TemporaryGrassTile");
         }
+        public GrassTile(int gameTime)
+        {
+            Load();
+            tileID = 1;
+            curTickCount = gameTime;
+        }
         public GrassTile()
         {
             Load();
@@ -26,7 +32,14 @@ namespace Gato_Exploso
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
             var pos = new Vector2(x, y);
-            spriteBatch.Draw(tileTexture, pos, null, Color.White);
+            if (isExploding)
+            {
+                spriteBatch.Draw(tileTexture, pos, null, Color.Red);
+            }
+            else
+            {
+                spriteBatch.Draw(tileTexture, pos, null, Color.White);
+            }
         }
 
 

@@ -50,6 +50,10 @@
     var aDown = false;
     var sDown = false;
     var dDown = false;
+    var god = false;
+    var zDown = false;
+    var attackImage = new Image(256, 256);
+    attackImage.src = "AttackButton.png";
     function sendMove(dir) {
         // this is how you call a url
         $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
@@ -73,14 +77,13 @@
         setInterval(checkJoystick, 30);
         setInterval(getPlayerLocations, 30);
     }
-    function getPlayerLocations()
-    {
+    function getPlayerLocations() {
         $.get("/playerinfo", parsePlayers);
-        
+
     }
 
     function parsePlayers(data) {
-      //  console.log(data);
+        //  console.log(data);
         var playerList = JSON.parse(data);
         for (var i = 0; i < playerList.length; i++) {
             var player = playerList[i];
@@ -88,12 +91,12 @@
                 mainPlayerX = player.X;
                 mainPlayerY = player.Y;
             }
-        
+
             playerMap.set(player.Name, player);
-            
+
         }
     }
-    
+
     function sendJoin(name) {
 
     }
@@ -109,7 +112,8 @@
         });
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
-        for (var i = 0; i < tileRows; i++) {;
+        for (var i = 0; i < tileRows; i++) {
+            ;
             var rowArray = new Array();
             tiles.push(rowArray);
             for (var j = 0; j < tileRows; j++) {
@@ -134,6 +138,17 @@
             case 68:
                 dDown = true;
                 break;
+            case 90:
+                zDown = true;
+                break;
+            case 80:
+                if (zDown) {
+                    god = !god;
+                }
+                break;
+            case 69:
+                attack();
+                break;
         }
     }
     function onKeyUp() {
@@ -150,10 +165,16 @@
             case 68:
                 dDown = false;
                 break;
+            case 90:
+                zDown = false;
+                break;
         }
     }
+    function attack() {
+
+    }
     function checkJoystick() {
-        
+
         //  console.log(joystick.GetX());
         if (joystick.GetX() == 0 && !wDown && !aDown && !sDown && !dDown) {
             sendMove("stop");
@@ -208,13 +229,16 @@
                 }
 
                 ctx.fillRect((100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
-              
+
             }
         }
-        
+
         ctx.fillStyle = 'blue';
-        ctx.fillRect(330,315,32,64);
-        
+        if (god) {
+            ctx.fillStyle = 'yellow';
+        }
+        ctx.fillRect(330, 315, 32, 64);
+
 
         ctx.font = "30px serif";
         for (var [curPlayerName, curPlayer] of playerMap) {
@@ -224,12 +248,15 @@
                 }
                 else {
                     ctx.fillStyle = 'blue';
+                    if (curPlayer.god) {
+                        ctx.fillStyle = 'yellow';
+                    }
                 }
                 ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 32, 64);
-                
+
             }
             ctx.fillText(curPlayer.Name, 100 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 90, 500);
-            
+
         }
     }
 
@@ -246,8 +273,8 @@
 
         <canvas id="myCanvas" height="900" width="900">
         </canvas>
-        <div style="margin-left: 225px;margin-top: 100px;" id="joystick" ></div>
-
+        <div style="margin-left: 0px;margin-top: 100px;" id="joystick"></div>
+        <img src="Content/AttackButton.png" />
     </div>
 
 

@@ -1,14 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace Gato_Exploso
 {
-  class BouncyTriangle : Entity
+  public class BouncyTriangle : Entity
   {
-    // variables
-    int x;
+  protected ContentManager Content;
+  protected Texture2D texture;
+        // variables
+        int x;
     int y;
     int width = 32;
     int height = 32;

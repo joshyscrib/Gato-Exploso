@@ -7,18 +7,34 @@ using System.IO;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using System.Threading;
 
 namespace Gato_Exploso
 {
     internal class WebServer
     {
+        private bool running = false;
+        Thread listenThread;
+
         HttpListener listener = new HttpListener();
         public void Start()
         {
-            listener = new HttpListener();
-            listener.Prefixes.Add("http://*:8888/");
-            listener.Start();
-            ReceiveData();
+            running = true;
+            listenThread = new Thread(()=> RunThread(this));
+            listenThread.Start();
+
+         //   ReceiveData();
+        }
+
+        public static void RunThread(WebServer instance)
+        {
+            instance.StartListening();
+        }
+        public void Stop()
+        {
+            running = false;
+            listener.Stop();
+            listenThread.Join();
         }
 
         public delegate void PlayerActionHandler(object sender, PlayerActionArgs args);
@@ -29,6 +45,81 @@ namespace Gato_Exploso
         {
             listener.BeginGetContext(new AsyncCallback(Callback), listener);
         }
+
+        private void StartListening()
+        {
+
+            listener = new HttpListener();
+            listener.Prefixes.Add("http://*:8888/");
+            listener.Start();
+            while (running)
+            {
+                ThreadPool.QueueUserWorkItem(Process, listener.GetContext());
+            }
+        }
+        void Process(object o)
+        {
+            var context = o as HttpListenerContext;
+
+
+            var request = context.Request;
+            var response = context.Response;
+
+            Console.WriteLine("data received.");
+            string html = "ok";
+
+            if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
+            {
+                html = File.ReadAllText("../../../Content/Joy.js");
+            }
+
+
+            if (request.Url.PathAndQuery.Contains("home"))
+            {
+                html = File.ReadAllText("../../../Content/GatoControl.html");
+            }
+            if (request.Url.PathAndQuery.Contains("playerinfo"))
+            {
+                html = HandleGetPlayers();
+            }
+            if (request.Url.PathAndQuery.Contains("gameworld"))
+            {
+                html = Game1.Instance.GetGameWorld();
+            }
+            if (request.Url.PathAndQuery.Contains("action"))
+            {
+                string command = request.QueryString["command"];
+                string name = request.QueryString["name"];
+                if (command != null)
+                {
+                    switch (command)
+                    {
+                        case "move":
+                            HandleMove(request.QueryString["direction"], request.QueryString["name"]);
+                            break;
+                        case "join":
+                            HandleJoin(name);
+                            break;
+
+                    }
+                }
+            }
+
+
+
+
+            String direct = request.QueryString["action"];
+
+
+
+            String url = request.Url.PathAndQuery;
+            byte[] bytes = Encoding.ASCII.GetBytes(html);
+            response.OutputStream.Write(bytes, 0, bytes.Length);
+            response.OutputStream.Close();
+ 
+        }
+
+
         public void HandleMove(string direct, string name)
         {
             if (direct != null)
@@ -80,6 +171,8 @@ namespace Gato_Exploso
                 {
                     html = File.ReadAllText("../../../Content/Joy.js");
                 }
+
+                
                 if (request.Url.PathAndQuery.Contains("home"))
                 {
                     html = File.ReadAllText("../../../Content/GatoControl.html");
@@ -126,6 +219,7 @@ namespace Gato_Exploso
             }
 
         }
+
 
         public string HandleGetPlayers()
         {
