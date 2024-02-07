@@ -41,10 +41,6 @@ namespace Gato_Exploso
         public delegate void PlayerRegisterHandler(object sender, RegisterPlayerArgs args);
         public event PlayerActionHandler PlayerAction;
         public event PlayerRegisterHandler PlayerRegister;
-        private void ReceiveData()
-        {
-            listener.BeginGetContext(new AsyncCallback(Callback), listener);
-        }
 
         private void StartListening()
         {
@@ -99,6 +95,9 @@ namespace Gato_Exploso
                             break;
                         case "join":
                             HandleJoin(name);
+                            break;
+                        case "attack":
+                            HandleAttack(name);
                             break;
 
                     }
@@ -156,68 +155,15 @@ namespace Gato_Exploso
                 PlayerRegister(this, registerPlayerArgs);
             }
         }
-        private void Callback(IAsyncResult result)
+        public void HandleAttack(string name)
         {
-            if (listener.IsListening)
+            if (PlayerAction != null)
             {
-                var context = listener.EndGetContext(result);
-                var request = context.Request;
-                var response = context.Response;
-
-                Console.WriteLine("data received.");
-                string html = "ok";
-
-                if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
-                {
-                    html = File.ReadAllText("../../../Content/Joy.js");
-                }
-
-                
-                if (request.Url.PathAndQuery.Contains("home"))
-                {
-                    html = File.ReadAllText("../../../Content/GatoControl.html");
-                }
-                if (request.Url.PathAndQuery.Contains("playerinfo"))
-                {
-                    html = HandleGetPlayers();
-                }
-                if (request.Url.PathAndQuery.Contains("gameworld"))
-                {
-                    html = Game1.Instance.GetGameWorld();
-                }
-                if (request.Url.PathAndQuery.Contains("action"))
-                {
-                    string command = request.QueryString["command"];
-                    string name = request.QueryString["name"];
-                    if (command != null)
-                    {
-                        switch (command)
-                        {
-                            case "move":
-                                HandleMove(request.QueryString["direction"], request.QueryString["name"]);
-                                break;
-                            case "join":
-                                HandleJoin(name);
-                                break;
-
-                        }
-                    }
-                }
-
-
-
-
-                String direct = request.QueryString["action"];
-
-
-
-                String url = request.Url.PathAndQuery;
-                byte[] bytes = Encoding.ASCII.GetBytes(html);
-                response.OutputStream.Write(bytes, 0, bytes.Length);
-                response.OutputStream.Close();
-                ReceiveData();
+                PlayerActionArgs actionArgs = new PlayerActionArgs();
+                actionArgs.name = name;
+                actionArgs.attack = true;
+                PlayerAction(this, actionArgs);
             }
-
         }
 
 

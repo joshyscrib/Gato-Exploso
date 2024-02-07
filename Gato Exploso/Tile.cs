@@ -49,6 +49,10 @@ namespace Gato_Exploso
                 obj.Draw(spriteBatch, x, y);
             }
         }
+        public bool IsExploding()
+        {
+            return isExploding;
+        }
         public bool isActive()
         {
             if(objects.Count > 0)
@@ -107,7 +111,7 @@ namespace Gato_Exploso
             }
             if (isExploding)
             {
-                if (curTickCount - explosionStartTime > 100)
+                if (curTickCount - explosionStartTime > 2000)
                 {
                     isExploding = false;
                 }

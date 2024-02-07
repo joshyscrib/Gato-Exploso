@@ -70,6 +70,19 @@ namespace Gato_Exploso
             }
             return coords;
         }
+        // returns the tile at a given position
+        public Tile GetTile(int x, int y)
+        {
+            if(x < 0 || y < 0 || x > 99 || y > 99)
+            {
+                return null;
+            }
+            return tiles[x, y];
+        }
+        public Tile GetTile(Vector2 loc)
+        {
+            return GetTile((int)loc.X, (int)loc.Y);
+        }
         // updates the total gametime variable
         public void UpdateTime(double time)
         {
@@ -82,7 +95,7 @@ namespace Gato_Exploso
                 int j = (int)coord.Y;
                 if (tiles[i, j].bombExploded)
                 {
-                    var nearbyCoords = getCoordsAroundTile(i, j, 100);
+                    var nearbyCoords = getCoordsAroundTile(i, j, 5);
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
                         if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= 100 || coord2.Y >= 100) continue;

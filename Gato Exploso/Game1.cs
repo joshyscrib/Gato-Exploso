@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Gato_Exploso
@@ -33,7 +34,7 @@ namespace Gato_Exploso
         Hud hud = new Hud();
         // makes a new webserver
         WebServer server = new WebServer();
-        
+        double currentTime = 0;
         public Game1()
         {
             Instance = this;
@@ -64,6 +65,7 @@ namespace Gato_Exploso
                 curPlayer.X = player.x;
                 curPlayer.Y = player.y;
                 list.Add(curPlayer);
+                curPlayer.Health = (int)player.hp;
 
             }
             return list;
@@ -91,7 +93,8 @@ namespace Gato_Exploso
             {
                 return;
             }
-            Ostrich ost = new Ostrich(Content);
+            Ostrich ost = new Ostrich(Content, currentTime);
+            ost.Name = playerName;
             ost.Load();
             _players.Add(playerName, ost);
 
@@ -102,7 +105,7 @@ namespace Gato_Exploso
             if (_players.ContainsKey(args.name))
             {
                 Player pl = _players[args.name];
-                if (args.direction.IsDirectionSet())
+                if (args.direction != null && args.direction.IsDirectionSet())
                 {
                     pl.StartMoving();
                     pl.FacePlayer(args.direction);
@@ -112,9 +115,58 @@ namespace Gato_Exploso
                     pl.StopMoving();
                 }
                 MovePlayer(pl);
+                if (args.attack)
+                {
+                    Attack(pl);
+                }
             }
         }
+        // ostrich attack
+        public void Attack(Player player)
+        {
+            HashSet<Vector2> attackCoords = new HashSet<Vector2>();
 
+            if (player.facing.Up)
+            {
+                attackCoords.Add(new Vector2(player.x / 32, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
+            }
+            if (player.facing.Left)
+            {
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32)));
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
+            }
+            if (player.facing.Down)
+            {
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
+                attackCoords.Add(new Vector2((player.x / 32), (player.y / 32) + 1));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
+            }
+            if (player.facing.Right)
+            {
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
+            }
+            foreach (Player play in _players.Values)
+            {
+                if (play != player)
+                {
+                    HashSet<Vector2> playerCoords = GetPlayerTiles(play);
+                    if(attackCoords.Intersect(playerCoords).Count() > 0)
+                    {
+                        play.hp -= 10;
+                        if(play.hp < 0)
+                        {
+                            play.hp = 0;
+                        }
+                    }
+                   
+                }
+            }
+        }
 
         // loads images for different classes
         protected override void LoadContent()
@@ -238,6 +290,31 @@ namespace Gato_Exploso
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
+            currentTime = gameTime.TotalGameTime.TotalMilliseconds;
+            if (_players["gato"].hp < 100)
+            {
+                _players["gato"].hp += 0.1;
+            }
+
+            List<Player> playersToRemove = new List<Player>();
+            foreach(var curPlayer in _players.Values)
+            {
+                curPlayer.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
+                if (curPlayer.hp < 100)
+                {
+                    curPlayer.hp += 0.1;
+                }
+                if (curPlayer.IsTimedOut() && curPlayer.Name != "gato")
+                {
+                    playersToRemove.Add(curPlayer);
+                }
+            }
+
+            foreach(var curPlayer in playersToRemove)
+            {
+                _players.Remove(curPlayer.Name);
+            }
+
             level1.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
             var state = Keyboard.GetState();
             MouseState cursor = new MouseState();
@@ -272,18 +349,54 @@ namespace Gato_Exploso
                 MovePlayer(p);
             }
             ExexutePlayerAction(actionArgs);
-            HashSet<Vector2>tilesWBombs = level1.GetActiveTileCoords();
-            foreach(Vector2 coord in tilesWBombs)
+            HashSet<Vector2> activeTiles = level1.GetActiveTileCoords();
+            HashSet<Vector2> explodingTiles = new HashSet<Vector2>();
+            foreach (Vector2 coord in activeTiles)
             {
-                Tile curTile = level1.tiles[(int)coord.X,(int)coord.Y];
-                if (curTile.bombExploded)
+                Tile curTile = level1.GetTile(coord);
+                if (curTile != null && curTile.IsExploding())
                 {
-                    Console.WriteLine("baboom");
+                    explodingTiles.Add(coord);
                 }
             }
+            foreach (Player p in _players.Values)
+            {
+                // set of all tiles the player is touching
+                HashSet<Vector2> playerTiles = GetPlayerTiles(p);
+              
+                if (playerTiles.Intersect(explodingTiles).Count() > 0)
+                {
+                    p.hp -= 0.4;
+                }
+
+
+
+            }
+
 
             base.Update(gameTime);
 
+        }
+
+        private HashSet<Vector2> GetPlayerTiles(Player p)
+        {
+            // set of all tiles the player is touching
+            HashSet<Vector2> playerTiles = new HashSet<Vector2>
+                {
+                        // top left
+                    new Vector2(p.x / tileSide, p.y / tileSide),
+                        // mid left
+                    new Vector2(p.x / tileSide, (p.y + (p.height / 2)) / tileSide),
+                        // bottom left
+                    new Vector2(p.x / tileSide, (p.y + p.height) / tileSide),
+                        // top right
+                    new Vector2((p.x + p.width) / tileSide, p.y / tileSide),
+                        // mid right
+                    new Vector2(p.x / tileSide, p.y + (p.height / tileSide)),
+                        //bottom right
+                    new Vector2(p.x / tileSide, (p.y + p.height) / tileSide)
+                };
+            return playerTiles;
         }
         public void ExexutePlayerAction(PlayerActionArgs act)
         {
@@ -350,10 +463,10 @@ namespace Gato_Exploso
 
 
             base.Draw(gameTime);
-            
+
 
             // draws HUD
-            hud.Draw(_spriteBatch, _players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX) , (bombIndY * 32) - (level1.offsetY) );
+            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX), (bombIndY * 32) - (level1.offsetY));
             _spriteBatch.End();
         }
 
