@@ -206,7 +206,7 @@ namespace Gato_Exploso
             Vector2 vec = GetTileUnderMouse();
             if (vec.X < 0 || vec.Y < 0) { return; }
             RockTile rock = new RockTile();
-            tiles[(int)vec.X, (int)vec.Y] = rock;
+            tiles[(int)vec.X, (int)vec.Y].PlaceRock();
 
         }
 

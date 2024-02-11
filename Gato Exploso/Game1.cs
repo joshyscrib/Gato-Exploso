@@ -66,6 +66,7 @@ namespace Gato_Exploso
                 curPlayer.Y = player.y;
                 list.Add(curPlayer);
                 curPlayer.Health = (int)player.hp;
+                curPlayer.Facing = player.facing;
 
             }
             return list;
@@ -114,7 +115,7 @@ namespace Gato_Exploso
                 {
                     pl.StopMoving();
                 }
-                MovePlayer(pl);
+          //      MovePlayer(pl);
                 if (args.attack)
                 {
                     Attack(pl);
@@ -150,20 +151,22 @@ namespace Gato_Exploso
                 attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
                 attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
             }
+            
             foreach (Player play in _players.Values)
             {
                 if (play != player)
                 {
+
                     HashSet<Vector2> playerCoords = GetPlayerTiles(play);
-                    if(attackCoords.Intersect(playerCoords).Count() > 0)
+                    if (attackCoords.Intersect(playerCoords).Count() > 0)
                     {
                         play.hp -= 10;
-                        if(play.hp < 0)
-                        {
-                            play.hp = 0;
-                        }
                     }
-                   
+                    if(play.Name == "gato")
+                    {
+                        play.hp += 20;
+                    }
+
                 }
             }
         }
@@ -178,88 +181,90 @@ namespace Gato_Exploso
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(Player gato)
         {
-            if (!gato.moving)
+            lock (this)
             {
-                return;
-            }
-            targetX = gato.x;
-            targetY = gato.y;
-            MoveDirection dir = gato.facing;
-            if (dir.Up)
-            {
-                targetY -= gato.speed;
-                Tile l = getTileAt(gato.x, targetY - 1);
-                Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
-                if (l is not RockTile && r is not RockTile && gato.y > 0)
+                if (!gato.moving)
                 {
-                    gato.MoveY(targetY);
+                    return;
                 }
-                gato.facing = dir;
-            }
-            if (dir.Left)
-            {
-                targetX -= gato.speed;
-                Tile t = getTileAt(targetX, gato.y);
-                Tile b = getTileAt(targetX, gato.y + gato.height - 1);
-                Tile m = getTileAt(targetX, gato.y + 32);
-                if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x > 0)
+                targetX = gato.x;
+                targetY = gato.y;
+                MoveDirection dir = gato.facing;
+                if (dir.Up)
                 {
-                    gato.MoveX(targetX);
+                    targetY -= gato.speed;
+                    Tile l = getTileAt(gato.x, targetY - 1);
+                    Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
+                    if (l is not RockTile && r is not RockTile && gato.y > 0)
+                    {
+                        gato.MoveY(targetY);
+                    }
+                    gato.facing = dir;
                 }
-                gato.facing = dir;
-            }
-            if (dir.Down)
-            {
-                targetY += gato.speed;
-                Tile l = getTileAt(gato.x, targetY + gato.height - 1);
-                Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
-                if (l is not RockTile && r is not RockTile && gato.y < 3168)
+                if (dir.Left)
                 {
-                    gato.MoveY(targetY);
+                    targetX -= gato.speed;
+                    Tile t = getTileAt(targetX, gato.y);
+                    Tile b = getTileAt(targetX, gato.y + gato.height - 1);
+                    Tile m = getTileAt(targetX, gato.y + 32);
+                    if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x > 0)
+                    {
+                        gato.MoveX(targetX);
+                    }
+                    gato.facing = dir;
                 }
-                gato.facing = dir;
-            }
-            if (dir.Right)
-            {
-                targetX += gato.speed;
-                Tile t = getTileAt(targetX + gato.width - 1, gato.y);
-                Tile b = getTileAt(targetX + gato.width - 1, gato.y + gato.height - 1);
-                Tile m = getTileAt(targetX + gato.width - 1, gato.y + 32);
-                if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x < 3168)
+                if (dir.Down)
                 {
-                    gato.MoveX(targetX);
+                    targetY += gato.speed;
+                    Tile l = getTileAt(gato.x, targetY + gato.height - 1);
+                    Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
+                    if (l is not RockTile && r is not RockTile && gato.y < 3168)
+                    {
+                        gato.MoveY(targetY);
+                    }
+                    gato.facing = dir;
                 }
-                gato.facing = dir;
-            }
-            // updates the offset between screen and world coordinates
-            if (gato is MainPlayer)
-            {
-                level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
-                if (gato.facing.Up)
+                if (dir.Right)
                 {
-                    bombIndX = (_players[mainPlayerName].x + 16) / 32;
-                    bombIndY = (_players[mainPlayerName].y - 16) / 32;
+                    targetX += gato.speed;
+                    Tile t = getTileAt(targetX + gato.width - 1, gato.y);
+                    Tile b = getTileAt(targetX + gato.width - 1, gato.y + gato.height - 1);
+                    Tile m = getTileAt(targetX + gato.width - 1, gato.y + 32);
+                    if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x < 3168)
+                    {
+                        gato.MoveX(targetX);
+                    }
+                    gato.facing = dir;
+                }
+                // updates the offset between screen and world coordinates
+                if (gato is MainPlayer)
+                {
+                    level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+                    if (gato.facing.Up)
+                    {
+                        bombIndX = (_players[mainPlayerName].x + 16) / 32;
+                        bombIndY = (_players[mainPlayerName].y - 16) / 32;
 
 
-                }
-                if (gato.facing.Left)
-                {
-                    bombIndX = (_players[mainPlayerName].x - 16) / 32;
-                    bombIndY = (_players[mainPlayerName].y + 48) / 32;
+                    }
+                    if (gato.facing.Left)
+                    {
+                        bombIndX = (_players[mainPlayerName].x - 16) / 32;
+                        bombIndY = (_players[mainPlayerName].y + 48) / 32;
 
-                }
-                if (gato.facing.Down)
-                {
-                    bombIndX = (_players[mainPlayerName].x + 16) / 32;
-                    bombIndY = (_players[mainPlayerName].y + 80) / 32;
-                }
-                if (gato.facing.Right)
-                {
-                    bombIndX = (_players[mainPlayerName].x + 48) / 32;
-                    bombIndY = (_players[mainPlayerName].y + 48) / 32;
+                    }
+                    if (gato.facing.Down)
+                    {
+                        bombIndX = (_players[mainPlayerName].x + 16) / 32;
+                        bombIndY = (_players[mainPlayerName].y + 80) / 32;
+                    }
+                    if (gato.facing.Right)
+                    {
+                        bombIndX = (_players[mainPlayerName].x + 48) / 32;
+                        bombIndY = (_players[mainPlayerName].y + 48) / 32;
+                    }
                 }
             }
-
 
         }
         // gets the tile at a position
@@ -290,10 +295,28 @@ namespace Gato_Exploso
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
-            currentTime = gameTime.TotalGameTime.TotalMilliseconds;
-            if (_players["gato"].hp < 100)
+            HashSet<string> playersToDie = new HashSet<string>();
+            foreach (Player play in _players.Values)
             {
-                _players["gato"].hp += 0.1;
+                        if (play.hp <= 0)
+                        {
+                            playersToDie.Add(play.Name);
+                        }
+                else
+                {
+                    MovePlayer(play);
+                }
+            }
+
+
+            foreach (string s in playersToDie)
+            {
+                _players.Remove(s);
+            }
+            currentTime = gameTime.TotalGameTime.TotalMilliseconds;
+            if (_players["gato"].hp < 81)
+            {
+                _players["gato"].hp += 20;
             }
 
             List<Player> playersToRemove = new List<Player>();

@@ -2,6 +2,9 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="joy.js"></script>
@@ -35,6 +38,7 @@
             X;
             Y;
             Health;
+            Facing;
         };
         var joystick;
         var playerName = "";
@@ -77,8 +81,8 @@
                 }
             }
             );
-            setInterval(checkJoystick, 30);
-            setInterval(getPlayerLocations, 30);
+            setInterval(checkJoystick, 50);
+            setInterval(getPlayerLocations, 50);
         }
         function getPlayerLocations() {
             $.get("/playerinfo", parsePlayers);
@@ -99,7 +103,7 @@
 
             }
 
-          
+
         }
 
         function sendJoin(name) {
@@ -270,8 +274,15 @@
                 ctx.fillText(curPlayer.Name, 100 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 45, 500);
                 ctx.fillStyle = 'gray';
                 ctx.fillRect(75 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 50, 104, 25);
-                ctx.fillStyle = 'red';
-                ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+
+                if (curPlayer.Name == "gato") {
+                    ctx.fillStyle = 'yellow';
+                    ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+                }
+                else {
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+                }
                 ctx.fillStyle = 'blue';
 
             }

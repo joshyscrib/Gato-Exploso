@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Net.Mime;
+using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 
 namespace Gato_Exploso
@@ -26,7 +27,7 @@ namespace Gato_Exploso
         // Id for each different tile type(e.g. grass=1,forest=1, etc)
         public int tileID;
         // list of tile objects
-        public List<TileObject> objects = new List<TileObject>();
+        private List<TileObject> objects = new List<TileObject>();
         // bool for if the tile has a bomb that is currently explodng
         protected bool isExploding = false;
         // tick when the explosion started
@@ -40,9 +41,10 @@ namespace Gato_Exploso
         {
             bombExploded = true;
         }
-
+     
         public void DrawTileObjects(SpriteBatch spriteBatch, int x, int y)
         {
+           
             // draw each object
             foreach (var obj in objects)
             {
@@ -52,6 +54,22 @@ namespace Gato_Exploso
         public bool IsExploding()
         {
             return isExploding;
+        }
+        // checks if the tile is solid 
+        public bool IsSolid()
+        {
+            for(int i = 0; i < objects.Count; i++)
+            {
+                if(i.GetType() == typeof(Rock))
+                {
+                    return true;
+                }
+            }
+            if (solid)
+            {
+                return true;
+            }
+            return false;
         }
         public bool isActive()
         {
@@ -84,6 +102,11 @@ namespace Gato_Exploso
             {
                 objects.Add(b);
             }
+        }
+        // places a rock
+        public void PlaceRock()
+        {
+            objects.Add(new Rock());
         }
         // starts one-frame animation of bomb explosion
         public void startExplosion()

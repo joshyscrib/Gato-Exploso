@@ -62,6 +62,7 @@ namespace Gato_Exploso
         {
             lastMoveTime = currentTime;
             x = locX;
+
         }
         public void MoveY(int locY)
         {
