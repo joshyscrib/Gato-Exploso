@@ -52,6 +52,8 @@
         const playerMap = new Map();
         // size of tiles to draw on browser
         var browserTileSize = 32;
+        // current game time(Based on main game time)
+        var lastGameTime = 0;
         // Key down detector booleans
         var wDown = false;
         var aDown = false;
@@ -59,6 +61,12 @@
         var dDown = false;
         var god = false;
         var zDown = false;
+        // stats for how fast game is running
+        var avgLatency = 0;
+        var lastLatencies = new Array();
+        var lastFullUpdate = 0;
+        // makes sure the web sends and recieves data every time it tries
+        var tick = Date.now();
         var attackImage = new Image(256, 256);
         attackImage.src = "AttackButton.png";
         function sendMove(dir) {
@@ -82,16 +90,48 @@
             }
             );
             setInterval(checkJoystick, 50);
-            setInterval(getPlayerLocations, 50);
+            setTimeout(getPlayerLocations, 50);
         }
         function getPlayerLocations() {
-            $.get("/playerinfo", parsePlayers);
+            var curTime = Date.now();
+            var offsetTime = lastGameTime;
+            if (curTime - lastFullUpdate > 2000) {
+                lastFullUpdate = curTime;
+                offsetTime = 0;
+            }
+            $.get("/playerinfo?name=" + playerName + "&knonce=" + tick++ + "&time=" + offsetTime, parsePlayers).always(function (d)
+            {
+                var elapsed = Date.now() - curTime;
+                var msToWait = 30 - elapsed;
+                if (msToWait < 0) {
+                    msToWait = 0;
+                }
+                addAndComputeLatency(elapsed);
+                setTimeout(getPlayerLocations, msToWait);
+            }
+            );
 
+        }
+
+//        calculates latency and adds to list
+        function addAndComputeLatency(latency) {
+            lastLatencies.push(latency);
+            if (lastLatencies.length > 10) {
+                lastLatencies.shift();
+            }
+            var all = 0;
+            for (var i = 0; i < lastLatencies.length; i++) {
+                all += lastLatencies[i];
+            }
+            avgLatency = Math.floor(all / lastLatencies.length);
+            
         }
 
         function parsePlayers(data) {
             //  console.log(data);
-            var playerList = JSON.parse(data);
+            var gameInfo = JSON.parse(data);
+            lastGameTime = gameInfo.GameTime;
+            var playerList = gameInfo.PlayerInfos;
             for (var i = 0; i < playerList.length; i++) {
                 var player = playerList[i];
                 if (player.Name == playerName) {
@@ -102,7 +142,31 @@
                 playerMap.set(player.Name, player);
 
             }
-
+            var tileList = gameInfo.TileInfos;
+            for (var i = 0; i < tileList.length; i++) {
+                var tileinfo = tileList[i];
+                var tile = tiles[tileinfo.X][tileinfo.Y];
+                tile.hasBomb = false;
+                tile.hasRock = false;
+                tile.isExploding = false;
+                if (tileinfo.State == 1) {
+                    tile.isExploding = true;
+                }
+                if (tileinfo.ObjectInfos != null) {
+                    for (var p = 0; p < tileinfo.ObjectInfos.length; p++) {
+                        var curObjInfo = tileinfo.ObjectInfos[p];
+                        switch (curObjInfo.ObjectType) {
+                            case "bomb":
+                                tile.hasBomb = true;
+                                console.log("has bomb KABOOMIE");
+                                break;
+                            case "rock":
+                                tile.hasRock = true;
+                                break;
+                        }
+                    }
+                }
+            }
 
         }
 
@@ -236,28 +300,35 @@
             var offsetY = 0 - (mainPlayerY - 216) - 1;
             for (var i = 0; i < 100; i++) {
                 for (var j = 0; j < 100; j++) {
-
-                    if (tiles[i][j].tileID == '1') {
+                    var curTile = tiles[i][j];
+                    if (curTile.tileID == '1') {
                         ctx.fillStyle = 'lime';
                     }
-                    else {
+                    if (curTile.hasRock) {
                         ctx.fillStyle = 'gray';
+                    }
+                    if (curTile.hasBomb) {
+                        ctx.fillStyle = 'black';
+                    }
+                    if (curTile.isExploding) {
+                        ctx.fillStyle = 'pink';
                     }
 
                     ctx.fillRect((100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
 
                 }
             }
-
+            // draws self;
             ctx.fillStyle = 'blue';
             if (god) {
                 ctx.fillStyle = 'yellow';
             }
             ctx.fillRect(330, 315, 32, 64);
 
-
+            
             ctx.font = "30px serif";
             for (var [curPlayerName, curPlayer] of playerMap) {
+                // draws others
                 if (curPlayer.Name != playerName) {
                     if (curPlayer.Name == "gato") {
                         ctx.fillStyle = 'red';
@@ -271,7 +342,9 @@
                     ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 32, 64);
 
                 }
+                // draws names
                 ctx.fillText(curPlayer.Name, 100 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 45, 500);
+                // draws healthbars
                 ctx.fillStyle = 'gray';
                 ctx.fillRect(75 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 50, 104, 25);
 
@@ -286,9 +359,11 @@
                 ctx.fillStyle = 'blue';
 
             }
-
+            // draws attack button
             attackCtx.fillStyle = 'red';
             attackCtx.fillRect(20, 20, 150, 150);
+            // writes current latency
+            ctx.fillText(avgLatency + "ms", 750, 50, 999);
         }
 
 

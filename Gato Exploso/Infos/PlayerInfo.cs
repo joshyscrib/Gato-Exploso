@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gato_Exploso
+namespace Gato_Exploso.Infos
 {
     public class PlayerInfo
     {

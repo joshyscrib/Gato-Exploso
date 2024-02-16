@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gato_Exploso.Infos;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -6,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Gato_Exploso.TileObjects;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Gato_Exploso
 {
@@ -35,6 +38,8 @@ namespace Gato_Exploso
         // makes a new webserver
         WebServer server = new WebServer();
         double currentTime = 0;
+        // for when ostriches die
+        Random rand = new Random();
         public Game1()
         {
             Instance = this;
@@ -53,9 +58,15 @@ namespace Gato_Exploso
         {
             server.Stop();
         }
-
-        public List<PlayerInfo> GetPlayerInfos()
+        // returns current time
+        public int GetTime()
         {
+            return (int)currentTime;
+        }
+
+        public GameInfo GetGameInfo(string playerName, int time)
+        {
+            GameInfo info = new GameInfo();
             var list = new List<PlayerInfo>();
             foreach (var name in _players.Keys)
             {
@@ -69,7 +80,57 @@ namespace Gato_Exploso
                 curPlayer.Facing = player.facing;
 
             }
-            return list;
+            if (!_players.ContainsKey(playerName))
+            {
+                return null;
+            }
+            Player curplayer = _players[playerName];
+            List<Tile> updatedTiles = level1.GetUpdatedTiles(getTileAt(curplayer.x, curplayer.y).x, getTileAt(curplayer.x, curplayer.y).y, 17, time);
+            List<TileInfo> tileInfos = new List<TileInfo>();
+            // optimize by only sending new stuff
+            foreach (Tile tile in updatedTiles)
+            {
+                if (tile.GetLastUpdatedTick() < time)
+                {
+                    continue;
+                }
+                TileInfo information = new TileInfo();
+                information.X = tile.x;
+                information.Y = tile.y;
+                if (tile.IsExploding())
+                {
+                    information.State = 1;
+                }
+
+                if (tile.GetTileObjects().Count > 0)
+                {
+
+                    List<ObjectInfo> objectInfos = new List<ObjectInfo>();
+                    foreach (var obj in tile.GetTileObjects())
+                    {
+                        string objType = "";
+                        if (obj.GetType() == typeof(Bomb))
+                        {
+                            objType = "bomb";
+                        }
+                        if (obj.GetType() == typeof(Rock))
+                        {
+                            objType = "rock";
+                        }
+                        ObjectInfo objectInfo = new ObjectInfo();
+                        objectInfo.ObjectType = objType;
+                        objectInfos.Add(objectInfo);
+                    }
+                    information.ObjectInfos = objectInfos;
+
+                }
+                tileInfos.Add(information);
+            }
+
+            info.TileInfos = tileInfos;
+            info.PlayerInfos = list;
+            info.GameTime = (int)currentTime;
+            return info;
         }
 
         protected Player GetMainPlayer()
@@ -115,7 +176,7 @@ namespace Gato_Exploso
                 {
                     pl.StopMoving();
                 }
-          //      MovePlayer(pl);
+                //      MovePlayer(pl);
                 if (args.attack)
                 {
                     Attack(pl);
@@ -151,7 +212,7 @@ namespace Gato_Exploso
                 attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
                 attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
             }
-            
+
             foreach (Player play in _players.Values)
             {
                 if (play != player)
@@ -162,7 +223,7 @@ namespace Gato_Exploso
                     {
                         play.hp -= 10;
                     }
-                    if(play.Name == "gato")
+                    if (play.Name == "gato")
                     {
                         play.hp += 20;
                     }
@@ -177,6 +238,14 @@ namespace Gato_Exploso
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             GetMainPlayer().Load();
             hud.Load(_graphics);
+        }
+        private bool isPassableTile(Tile t)
+        {
+            if (t == null || t.IsSolid())
+            {
+                return false;
+            }
+            return true;
         }
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(Player gato)
@@ -195,7 +264,7 @@ namespace Gato_Exploso
                     targetY -= gato.speed;
                     Tile l = getTileAt(gato.x, targetY - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
-                    if (l is not RockTile && r is not RockTile && gato.y > 0)
+                    if (isPassableTile(l) && isPassableTile(r) && gato.y > 0)
                     {
                         gato.MoveY(targetY);
                     }
@@ -207,7 +276,7 @@ namespace Gato_Exploso
                     Tile t = getTileAt(targetX, gato.y);
                     Tile b = getTileAt(targetX, gato.y + gato.height - 1);
                     Tile m = getTileAt(targetX, gato.y + 32);
-                    if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x > 0)
+                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x > 0)
                     {
                         gato.MoveX(targetX);
                     }
@@ -218,7 +287,7 @@ namespace Gato_Exploso
                     targetY += gato.speed;
                     Tile l = getTileAt(gato.x, targetY + gato.height - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
-                    if (l is not RockTile && r is not RockTile && gato.y < 3168)
+                    if (isPassableTile(l) && isPassableTile(r) && gato.y < 3168)
                     {
                         gato.MoveY(targetY);
                     }
@@ -230,12 +299,14 @@ namespace Gato_Exploso
                     Tile t = getTileAt(targetX + gato.width - 1, gato.y);
                     Tile b = getTileAt(targetX + gato.width - 1, gato.y + gato.height - 1);
                     Tile m = getTileAt(targetX + gato.width - 1, gato.y + 32);
-                    if (t is not RockTile && b is not RockTile && m is not RockTile && gato.x < 3168)
+
+                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x < 3168)
                     {
                         gato.MoveX(targetX);
                     }
                     gato.facing = dir;
                 }
+
                 // updates the offset between screen and world coordinates
                 if (gato is MainPlayer)
                 {
@@ -298,10 +369,10 @@ namespace Gato_Exploso
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
             {
-                        if (play.hp <= 0)
-                        {
-                            playersToDie.Add(play.Name);
-                        }
+                if (play.hp <= 0)
+                {
+                    playersToDie.Add(play.Name);
+                }
                 else
                 {
                     MovePlayer(play);
@@ -311,7 +382,10 @@ namespace Gato_Exploso
 
             foreach (string s in playersToDie)
             {
-                _players.Remove(s);
+
+                Random ry = new Random();
+                _players[s].x = rand.Next((Level.xTiles - 4) * 32);
+                _players[s].y = ry.Next((Level.yTiles - 4) * 32);
             }
             currentTime = gameTime.TotalGameTime.TotalMilliseconds;
             if (_players["gato"].hp < 81)
@@ -320,7 +394,7 @@ namespace Gato_Exploso
             }
 
             List<Player> playersToRemove = new List<Player>();
-            foreach(var curPlayer in _players.Values)
+            foreach (var curPlayer in _players.Values)
             {
                 curPlayer.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
                 if (curPlayer.hp < 100)
@@ -333,7 +407,7 @@ namespace Gato_Exploso
                 }
             }
 
-            foreach(var curPlayer in playersToRemove)
+            foreach (var curPlayer in playersToRemove)
             {
                 _players.Remove(curPlayer.Name);
             }
@@ -386,19 +460,14 @@ namespace Gato_Exploso
             {
                 // set of all tiles the player is touching
                 HashSet<Vector2> playerTiles = GetPlayerTiles(p);
-              
+
                 if (playerTiles.Intersect(explodingTiles).Count() > 0)
                 {
                     p.hp -= 0.4;
                 }
-
-
-
             }
 
-
             base.Update(gameTime);
-
         }
 
         private HashSet<Vector2> GetPlayerTiles(Player p)
@@ -443,7 +512,6 @@ namespace Gato_Exploso
                 {
                     level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48);
                 }
-
             }
         }
         public string GetGameWorld()
@@ -458,7 +526,6 @@ namespace Gato_Exploso
                 }
             }
             return world.ToString();
-
         }
 
         // tells each class to draw themselves
@@ -484,14 +551,11 @@ namespace Gato_Exploso
                 }
             }
 
-
             base.Draw(gameTime);
-
 
             // draws HUD
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX), (bombIndY * 32) - (level1.offsetY));
             _spriteBatch.End();
         }
-
     }
 }

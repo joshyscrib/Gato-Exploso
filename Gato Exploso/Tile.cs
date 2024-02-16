@@ -15,6 +15,9 @@ namespace Gato_Exploso
     {
         // variables
 
+        // location of tile
+        int x = 0;
+        int y = 0;
         // sets variables for the height and width of tiles
         public const int tileSide = 32;
         public int width = tileSide;
@@ -33,7 +36,10 @@ namespace Gato_Exploso
         // tick when the explosion started
         int explosionStartTime = 0;
         protected Texture2D tileTexture;
-        protected int curTickCount = 0;
+        // current game time
+       // protected int curTickCount = 0;
+
+        protected int lastModifiedTime = 0;
         // methods
         public abstract void Load();
         public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
@@ -41,15 +47,24 @@ namespace Gato_Exploso
         {
             bombExploded = true;
         }
-     
+
         public void DrawTileObjects(SpriteBatch spriteBatch, int x, int y)
         {
-           
+
             // draw each object
             foreach (var obj in objects)
             {
                 obj.Draw(spriteBatch, x, y);
             }
+        }
+        // returns list of tile objects
+        public List<TileObject> GetTileObjects()
+        {
+            return objects;
+        }
+        public int GetLastUpdatedTick()
+        {
+            return lastModifiedTime;
         }
         public bool IsExploding()
         {
@@ -58,9 +73,9 @@ namespace Gato_Exploso
         // checks if the tile is solid 
         public bool IsSolid()
         {
-            for(int i = 0; i < objects.Count; i++)
+            for (int i = 0; i < objects.Count; i++)
             {
-                if(i.GetType() == typeof(Rock))
+                if (objects[i].GetType() == typeof(Rock))
                 {
                     return true;
                 }
@@ -73,7 +88,7 @@ namespace Gato_Exploso
         }
         public bool isActive()
         {
-            if(objects.Count > 0)
+            if (objects.Count > 0)
             {
                 return true;
             }
@@ -85,7 +100,7 @@ namespace Gato_Exploso
             {
                 return true;
             }
-            
+
             return false;
         }
         public void AddBomb(Bomb b)
@@ -102,29 +117,53 @@ namespace Gato_Exploso
             {
                 objects.Add(b);
             }
+            lastModifiedTime = Game1.Instance.GetTime();
         }
         // places a rock
         public void PlaceRock()
         {
             objects.Add(new Rock());
+            lastModifiedTime = Game1.Instance.GetTime();
         }
         // starts one-frame animation of bomb explosion
         public void startExplosion()
         {
-            explosionStartTime = curTickCount;
+
+        //    curTickCount = Game1.Instance.GetTime();
+            explosionStartTime = Game1.Instance.GetTime(); ;
             isExploding = true;
+
+            lastModifiedTime = Game1.Instance.GetTime();
+            for (int i = objects.Count - 1; i >= 0; i--)
+            {
+                TileObject tileObj = objects[i];
+                if (tileObj.GetType() == typeof(Bomb))
+                {
+                    Bomb b = tileObj as Bomb;
+                    b.DetonateBomb();
+                }
+                else
+                {
+                    objects.RemoveAt(i);
+                }
+            }
         }
         // updates current game time and updates time based objects
-        public void UpdateGameTime(double curTime)
+        public void UpdateGameTime(double curTime2)
         {
-            curTickCount = (int)curTime;
+
             // uses a Hashset to remove every bomb that is past his life time
             HashSet<Bomb> bombsToDelete = new HashSet<Bomb>();
-            foreach (Bomb bmb in objects)
+            foreach (TileObject bmb in objects)
             {
-                if (curTime - 3000 > bmb.createTime)
+                if (bmb.GetType() == typeof(Bomb))
                 {
-                    bombsToDelete.Add(bmb);
+                    Bomb bomb = (Bomb)bmb;
+                    if (Game1.Instance.GetTime() - 3000 > bomb.createTime)
+                    {
+                        bombsToDelete.Add(bomb);
+                        lastModifiedTime = Game1.Instance.GetTime();
+                    }
                 }
             }
             foreach (Bomb bmb in bombsToDelete)
@@ -134,9 +173,10 @@ namespace Gato_Exploso
             }
             if (isExploding)
             {
-                if (curTickCount - explosionStartTime > 2000)
+                if (Game1.Instance.GetTime() - explosionStartTime > 2000)
                 {
                     isExploding = false;
+                    lastModifiedTime = Game1.Instance.GetTime();
                 }
             }
         }

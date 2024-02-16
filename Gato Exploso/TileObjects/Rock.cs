@@ -17,7 +17,7 @@ namespace Gato_Exploso.TileObjects
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(rockTexture, new Vector2(x,y), Color.White);
+            spriteBatch.Draw(rockTexture, new Vector2(x, y), Color.White);
         }
 
 

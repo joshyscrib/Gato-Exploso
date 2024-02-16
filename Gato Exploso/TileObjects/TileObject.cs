@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gato_Exploso.TileObjects
 {
-    internal abstract class TileObject
+    public abstract class TileObject
     {
         // sets a variable for if the variable exists
         protected bool deleted = false;

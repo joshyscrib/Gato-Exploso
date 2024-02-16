@@ -9,6 +9,6 @@ namespace Gato_Exploso
     public class RegisterPlayerArgs
     {
         public string Name { get; set; }
-        public  string Color { get; set; }
+        public string Color { get; set; }
     }
 }

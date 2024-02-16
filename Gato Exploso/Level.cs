@@ -56,7 +56,7 @@ namespace Gato_Exploso
             offsetY = y;
         }
         // gets coords around a tile
-        public HashSet<Vector2> getCoordsAroundTile(int x, int y, int radius)
+        public HashSet<Vector2> GetCoordsAroundTile(int x, int y, int radius)
         {
             HashSet<Vector2> coords = new HashSet<Vector2>();
             int startX = x - radius;
@@ -73,7 +73,7 @@ namespace Gato_Exploso
         // returns the tile at a given position
         public Tile GetTile(int x, int y)
         {
-            if(x < 0 || y < 0 || x > 99 || y > 99)
+            if (x < 0 || y < 0 || x > 99 || y > 99)
             {
                 return null;
             }
@@ -95,12 +95,10 @@ namespace Gato_Exploso
                 int j = (int)coord.Y;
                 if (tiles[i, j].bombExploded)
                 {
-                    var nearbyCoords = getCoordsAroundTile(i, j, 5);
+                    var nearbyCoords = GetCoordsAroundTile(i, j, 5);
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
                         if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= 100 || coord2.Y >= 100) continue;
-                        var tile = new GrassTile((int)time);
-                        tiles[(int)coord2.X, (int)coord2.Y] = new GrassTile((int)time);
                         tiles[(int)coord2.X, (int)coord2.Y].startExplosion();
                         coordsToAdd.Add(coord2);
 
@@ -111,7 +109,7 @@ namespace Gato_Exploso
                     {
                         coordsToRemove.Add(new Vector2(i, j));
                     }
-                    
+
                 }
 
                 if (IsTileOnScreen(i, j, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, offsetX, offsetY))
@@ -127,8 +125,9 @@ namespace Gato_Exploso
             foreach (Vector2 vec in coordsToRemove)
             {
                 activeTileCoords.Remove(vec);
+                
             }
-            foreach(Vector2 vec in coordsToAdd)
+            foreach (Vector2 vec in coordsToAdd)
             {
                 activeTileCoords.Add(vec);
             }
@@ -145,6 +144,8 @@ namespace Gato_Exploso
                 {
                     GrassTile tile = new GrassTile();
                     tiles[i, j] = tile;
+                    tiles[i, j].x = i;
+                    tiles[i, j].y = j;
 
                 }
             }
@@ -153,7 +154,7 @@ namespace Gato_Exploso
 
                 int rockTileX = random.Next(0, 100);
                 int rockTileY = random.Next(0, 100);
-                tiles[rockTileX, rockTileY] = new RockTile();
+                tiles[rockTileX, rockTileY].PlaceRock();
 
             }
         }
@@ -199,13 +200,32 @@ namespace Gato_Exploso
                 }
             }
         }
+        // checks if the coordinate is in bounds
+        private bool IsCoordInBounds(int x, int y)
+        {
+            if(x < 0 || y < 0 || x >= xTiles || y >= yTiles)
+            {
+                return false;
+            }
+            return true;
+        }
+        private bool IsCoordInBounds(Vector2 vec)
+        {
+            if ((int)vec.X < 0 || (int)vec.Y < 0 || (int)vec.X >= xTiles || (int)vec.Y >= yTiles)
+            {
+                return false;
+            }
+            return true;
+        }
         // places a new rock tile
         public void PlaceRock()
         {
 
             Vector2 vec = GetTileUnderMouse();
-            if (vec.X < 0 || vec.Y < 0) { return; }
+            if (!IsCoordInBounds(vec)) { return; }
+
             RockTile rock = new RockTile();
+
             tiles[(int)vec.X, (int)vec.Y].PlaceRock();
 
         }
@@ -214,12 +234,45 @@ namespace Gato_Exploso
         public void PlaceBomb(int x, int y)
         {
             Vector2 vec = GetTilePosition(x, y);
-            if (vec.X < 0 || vec.Y < 0) { return; }
+            if (!IsCoordInBounds(vec)) { return; }
             Bomb b = new Bomb(gameTime);
             Tile curTile = tiles[(int)vec.X, (int)vec.Y];
             curTile.AddBomb(b);
             activeTileCoords.Add(vec);
 
+        }
+        // gets tiles all around a player
+        public List<Tile> GetUpdatedTiles(int tileX, int tileY, int radius, int updatedSince)
+        {
+            int startX = tileX - radius;
+            int startY = tileY - radius;
+            if (startX < 0)
+            {
+                startX = 0;
+            }
+            if (startY < 0)
+            {
+                startY = 0;
+            }
+            int endX = tileX + radius;
+            int endY = tileY + radius;
+            if (endX > xTiles - 1)
+            {
+                endX = xTiles - 1;
+            }
+            if (endY > yTiles - 1)
+            {
+                endY = yTiles - 1;
+            }
+            List<Tile> tilesInRadius = new List<Tile>();
+            for(int i = 0; i < endX; i++)
+            {
+                for(int j = 0; j < endY; j++)
+                {
+                    tilesInRadius.Add(tiles[i,j]);
+                }
+            }
+            return tilesInRadius;
         }
 
         // finds what tile the mouse is on

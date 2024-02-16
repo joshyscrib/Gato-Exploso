@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gato_Exploso.TileObjects
 {
-    internal class Bomb : TileObject
+    public class Bomb : TileObject
     {
     
         public double createTime = 0;
@@ -32,6 +32,10 @@ namespace Gato_Exploso.TileObjects
             spriteBatch.Draw(bombTexture, pos, null, Color.White);
 
             
+        }
+        public void DetonateBomb()
+        {
+            createTime = 0;
         }
     }
 }

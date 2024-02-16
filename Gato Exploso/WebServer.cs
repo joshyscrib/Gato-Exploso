@@ -76,7 +76,13 @@ namespace Gato_Exploso
             }
             if (request.Url.PathAndQuery.Contains("playerinfo"))
             {
-                html = HandleGetPlayers();
+                string name = request.QueryString["name"];
+                string timeString = request.QueryString["time"];
+                int webTime = int.Parse(timeString);
+                html = HandleGetPlayers(name, webTime);
+                
+                
+                
             }
             if (request.Url.PathAndQuery.Contains("gameworld"))
             {
@@ -167,10 +173,10 @@ namespace Gato_Exploso
         }
 
 
-        public string HandleGetPlayers()
+        public string HandleGetPlayers(string name, int time)
         {
-            var players = Game1.Instance.GetPlayerInfos();
-            string json = JsonSerializer.Serialize(players);
+            var gameInfo = Game1.Instance.GetGameInfo(name, time);
+            string json = JsonSerializer.Serialize(gameInfo);
             return json;
         }
         private void ReportPlayerMoved(MoveDirection direction, string name)

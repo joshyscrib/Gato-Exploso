@@ -12,17 +12,16 @@ namespace Gato_Exploso
     {
         // variables
         public bool solid = false;
-        
+
         // methods
         public override void Load()
         {
-            tileTexture = Game1.GameContent.Load<Texture2D>("TemporaryGrassTile");
+            tileTexture = Game1.GameContent.Load<Texture2D>("GrassTile");
         }
         public GrassTile(int gameTime)
         {
             Load();
             tileID = 1;
-            curTickCount = gameTime;
         }
         public GrassTile()
         {
