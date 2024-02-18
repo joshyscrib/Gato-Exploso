@@ -16,30 +16,41 @@ namespace Gato_Exploso
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
         // private Player gato;
         private Dictionary<string, Player> _players = new Dictionary<string, Player>();
         private string mainPlayerName = "gato";
         public static ContentManager GameContent;
         public static Game1 Instance;
+
         // Location for the bomb placement indicator
         public int bombIndX = 0;
         public int bombIndY = 0;
+
         // Move position for collision detection
         int targetX = 300;
         int targetY = 300;
+
         // Number for how many rows of tiles there are
         const int tileRows = 100;
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
         MoveDirection lastNetDirection = new MoveDirection();
+
         // Makes a Heads-Up Display
         Hud hud = new Hud();
+
         // makes a new webserver
         WebServer server = new WebServer();
         double currentTime = 0;
+
         // for when ostriches die
         Random rand = new Random();
+
+        // list of eggs(bullets)
+        public List<Egg> eggs = new List<Egg>();
+
         public Game1()
         {
             Instance = this;
@@ -85,7 +96,7 @@ namespace Gato_Exploso
                 return null;
             }
             Player curplayer = _players[playerName];
-            List<Tile> updatedTiles = level1.GetUpdatedTiles(getTileAt(curplayer.x, curplayer.y).x, getTileAt(curplayer.x, curplayer.y).y, 17, time);
+            List<Tile> updatedTiles = level1.GetUpdatedTiles(getTileAt(curplayer.x, curplayer.y).x, getTileAt(curplayer.x, curplayer.y).y, 30, time);
             List<TileInfo> tileInfos = new List<TileInfo>();
             // optimize by only sending new stuff
             foreach (Tile tile in updatedTiles)
@@ -181,6 +192,10 @@ namespace Gato_Exploso
                 {
                     Attack(pl);
                 }
+                if (args.shoot)
+                {
+                    Shoot(pl);
+                }
             }
         }
         // ostrich attack
@@ -221,15 +236,24 @@ namespace Gato_Exploso
                     HashSet<Vector2> playerCoords = GetPlayerTiles(play);
                     if (attackCoords.Intersect(playerCoords).Count() > 0)
                     {
-                        play.hp -= 10;
+                        /* remove*/
+                        play.hp -= 6;
+                        if (play.Name == "gato")
+                        {
+                            play.hp -= 10;
+                        }
                     }
-                    if (play.Name == "gato")
-                    {
-                        play.hp += 20;
-                    }
+
 
                 }
             }
+        }
+        public void Shoot(Player player)
+        {
+            Egg egg = new Egg(player.x,player.y,player.facing,player.speed + 7, 3000);
+            // sets egg's location, direction and speed to match the player that shot it
+            
+            eggs.Add(egg);
         }
 
         // loads images for different classes
@@ -250,6 +274,7 @@ namespace Gato_Exploso
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(Player gato)
         {
+            // makes sure only 1 thread can access at a time
             lock (this)
             {
                 if (!gato.moving)
@@ -311,6 +336,7 @@ namespace Gato_Exploso
                 if (gato is MainPlayer)
                 {
                     level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
+                    // bomb indicator
                     if (gato.facing.Up)
                     {
                         bombIndX = (_players[mainPlayerName].x + 16) / 32;
@@ -337,6 +363,38 @@ namespace Gato_Exploso
                 }
             }
 
+        }
+        // moves all eggs
+        public void MoveEggs()
+        {
+            for (int i = eggs.Count - 1; i >= 0; i--)
+            {
+
+                Egg curEgg = eggs[i];
+                curEgg.Tick();
+                if(curEgg.doneTraveling)
+                {
+                    eggs.RemoveAt(i);
+                    continue;
+                }
+                // checks what direction the egg is moving and moves it in that direction
+                if (curEgg.direction.Up)
+                {
+                    curEgg.y -= curEgg.speed;
+                }
+                if (curEgg.direction.Left)
+                {
+                    curEgg.x -= curEgg.speed;
+                }
+                if (curEgg.direction.Down)
+                {
+                    curEgg.y += curEgg.speed;
+                }
+                if (curEgg.direction.Right)
+                {
+                    curEgg.x += curEgg.speed;
+                }
+            }
         }
         // gets the tile at a position
         private Tile getTileAt(int x, int y)
@@ -366,6 +424,7 @@ namespace Gato_Exploso
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
+            MoveEggs();
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
             {
@@ -386,21 +445,25 @@ namespace Gato_Exploso
                 Random ry = new Random();
                 _players[s].x = rand.Next((Level.xTiles - 4) * 32);
                 _players[s].y = ry.Next((Level.yTiles - 4) * 32);
+                _players[s].hp = 100;
             }
             currentTime = gameTime.TotalGameTime.TotalMilliseconds;
-            if (_players["gato"].hp < 81)
+            if (_players["gato"].hp < 100)
             {
-                _players["gato"].hp += 20;
+                _players["gato"].hp += 0.05;
             }
 
             List<Player> playersToRemove = new List<Player>();
             foreach (var curPlayer in _players.Values)
             {
+
                 curPlayer.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
-                if (curPlayer.hp < 100)
+                // regenerates health
+                if (curPlayer.hp < 100 && curPlayer.Name != "gato")
                 {
-                    curPlayer.hp += 0.1;
+                    curPlayer.hp += 0.015;
                 }
+                // removes idle players
                 if (curPlayer.IsTimedOut() && curPlayer.Name != "gato")
                 {
                     playersToRemove.Add(curPlayer);
@@ -550,12 +613,19 @@ namespace Gato_Exploso
                     play.Draw(_spriteBatch, play.x, play.y);
                 }
             }
-
+            // draws eggs
+            for (int i = 0; i < eggs.Count; i++)
+            {
+                Egg curEgg = eggs[i];
+                curEgg.Draw(_spriteBatch, curEgg.x - (int)topLeftPixel.X, curEgg.y - (int)topLeftPixel.Y);
+            }
             base.Draw(gameTime);
 
             // draws HUD
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX), (bombIndY * 32) - (level1.offsetY));
             _spriteBatch.End();
+
+         
         }
     }
 }

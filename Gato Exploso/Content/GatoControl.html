@@ -67,8 +67,10 @@
         var lastFullUpdate = 0;
         // makes sure the web sends and recieves data every time it tries
         var tick = Date.now();
-        var attackImage = new Image(256, 256);
-        attackImage.src = "AttackButton.png";
+
+        // images
+        var grassImage = new Image(browserTileSize, browserTileSize);
+        grassImage.src = "/image/GrassTile.png";
         function sendMove(dir) {
             // this is how you call a url
             $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
@@ -95,7 +97,7 @@
         function getPlayerLocations() {
             var curTime = Date.now();
             var offsetTime = lastGameTime;
-            if (curTime - lastFullUpdate > 2000) {
+            if (curTime - lastFullUpdate > 1000) {
                 lastFullUpdate = curTime;
                 offsetTime = 0;
             }
@@ -226,9 +228,7 @@
                         god = !god;
                     }
                     break;
-                case 69:
-                    attack();
-                    break;
+                
             }
         }
         function onKeyUp() {
@@ -248,10 +248,19 @@
                 case 90:
                     zDown = false;
                     break;
+                case 32:
+                    attack();
+                    break;
+                case 69:
+                    shoot();
+                    break;
             }
         }
         function attack() {
             $.get("/action?command=attack&name=" + playerName);
+        }
+        function shoot() {
+            $.get("/action?command=shoot&name=" + playerName);
         }
         function checkJoystick() {
 
@@ -294,27 +303,43 @@
         }
 
         function drawWorld() {
+            // image to draw
+            
+            // Draws background in case player is near the edge of the world
+            ctx.fillStyle = 'green';
+            ctx.fillRect(0, 0, 900, 900);
             // Offset to draw the tiles in the correct position
             // Offset Function: 0 - TLPixel.X
             var offsetX = 0 - (mainPlayerX - 216) + 12;
             var offsetY = 0 - (mainPlayerY - 216) - 1;
             for (var i = 0; i < 100; i++) {
                 for (var j = 0; j < 100; j++) {
+                    var curTileImage = null;
                     var curTile = tiles[i][j];
                     if (curTile.tileID == '1') {
                         ctx.fillStyle = 'lime';
+                        curTileImage = grassImage;
                     }
                     if (curTile.hasRock) {
                         ctx.fillStyle = 'gray';
+                        curTileImage = null;
                     }
                     if (curTile.hasBomb) {
                         ctx.fillStyle = 'black';
+                        curTileImage = null;
                     }
                     if (curTile.isExploding) {
                         ctx.fillStyle = 'pink';
+                        curTileImage = null;
                     }
-
-                    ctx.fillRect((100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
+                    
+                    if (curTileImage == null) {
+                        ctx.fillRect((100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
+                    }
+                    else {
+                        ctx.drawImage(curTileImage, (100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
+                    }
+                    
 
                 }
             }

@@ -17,7 +17,6 @@ namespace Gato_Exploso
         public Entity()
         {
         }
-        // functions
 
        
 

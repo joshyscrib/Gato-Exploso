@@ -36,6 +36,10 @@ namespace Gato_Exploso
         {
             
         }
+        public void Shoot()
+        {
+
+        }
     }
 
     }

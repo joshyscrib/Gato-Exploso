@@ -188,7 +188,7 @@ namespace Gato_Exploso
                         continue;
                     }
                     // draws the on-screen tiles
-                    if (IsTileOnScreen(i, j, SWidth, SHeight, TLPixel.X, TLPixel.Y))
+                    if (IsTileOnScreen(i, j, SWidth + 300, SHeight + 300, TLPixel.X - 300, TLPixel.Y - 300))
                     {
                         int drawX = (i * tileSide) + tileXOffset;
                         int drawY = (j * tileSide) + tileYOffset;

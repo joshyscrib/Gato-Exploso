@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Threading;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Gato_Exploso
 {
@@ -53,74 +54,109 @@ namespace Gato_Exploso
                 ThreadPool.QueueUserWorkItem(Process, listener.GetContext());
             }
         }
+        byte[] GetBinaryFile(string fileName)
+        {
+            return File.ReadAllBytes("../../../Content/" + fileName);
+        }
         void Process(object o)
         {
-            var context = o as HttpListenerContext;
-
-
-            var request = context.Request;
-            var response = context.Response;
-
-            Console.WriteLine("data received.");
-            string html = "ok";
-
-            if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
+            try
             {
-                html = File.ReadAllText("../../../Content/Joy.js");
-            }
+                var context = o as HttpListenerContext;
 
 
-            if (request.Url.PathAndQuery.Contains("home"))
-            {
-                html = File.ReadAllText("../../../Content/GatoControl.html");
-            }
-            if (request.Url.PathAndQuery.Contains("playerinfo"))
-            {
-                string name = request.QueryString["name"];
-                string timeString = request.QueryString["time"];
-                int webTime = int.Parse(timeString);
-                html = HandleGetPlayers(name, webTime);
-                
-                
-                
-            }
-            if (request.Url.PathAndQuery.Contains("gameworld"))
-            {
-                html = Game1.Instance.GetGameWorld();
-            }
-            if (request.Url.PathAndQuery.Contains("action"))
-            {
-                string command = request.QueryString["command"];
-                string name = request.QueryString["name"];
-                if (command != null)
+                var request = context.Request;
+                var response = context.Response;
+                // if web should return a string
+                bool returnString = true;
+                // array of bytes 
+                byte[] bytes = null;
+                string html = "ok";
+
+                if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
                 {
-                    switch (command)
+                    html = File.ReadAllText("../../../Content/Joy.js");
+                }
+                if (request.Url.PathAndQuery.ToLower().Contains("image"))
+                {
+                    try
                     {
-                        case "move":
-                            HandleMove(request.QueryString["direction"], request.QueryString["name"]);
-                            break;
-                        case "join":
-                            HandleJoin(name);
-                            break;
-                        case "attack":
-                            HandleAttack(name);
-                            break;
+                        string path = request.Url.LocalPath;
+                        // gets the name of the file provided by PATH variable
+                        string[] parts = path.Split(new char[] { '/' });
+                        bytes = GetBinaryFile(parts[2]);
+                        returnString = false;
+                    }
+                    catch (Exception ex) { }
 
+
+                }
+
+                if (request.Url.PathAndQuery.Contains("home"))
+                {
+                    html = File.ReadAllText("../../../Content/GatoControl.html");
+                }
+                if (request.Url.PathAndQuery.Contains("playerinfo"))
+                {
+                    string name = request.QueryString["name"];
+                    string timeString = request.QueryString["time"];
+                    int webTime = int.Parse(timeString);
+                    html = HandleGetPlayers(name, webTime);
+
+
+
+                }
+                if (request.Url.PathAndQuery.Contains("gameworld"))
+                {
+                    html = Game1.Instance.GetGameWorld();
+                }
+                if (request.Url.PathAndQuery.Contains("action"))
+                {
+                    string command = request.QueryString["command"];
+                    string name = request.QueryString["name"];
+                    if (command != null)
+                    {
+                        switch (command)
+                        {
+                            case "move":
+                                HandleMove(request.QueryString["direction"], request.QueryString["name"]);
+                                break;
+                            case "join":
+                                HandleJoin(name);
+                                break;
+                            case "attack":
+                                HandleAttack(name,"peck");
+                                break;
+                            case "shoot":
+                                HandleAttack(name,"shoot");
+                                break;
+                                
+
+                        }
                     }
                 }
+
+
+
+
+                String direct = request.QueryString["action"];
+
+
+
+                String url = request.Url.PathAndQuery;
+                if (returnString)
+                {
+                    bytes = Encoding.ASCII.GetBytes(html);
+                }
+                else
+                {
+                    response.AddHeader("Content-Type", "image/png");
+                }
+
+                response.OutputStream.Write(bytes, 0, bytes.Length);
+                response.OutputStream.Close();
             }
-
-
-
-
-            String direct = request.QueryString["action"];
-
-
-
-            String url = request.Url.PathAndQuery;
-            byte[] bytes = Encoding.ASCII.GetBytes(html);
-            response.OutputStream.Write(bytes, 0, bytes.Length);
-            response.OutputStream.Close();
+            catch (Exception ex) { }
  
         }
 
@@ -161,13 +197,20 @@ namespace Gato_Exploso
                 PlayerRegister(this, registerPlayerArgs);
             }
         }
-        public void HandleAttack(string name)
+        public void HandleAttack(string name, string type)
         {
             if (PlayerAction != null)
             {
                 PlayerActionArgs actionArgs = new PlayerActionArgs();
                 actionArgs.name = name;
-                actionArgs.attack = true;
+               if(type == "peck")
+                {
+                    actionArgs.attack = true;
+                }
+                else
+                {
+                    actionArgs.shoot = true;
+                }
                 PlayerAction(this, actionArgs);
             }
         }
