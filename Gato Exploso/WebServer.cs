@@ -73,16 +73,20 @@ namespace Gato_Exploso
                 byte[] bytes = null;
                 string html = "ok";
 
+
+                // returns tje joystick
                 if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
                 {
                     html = File.ReadAllText("../../../Content/Joy.js");
                 }
+
+                // returns images
                 if (request.Url.PathAndQuery.ToLower().Contains("image"))
                 {
                     try
                     {
                         string path = request.Url.LocalPath;
-                        // gets the name of the file provided by PATH variable
+                        // gets the name of the file provided by PATH variable by splitting the path at the forward slash
                         string[] parts = path.Split(new char[] { '/' });
                         bytes = GetBinaryFile(parts[2]);
                         returnString = false;
@@ -92,10 +96,19 @@ namespace Gato_Exploso
 
                 }
 
+                // returns main ostrich page
                 if (request.Url.PathAndQuery.Contains("home"))
                 {
                     html = File.ReadAllText("../../../Content/GatoControl.html");
                 }
+
+                // returns bullets(eggs)
+                if (request.Url.PathAndQuery.Contains("eggs"))
+                {
+                    html = Game1.Instance.GetEggs();
+                }
+
+                // returns info about all players
                 if (request.Url.PathAndQuery.Contains("playerinfo"))
                 {
                     string name = request.QueryString["name"];
@@ -106,10 +119,14 @@ namespace Gato_Exploso
 
 
                 }
+
+                // returns tiles and objects
                 if (request.Url.PathAndQuery.Contains("gameworld"))
                 {
                     html = Game1.Instance.GetGameWorld();
                 }
+
+                // ostrich actions(movement, joining the game, attacking, and shooting an egg)
                 if (request.Url.PathAndQuery.Contains("action"))
                 {
                     string command = request.QueryString["command"];

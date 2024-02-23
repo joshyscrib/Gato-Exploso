@@ -94,6 +94,8 @@
             setInterval(checkJoystick, 50);
             setTimeout(getPlayerLocations, 50);
         }
+
+        // gets locations of all players
         function getPlayerLocations() {
             var curTime = Date.now();
             var offsetTime = lastGameTime;
@@ -112,6 +114,11 @@
                 setTimeout(getPlayerLocations, msToWait);
             }
             );
+
+        }
+
+        // gets all eggs
+        function getEggs() {
 
         }
 

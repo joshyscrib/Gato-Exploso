@@ -577,6 +577,7 @@ namespace Gato_Exploso
                 }
             }
         }
+        // returns the full list of tiles in a string
         public string GetGameWorld()
         {
             StringBuilder world = new StringBuilder();
@@ -589,6 +590,17 @@ namespace Gato_Exploso
                 }
             }
             return world.ToString();
+        }
+
+        //returns the list of all Eggs as a string
+        public string GetEggs()
+        {
+            StringBuilder eggString = new StringBuilder();
+            for(int i = 0; i < eggs.Count; i++)
+            {
+                eggString.Append(eggs[i]);
+            }
+            return eggString.ToString();   
         }
 
         // tells each class to draw themselves
