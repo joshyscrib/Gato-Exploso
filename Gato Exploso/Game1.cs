@@ -36,6 +36,7 @@ namespace Gato_Exploso
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
+        // helps determine which direction the player is facing
         MoveDirection lastNetDirection = new MoveDirection();
 
         // Makes a Heads-Up Display
@@ -67,6 +68,7 @@ namespace Gato_Exploso
 
         private void Game1_Exiting(object sender, EventArgs e)
         {
+            // stops running the server on the web
             server.Stop();
         }
         // returns current time
@@ -81,6 +83,7 @@ namespace Gato_Exploso
             var list = new List<PlayerInfo>();
             foreach (var name in _players.Keys)
             {
+                // sets data for each player to return to the server
                 var player = _players[name];
                 var curPlayer = new PlayerInfo();
                 curPlayer.Name = name;
@@ -119,6 +122,7 @@ namespace Gato_Exploso
                     List<ObjectInfo> objectInfos = new List<ObjectInfo>();
                     foreach (var obj in tile.GetTileObjects())
                     {
+                        // returns the type of tile objects for the server
                         string objType = "";
                         if (obj.GetType() == typeof(Bomb))
                         {
@@ -128,6 +132,7 @@ namespace Gato_Exploso
                         {
                             objType = "rock";
                         }
+                        // adds the object to a list of objects to give the webser
                         ObjectInfo objectInfo = new ObjectInfo();
                         objectInfo.ObjectType = objType;
                         objectInfos.Add(objectInfo);
@@ -151,16 +156,17 @@ namespace Gato_Exploso
 
         protected override void Initialize()
         {
-
+            // starts main game sequences (makes tiles, begins events, runs web server)
             base.Initialize();
             level1.InitTiles();
             server.Start();
             server.PlayerAction += Server_PlayerAction;
             server.PlayerRegister += Server_PlayerRegister;
         }
-
+        // registers players on the web
         private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
         {
+            // gives players information
             string playerName = args.Name;
             if (_players.ContainsKey(playerName))
             {
@@ -169,10 +175,11 @@ namespace Gato_Exploso
             Ostrich ost = new Ostrich(Content, currentTime);
             ost.Name = playerName;
             ost.Load();
+            // adds new player to the list of player
             _players.Add(playerName, ost);
 
         }
-
+        // handles player action like moving and attacking
         private void Server_PlayerAction(object sender, PlayerActionArgs args)
         {
             if (_players.ContainsKey(args.name))
@@ -202,7 +209,7 @@ namespace Gato_Exploso
         public void Attack(Player player)
         {
             HashSet<Vector2> attackCoords = new HashSet<Vector2>();
-
+            // decides which tiles to attack based on which direction the player is facing
             if (player.facing.Up)
             {
                 attackCoords.Add(new Vector2(player.x / 32, (player.y / 32) - 1));
@@ -232,7 +239,7 @@ namespace Gato_Exploso
             {
                 if (play != player)
                 {
-
+                // 
                     HashSet<Vector2> playerCoords = GetPlayerTiles(play);
                     if (attackCoords.Intersect(playerCoords).Count() > 0)
                     {
@@ -263,6 +270,7 @@ namespace Gato_Exploso
             GetMainPlayer().Load();
             hud.Load(_graphics);
         }
+        // checks if the provide tile is solid
         private bool isPassableTile(Tile t)
         {
             if (t == null || t.IsSolid())
@@ -274,7 +282,7 @@ namespace Gato_Exploso
         // checks if the new location collides with an object and decides whether or not to move the player
         public void MovePlayer(Player gato)
         {
-            // makes sure only 1 thread can access at a time
+            // makes sure only 1 thread can access function at a time
             lock (this)
             {
                 if (!gato.moving)
@@ -284,6 +292,7 @@ namespace Gato_Exploso
                 targetX = gato.x;
                 targetY = gato.y;
                 MoveDirection dir = gato.facing;
+                // moves and sets facing direction based on which key is pressed
                 if (dir.Up)
                 {
                     targetY -= gato.speed;
@@ -336,7 +345,7 @@ namespace Gato_Exploso
                 if (gato is MainPlayer)
                 {
                     level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
-                    // bomb indicator
+                    // sets location of the bomb placement indicator
                     if (gato.facing.Up)
                     {
                         bombIndX = (_players[mainPlayerName].x + 16) / 32;
@@ -369,7 +378,7 @@ namespace Gato_Exploso
         {
             for (int i = eggs.Count - 1; i >= 0; i--)
             {
-
+                
                 Egg curEgg = eggs[i];
                 curEgg.Tick();
                 if(curEgg.doneTraveling)
@@ -415,6 +424,7 @@ namespace Gato_Exploso
             Player p = GetMainPlayer();
             return new Vector2(oldPoint.X + p.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), oldPoint.Y + p.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
         }
+        // vice versa
         public Vector2 WorldToScreenPoint(Vector2 oldPoint)
         {
             Player p = GetMainPlayer();
@@ -438,7 +448,7 @@ namespace Gato_Exploso
                 }
             }
 
-
+            // resets players' healths and randomly teleports them
             foreach (string s in playersToDie)
             {
 
@@ -463,13 +473,13 @@ namespace Gato_Exploso
                 {
                     curPlayer.hp += 0.015;
                 }
-                // removes idle players
+                // waits to remove idle players as not to disrupt the rest of the loop
                 if (curPlayer.IsTimedOut() && curPlayer.Name != "gato")
                 {
                     playersToRemove.Add(curPlayer);
                 }
             }
-
+            // removes idle players
             foreach (var curPlayer in playersToRemove)
             {
                 _players.Remove(curPlayer.Name);
@@ -482,7 +492,7 @@ namespace Gato_Exploso
             cursor = Mouse.GetState();
             PlayerActionArgs actionArgs = new PlayerActionArgs();
             Player player = GetMainPlayer();
-
+            // sets key pressed variables based on recieved key inputs
             if (state.IsKeyDown(Keys.W)) { direction.Up = true; }
             if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
             if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
