@@ -11,6 +11,7 @@ namespace Gato_Exploso.Infos
         public int GameTime { get; set; }
         public List<PlayerInfo> PlayerInfos { get; set; }
         public List<TileInfo> TileInfos { get; set; }
+        public List<ProjectileInfo> ProjectileInfos { get; set; }
 
     }
 }

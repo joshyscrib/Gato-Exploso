@@ -73,9 +73,21 @@ namespace Gato_Exploso
         // returns the tile at a given position
         public Tile GetTile(int x, int y)
         {
-            if (x < 0 || y < 0 || x > 99 || y > 99)
+            if (x < 0)
             {
-                return null;
+                return tiles[0, y];
+            }
+            if (x > 99)
+            {
+                return tiles[99, y];
+            }
+            if (y < 0)
+            {
+                return tiles[x, 0];
+            }
+            if (y > 99)
+            {
+                return tiles[x, 99];
             }
             return tiles[x, y];
         }

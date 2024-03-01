@@ -10,6 +10,12 @@ namespace Gato_Exploso
 {
     public class Egg : Entity
     {
+        // total eggs created
+        public static int numEggsCreated = 0;
+
+        // id of egg
+        public int Id { get; set; }
+
         // location of egg
         public int x = 0;
         public int y = 0;
@@ -19,6 +25,11 @@ namespace Gato_Exploso
 
         // when the egg was fired
         public int createTime = 0;
+        
+        // starting location of egg
+        public int startX = 0;
+        public int startY = 0;
+
         // egg image
         protected static Texture2D eggTexture;
 
@@ -39,6 +50,9 @@ namespace Gato_Exploso
             createTime = Game1.Instance.GetTime();
             endTime = Game1.Instance.GetTime() + maxTime;
             this.speed = speed;
+            this.startX = startX;
+            this.startY = startY;
+            Id = numEggsCreated++;
         }
         public void Load()
         {

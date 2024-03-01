@@ -142,11 +142,46 @@ namespace Gato_Exploso
                 }
                 tileInfos.Add(information);
             }
-
+            List<ProjectileInfo> eggInfos = new List<ProjectileInfo>();
+            for (int i = eggs.Count - 1; i >= 0; i--)
+            {
+                Egg curEgg = eggs[i];
+                if (eggs[i].createTime < time - 100)
+                {
+                    break;
+                }
+                ProjectileInfo pInfo = new ProjectileInfo();
+                pInfo.StartX = curEgg.startX;
+                pInfo.StartY = curEgg.startY;
+                pInfo.Id = curEgg.Id;
+                // BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP ...                          ... or i could do a cheating
+                pInfo.Speed = curEgg.speed + 5;
+                if (curEgg.direction.Up)
+                {
+                    pInfo.Direction = 1;
+                }
+                if (curEgg.direction.Left)
+                {
+                    pInfo.Direction = 2;
+                }
+                if (curEgg.direction.Down)
+                {
+                    pInfo.Direction = 3;
+                }
+                if (curEgg.direction.Right)
+                {
+                    pInfo.Direction = 4;
+                }
+                pInfo.EndTime = curEgg.endTime;
+                pInfo.Type = 1;
+                eggInfos.Add(pInfo);
+            }
+            info.ProjectileInfos = eggInfos;
             info.TileInfos = tileInfos;
             info.PlayerInfos = list;
             info.GameTime = (int)currentTime;
             return info;
+
         }
 
         protected Player GetMainPlayer()
@@ -239,7 +274,7 @@ namespace Gato_Exploso
             {
                 if (play != player)
                 {
-                // 
+                    // 
                     HashSet<Vector2> playerCoords = GetPlayerTiles(play);
                     if (attackCoords.Intersect(playerCoords).Count() > 0)
                     {
@@ -257,9 +292,9 @@ namespace Gato_Exploso
         }
         public void Shoot(Player player)
         {
-            Egg egg = new Egg(player.x,player.y,player.facing,player.speed + 7, 3000);
+            Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000);
             // sets egg's location, direction and speed to match the player that shot it
-            
+
             eggs.Add(egg);
         }
 
@@ -378,12 +413,12 @@ namespace Gato_Exploso
         {
             for (int i = eggs.Count - 1; i >= 0; i--)
             {
-                
+                // removes eggs that have traveled too far
                 Egg curEgg = eggs[i];
                 curEgg.Tick();
-                if(curEgg.doneTraveling)
+                if (curEgg.doneTraveling)
                 {
-                    eggs.RemoveAt(i);
+                    BreakEgg(curEgg);
                     continue;
                 }
                 // checks what direction the egg is moving and moves it in that direction
@@ -403,7 +438,28 @@ namespace Gato_Exploso
                 {
                     curEgg.x += curEgg.speed;
                 }
+                // damages players and removes egg if it collides with smth
+                foreach (Player hooman in _players.Values)
+                {
+                    if (CollisionDetection.AreRectsInEachOther(hooman.x, hooman.y, hooman.width, hooman.height, curEgg))
+                    {
+                        hooman.hp -= 17;
+                        BreakEgg(curEgg);
+                    }
+                    // checks if the egg collides with a solid tile
+                    else if (level1.GetTile(curEgg.x / 32, curEgg.y / 32).IsSolid())
+                    {
+                        BreakEgg(curEgg);
+                    }
+                }
             }
+
+        }
+
+        // what to do when the given egg breaks
+        public void BreakEgg(Egg eg)
+        {
+            eggs.Remove(eg);
         }
         // gets the tile at a position
         private Tile getTileAt(int x, int y)
@@ -550,16 +606,22 @@ namespace Gato_Exploso
                 {
                         // top left
                     new Vector2(p.x / tileSide, p.y / tileSide),
+
                         // mid left
                     new Vector2(p.x / tileSide, (p.y + (p.height / 2)) / tileSide),
+
                         // bottom left
                     new Vector2(p.x / tileSide, (p.y + p.height) / tileSide),
+
                         // top right
                     new Vector2((p.x + p.width) / tileSide, p.y / tileSide),
+
                         // mid right
                     new Vector2(p.x / tileSide, p.y + (p.height / tileSide)),
+
                         //bottom right
                     new Vector2(p.x / tileSide, (p.y + p.height) / tileSide)
+
                 };
             return playerTiles;
         }
@@ -606,11 +668,11 @@ namespace Gato_Exploso
         public string GetEggs()
         {
             StringBuilder eggString = new StringBuilder();
-            for(int i = 0; i < eggs.Count; i++)
+            for (int i = 0; i < eggs.Count; i++)
             {
                 eggString.Append(eggs[i]);
             }
-            return eggString.ToString();   
+            return eggString.ToString();
         }
 
         // tells each class to draw themselves
@@ -647,7 +709,7 @@ namespace Gato_Exploso
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX), (bombIndY * 32) - (level1.offsetY));
             _spriteBatch.End();
 
-         
+
         }
     }
 }

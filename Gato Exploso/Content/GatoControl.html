@@ -40,7 +40,22 @@
             Health;
             Facing;
         };
+        class Projectile {
+            X;
+            Y;
+            Type;
+            StartX;
+            StartY;
+            Speed;
+            Direction;
+            Id;
+            EndTime;
+        };
+        // map of all projectiles
+        const projectileMap = new Map();
+        // joystick
         var joystick;
+
         var playerName = "";
         var tiles = new Array();
         var tileRows = 100;
@@ -91,8 +106,10 @@
                 }
             }
             );
+            setInterval(tickGame, 30);
             setInterval(checkJoystick, 50);
             setTimeout(getPlayerLocations, 50);
+            
         }
 
         // gets locations of all players
@@ -136,6 +153,37 @@
             
         }
 
+        // moves eggs and removes eggs
+        function tickGame() {
+            var IdsToRemove = new Array();
+            for (var [curId, curEgg] of projectileMap) {
+
+                if (curEgg.EndTime < lastGameTime) {
+                    IdsToRemove.push(curEgg.Id);
+                }
+                switch (curEgg.Direction) {
+                    case 1:
+                        curEgg.Y -= curEgg.Speed;
+                        break;
+                    case 2:
+                        curEgg.X -= curEgg.Speed;
+                        break;
+                    case 3:
+                        curEgg.Y += curEgg.Speed;
+                        break;
+                    case 4:
+                        curEgg.X += curEgg.Speed;
+                        break;
+                    default:
+                        console.log("ruh roh SIDFISUDFIOSUFDHSUDFI ops");
+                }
+            }
+            for (var i = 0; i < IdsToRemove.length; i++) {
+                projectileMap.delete(IdsToRemove[i]);
+            }
+
+        }
+
         function parsePlayers(data) {
             //  console.log(data);
             var gameInfo = JSON.parse(data);
@@ -150,6 +198,25 @@
 
                 playerMap.set(player.Name, player);
 
+            }
+            for (var i = 0; i < gameInfo.ProjectileInfos.length; i++) {
+                var curInfo = gameInfo.ProjectileInfos[i];
+                if (lastGameTime > curInfo.endTime) {
+                    continue;
+                }
+                if (!projectileMap.has(curInfo.Id)) {
+                    var proj = new Projectile();
+                    proj.Direction = curInfo.Direction;
+                    proj.X = curInfo.StartX;
+                    proj.Y = curInfo.StartY;
+                    proj.StartX = curInfo.StartX;
+                    proj.StartY = curInfo.startY;
+                    proj.Speed = curInfo.Speed;
+                    proj.Type = curInfo.Type;
+                    proj.Id = curInfo.Id;
+                    proj.EndTime = curInfo.EndTime;
+                    projectileMap.set(proj.Id, proj);
+                }
             }
             var tileList = gameInfo.TileInfos;
             for (var i = 0; i < tileList.length; i++) {
@@ -349,6 +416,11 @@
                     
 
                 }
+            }
+            // draws all eggs
+            for (var [curId, curEgg] of projectileMap) {
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(100 + curEgg.X + offsetX + 1, curEgg.Y + offsetY + 96, 32, 32);
             }
             // draws self;
             ctx.fillStyle = 'blue';
