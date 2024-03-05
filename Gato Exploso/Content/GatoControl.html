@@ -199,8 +199,10 @@
                 playerMap.set(player.Name, player);
 
             }
+            var currentProjectiles = new Set();
             for (var i = 0; i < gameInfo.ProjectileInfos.length; i++) {
                 var curInfo = gameInfo.ProjectileInfos[i];
+                currentProjectiles.add(curInfo.Id);
                 if (lastGameTime > curInfo.endTime) {
                     continue;
                 }
@@ -218,6 +220,14 @@
                     projectileMap.set(proj.Id, proj);
                 }
             }
+
+            // going through all projectiles known to the js file
+            for (var [curId, curEgg] of projectileMap) {
+                if (!currentProjectiles.has(curId)) {
+                    projectileMap.delete(curId);
+                }
+            }
+
             var tileList = gameInfo.TileInfos;
             for (var i = 0; i < tileList.length; i++) {
                 var tileinfo = tileList[i];
@@ -302,6 +312,9 @@
                         god = !god;
                     }
                     break;
+                case 69:
+                    shoot();
+                    break;
                 
             }
         }
@@ -325,9 +338,7 @@
                 case 32:
                     attack();
                     break;
-                case 69:
-                    shoot();
-                    break;
+                
             }
         }
         function attack() {
@@ -427,7 +438,7 @@
             if (god) {
                 ctx.fillStyle = 'yellow';
             }
-            ctx.fillRect(330, 315, 32, 64);
+            ctx.fillRect(330, 315, 64, 64);
 
             
             ctx.font = "30px serif";
@@ -443,7 +454,7 @@
                             ctx.fillStyle = 'yellow';
                         }
                     }
-                    ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 32, 64);
+                    ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 64, 64);
 
                 }
                 // draws names

@@ -74,7 +74,7 @@ namespace Gato_Exploso
                 string html = "ok";
 
 
-                // returns tje joystick
+                // returns the joystick
                 if (request.Url.PathAndQuery.ToLower().Contains("joy.js"))
                 {
                     html = File.ReadAllText("../../../Content/Joy.js");
@@ -222,7 +222,7 @@ namespace Gato_Exploso
                 actionArgs.name = name;
                if(type == "peck")
                 {
-                    actionArgs.attack = true;
+                    actionArgs.shoot = true;                            // CHANGE (: (: (:
                 }
                 else
                 {

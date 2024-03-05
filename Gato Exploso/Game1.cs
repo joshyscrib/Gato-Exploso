@@ -146,10 +146,6 @@ namespace Gato_Exploso
             for (int i = eggs.Count - 1; i >= 0; i--)
             {
                 Egg curEgg = eggs[i];
-                if (eggs[i].createTime < time - 100)
-                {
-                    break;
-                }
                 ProjectileInfo pInfo = new ProjectileInfo();
                 pInfo.StartX = curEgg.startX;
                 pInfo.StartY = curEgg.startY;
@@ -292,10 +288,16 @@ namespace Gato_Exploso
         }
         public void Shoot(Player player)
         {
-            Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000);
-            // sets egg's location, direction and speed to match the player that shot it
+            // sets cooldown between shots
+            if(Instance.currentTime - player.lastTimeFired >= 400)
+            {
+                player.lastTimeFired = Instance.currentTime;
+                Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000, player.Name);
+                // sets egg's location, direction and speed to match the player that shot it
 
-            eggs.Add(egg);
+                eggs.Add(egg);
+            }
+            
         }
 
         // loads images for different classes
@@ -441,17 +443,31 @@ namespace Gato_Exploso
                 // damages players and removes egg if it collides with smth
                 foreach (Player hooman in _players.Values)
                 {
-                    if (CollisionDetection.AreRectsInEachOther(hooman.x, hooman.y, hooman.width, hooman.height, curEgg))
+                    if (CollisionDetection.AreRectsInEachOther(hooman.x, hooman.y, hooman.width, hooman.height, curEgg) && hooman.Name != curEgg.nameOfLauncher)
                     {
                         hooman.hp -= 17;
                         BreakEgg(curEgg);
                     }
                     // checks if the egg collides with a solid tile
-                    else if (level1.GetTile(curEgg.x / 32, curEgg.y / 32).IsSolid())
-                    {
-                        BreakEgg(curEgg);
-                    }
+
                 }
+                if (level1.GetTile(curEgg.x / 32, curEgg.y / 32).IsSolid())
+                {
+                    BreakEgg(curEgg);
+                }
+                else if (level1.GetTile((curEgg.x + 32) / 32, curEgg.y / 32).IsSolid())
+                {
+                    BreakEgg(curEgg);
+                }
+                else if (level1.GetTile(curEgg.x / 32, (curEgg.y + 32) / 32).IsSolid())
+                {
+                    BreakEgg(curEgg);
+                }
+                else if (level1.GetTile((curEgg.x + 32) / 32, (curEgg.y + 32) / 32).IsSolid())
+                {
+                    BreakEgg(curEgg);
+                }
+
             }
 
         }
@@ -553,6 +569,8 @@ namespace Gato_Exploso
             if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
             if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
             if (state.IsKeyDown(Keys.D)) { direction.Right = true; }
+            if (state.IsKeyDown(Keys.P)) { _players["gato"].hp += 5; }                                                      // HACKS HACKS HACKS HACKS
+
             if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -694,7 +712,7 @@ namespace Gato_Exploso
                 }
                 else
                 {
-                    play.Draw(_spriteBatch, play.x, play.y);
+                    play.Draw(_spriteBatch, (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2) - 8, (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2) - 12);
                 }
             }
             // draws eggs

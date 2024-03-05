@@ -15,15 +15,16 @@ namespace Gato_Exploso
         private double lastMoveTime = 0;
         public int x = 2000;
         public int y = 2000;
-        public int width = 32;
-        public int height = 64;
+        public int width = 60;
+        public int height = 48;
         public int speed = 3;
         // which direcion the player is facing
         public MoveDirection facing = new MoveDirection();
         protected ContentManager Content;
-        protected Texture2D PTextureUp;
+        protected Texture2D PTextureLeft;
         protected Texture2D PTextureRight;
         public bool moving = false;
+        public double lastTimeFired = 0;
         // player health
         public double hp = 100;
         public Player(ContentManager context, double createTime)
@@ -52,8 +53,8 @@ namespace Gato_Exploso
         // loads player texture
         public void Load()
         {
-            PTextureUp = Content.Load<Texture2D>("TempGatoUp");
-            PTextureRight = Content.Load<Texture2D>("TempGatoRight");
+            PTextureLeft = Content.Load<Texture2D>("gato3L");
+            PTextureRight = Content.Load<Texture2D>("gato3R");
         }
 
         // moves player to an X or Y

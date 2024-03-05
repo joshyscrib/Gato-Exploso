@@ -17,7 +17,7 @@ namespace Gato_Exploso
         // checks if a single point is in a rectangle
         public static bool IsPointInRect(int x, int y, int width, int height, Vector2 point)
         {
-            if (point.X >= x && point.X <= x + width && point.Y >= y && point.Y <= y)
+            if (point.X >= x && point.X <= x + width && point.Y >= y && point.Y <= y + height)
             {
                 return true;
             }

@@ -16,9 +16,8 @@ namespace Gato_Exploso
         // id of egg
         public int Id { get; set; }
 
-        // location of egg
-        public int x = 0;
-        public int y = 0;
+        // who fired the egg
+        public string nameOfLauncher = "";
 
         // if the egg has reached its max distance travelled
         public bool doneTraveling = false;
@@ -39,7 +38,7 @@ namespace Gato_Exploso
         // speed and direction of egg
         public int speed = 0;
         public MoveDirection direction = new MoveDirection();
-        public Egg(int startX, int startY, MoveDirection dir, int speed, int maxTime)
+        public Egg(int startX, int startY, MoveDirection dir, int speed, int maxTime, string nameOfLauncher)
         {
             // defaults direction to left to avoid any errors
             direction.Left = true;
@@ -53,6 +52,7 @@ namespace Gato_Exploso
             this.startX = startX;
             this.startY = startY;
             Id = numEggsCreated++;
+            this.nameOfLauncher = nameOfLauncher;
         }
         public void Load()
         {
