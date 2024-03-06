@@ -83,9 +83,20 @@
         // makes sure the web sends and recieves data every time it tries
         var tick = Date.now();
 
-        // images
+            // images
+        // grass tiles
         var grassImage = new Image(browserTileSize, browserTileSize);
         grassImage.src = "/image/GrassTile.png";
+
+        // gato sprites
+        
+        var gatoLImage = new Image();
+        gatoLImage.src = "/image/gato3L.png"
+
+        var gatoRImage = new Image();
+        gatoRImage.src = "/image/gato3R.png"
+
+        var curGatoImage = gatoLImage;
         function sendMove(dir) {
             // this is how you call a url
             $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
@@ -446,7 +457,13 @@
                 // draws others
                 if (curPlayer.Name != playerName) {
                     if (curPlayer.Name == "gato") {
-                        ctx.fillStyle = 'red';
+                        if (curPlayer.Facing.Left) {
+                            curGatoImage = gatoLImage
+                        }
+                        if (curPlayer.Facing.Right) {
+                            curGatoImage = gatoRImage
+                        }
+                        ctx.drawImage(curGatoImage, 100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96);
                     }
                     else {
                         ctx.fillStyle = 'blue';
@@ -454,7 +471,9 @@
                             ctx.fillStyle = 'yellow';
                         }
                     }
-                    ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 64, 64);
+                    if (curPlayerName != "gato") {
+                        ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 64, 64);
+                    }
 
                 }
                 // draws names

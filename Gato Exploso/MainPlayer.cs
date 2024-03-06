@@ -17,6 +17,7 @@ namespace Gato_Exploso
         {
             Name = "gato";
         }
+        
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
             if (curTexture == null)
@@ -32,6 +33,12 @@ namespace Gato_Exploso
         public override void Attack()
         {
 
+        }
+
+        public override void Load()
+        {
+            PTextureLeft = Content.Load<Texture2D>("gato3L");
+            PTextureRight = Content.Load<Texture2D>("gato3R");
         }
     }
 

@@ -24,9 +24,11 @@ namespace Gato_Exploso
         }
         public void Draw(SpriteBatch spriteBatch, int health, int bombX, int bombY)
         {
-            spriteBatch.Draw(texture, new Rectangle(1100, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 290, 408, 100), Color.Gray);
-            spriteBatch.Draw(texture, new Rectangle(1104, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 286, health * 4, 92), Color.Lime);
-            spriteBatch.Draw(texture, new Rectangle(bombX, bombY, 32, 32), Color.Red);
+            // draws health bar
+            spriteBatch.Draw(texture, new Rectangle(1100, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 290, 408, 75), Color.Gray);
+            spriteBatch.Draw(texture, new Rectangle(1104, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 286, health * 4, 67), Color.Lime);
+            
+            // TODO draw inventory
         }
     }
 }

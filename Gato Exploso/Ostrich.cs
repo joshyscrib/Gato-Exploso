@@ -27,7 +27,7 @@ namespace Gato_Exploso
             if (facing.Right) { curTexture = PTextureRight; }
             if (facing.Left) { curTexture = PTextureLeft; }
             Vector2 playerLocation = new Vector2(x, y);
-            spriteBatch.Draw(curTexture, playerLocation,  Color.Red);
+            spriteBatch.Draw(curTexture, playerLocation,  Color.White);
         }
         public override void Attack()
         {
@@ -36,6 +36,12 @@ namespace Gato_Exploso
         public void Shoot()
         {
 
+        }
+
+        public override void Load()
+        {
+            PTextureLeft = Content.Load<Texture2D>("ostrichL1");
+            PTextureRight = Content.Load<Texture2D>("ostrichR1");
         }
     }
 

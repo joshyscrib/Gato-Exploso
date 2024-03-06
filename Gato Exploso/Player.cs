@@ -51,11 +51,7 @@ namespace Gato_Exploso
             return false;
         }
         // loads player texture
-        public void Load()
-        {
-            PTextureLeft = Content.Load<Texture2D>("gato3L");
-            PTextureRight = Content.Load<Texture2D>("gato3R");
-        }
+        public abstract void Load();
 
         // moves player to an X or Y
         // there is a seperate function for each so that the player can still move horizontally  if they are touching a wall above them, or vice-versa

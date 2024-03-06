@@ -335,7 +335,8 @@ namespace Gato_Exploso
                     targetY -= gato.speed;
                     Tile l = getTileAt(gato.x, targetY - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
-                    if (isPassableTile(l) && isPassableTile(r) && gato.y > 0)
+                    Tile m = getTileAt(gato.x + (gato.width/2), gato.y);
+                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y > 0)
                     {
                         gato.MoveY(targetY);
                     }
@@ -346,7 +347,7 @@ namespace Gato_Exploso
                     targetX -= gato.speed;
                     Tile t = getTileAt(targetX, gato.y);
                     Tile b = getTileAt(targetX, gato.y + gato.height - 1);
-                    Tile m = getTileAt(targetX, gato.y + 32);
+                    Tile m = getTileAt(targetX, gato.y + (gato.height/2));
                     if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x > 0)
                     {
                         gato.MoveX(targetX);
@@ -358,7 +359,8 @@ namespace Gato_Exploso
                     targetY += gato.speed;
                     Tile l = getTileAt(gato.x, targetY + gato.height - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
-                    if (isPassableTile(l) && isPassableTile(r) && gato.y < 3168)
+                    Tile m = getTileAt(gato.x + (gato.width / 2), gato.y + gato.height);
+                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y < 3168)
                     {
                         gato.MoveY(targetY);
                     }
