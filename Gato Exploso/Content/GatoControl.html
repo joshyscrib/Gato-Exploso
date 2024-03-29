@@ -39,6 +39,7 @@
             Y;
             Health;
             Facing;
+            Points;
         };
         class Projectile {
             X;
@@ -91,12 +92,20 @@
         // gato sprites
         
         var gatoLImage = new Image();
-        gatoLImage.src = "/image/gato3L.png"
+        gatoLImage.src = "/image/gato3L.png";
 
         var gatoRImage = new Image();
-        gatoRImage.src = "/image/gato3R.png"
+        gatoRImage.src = "/image/gato3R.png";
 
         var curGatoImage = gatoLImage;
+
+        var ostrichLImage = new Image();
+        ostrichLImage.src = "/image/ostrichL1.png";
+
+        var ostrichRImage = new Image();
+        ostrichRImage.src = "/image/ostrichR1.png";
+
+        var curOstrichImage = ostrichLImage;
         function sendMove(dir) {
             // this is how you call a url
             $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
@@ -205,6 +214,7 @@
                 if (player.Name == playerName) {
                     mainPlayerX = player.X;
                     mainPlayerY = player.Y;
+                    
                 }
 
                 playerMap.set(player.Name, player);
@@ -255,7 +265,6 @@
                         switch (curObjInfo.ObjectType) {
                             case "bomb":
                                 tile.hasBomb = true;
-                                console.log("has bomb KABOOMIE");
                                 break;
                             case "rock":
                                 tile.hasRock = true;
@@ -445,17 +454,24 @@
                 ctx.fillRect(100 + curEgg.X + offsetX + 1, curEgg.Y + offsetY + 96, 32, 32);
             }
             // draws self;
-            ctx.fillStyle = 'blue';
-            if (god) {
-                ctx.fillStyle = 'yellow';
-            }
-            ctx.fillRect(330, 315, 64, 64);
+            ctx.drawImage(curOstrichImage, 330, 315, 64, 64);
 
             
             ctx.font = "30px serif";
             for (var [curPlayerName, curPlayer] of playerMap) {
-                // draws others
+
+                // determines which direction ostriches are facing
+                if (curPlayer.Name != "gato") {
+                    if (curPlayer.Facing.Left) {
+                        curOstrichImage = ostrichLImage;
+                    }
+                    if (curPlayer.Facing.Right) {
+                        curOstrichImage = ostrichRImage
+                    }
+                }
+                
                 if (curPlayer.Name != playerName) {
+                    // determines gato image (left/right)
                     if (curPlayer.Name == "gato") {
                         if (curPlayer.Facing.Left) {
                             curGatoImage = gatoLImage
@@ -463,6 +479,7 @@
                         if (curPlayer.Facing.Right) {
                             curGatoImage = gatoRImage
                         }
+                        // draw gato
                         ctx.drawImage(curGatoImage, 100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96);
                     }
                     else {
@@ -472,7 +489,8 @@
                         }
                     }
                     if (curPlayerName != "gato") {
-                        ctx.fillRect(100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 64, 64);
+                        // draw ostrich
+                        ctx.drawImage(curOstrichImage, 100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96, 64, 64)
                     }
 
                 }
@@ -497,7 +515,7 @@
             attackCtx.fillStyle = 'red';
             attackCtx.fillRect(20, 20, 150, 150);
             // writes current latency
-            ctx.fillText(avgLatency + "ms", 750, 50, 999);
+            ctx.fillText(playerMap[playerName].Points + " points", 750, 50, 999);
         }
 
 

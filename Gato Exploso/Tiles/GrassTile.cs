@@ -1,12 +1,11 @@
-﻿using Gato_Exploso;
-using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Net.Mime;
 
-namespace Gato_Exploso
+namespace Gato_Exploso.Tiles
 {
     internal class GrassTile : Tile
     {

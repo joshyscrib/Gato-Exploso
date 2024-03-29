@@ -14,5 +14,6 @@ namespace Gato_Exploso.Infos
         public int Y { get; set; }
         public int Health { get; set; }
         public MoveDirection Facing { get; set; }
+        public int Points { get; set; }
     }
 }

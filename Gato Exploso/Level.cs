@@ -12,6 +12,7 @@ using Gato_Exploso.TileObjects;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics.CodeAnalysis;
 using System.Data;
+using Gato_Exploso.Tiles;
 
 namespace Gato_Exploso
 {
@@ -19,11 +20,14 @@ namespace Gato_Exploso
     {
         // variables
 
+        // generated world
+        
+
         public bool playerBombed = false;
 
         // amount of tiles per row/column
-        public const int xTiles = 100;
-        public const int yTiles = 100;
+        public const int xTiles = 128;
+        public const int yTiles = 128;
         // width/height of each tile
         public const int tileSide = 32;
         // matrix of tiles
@@ -38,10 +42,14 @@ namespace Gato_Exploso
         // list of tiles that have bombs on them
         private HashSet<Vector2> activeTileCoords = new HashSet<Vector2>();
 
+        // variable to store procedurally generated world data
+        double[,] data;
+
         // constructor
         public Level()
         {
-
+            DiamondSquare diamond = new DiamondSquare(xTiles, 100, 12);
+            data = diamond.getData();
         }
         // methods
 
@@ -148,6 +156,32 @@ namespace Gato_Exploso
         // Assigns each tile a type
         public void InitTiles()
         {
+            for (int i = 0; i < xTiles; i++)
+            {
+                for (int j = 0; j < yTiles; j++)
+                {
+                    Tile tile = new GrassTile();
+                    double curTileNum = data[i,j];
+                    if(curTileNum < -60)
+                    {
+                        tile = new WaterTile();
+                    }
+                    if(curTileNum >= 10)
+                    {
+                        tile = new LForestTile();
+                    }
+                    if(curTileNum >= 60)
+                    {
+                        tile = new DForestTile();
+                    }
+                    tiles[i, j] = tile;
+                    tiles[i, j].x = i;
+                    tiles[i, j].y = j;
+
+                }
+            }
+            
+            /*
             Random random = new Random(100);
 
             for (int i = 0; i < xTiles; i++)
@@ -169,6 +203,7 @@ namespace Gato_Exploso
                 tiles[rockTileX, rockTileY].PlaceRock();
 
             }
+            */
         }
 
         // Draws all of the tiles relative to the player's position
@@ -235,8 +270,8 @@ namespace Gato_Exploso
 
             Vector2 vec = GetTileUnderMouse();
             if (!IsCoordInBounds(vec)) { return; }
+            
 
-            RockTile rock = new RockTile();
 
             tiles[(int)vec.X, (int)vec.Y].PlaceRock();
 

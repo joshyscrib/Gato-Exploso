@@ -9,7 +9,7 @@ using System.Net.Mime;
 using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 
-namespace Gato_Exploso
+namespace Gato_Exploso.Tiles
 {
     internal abstract class Tile : Entity
     {
@@ -37,7 +37,7 @@ namespace Gato_Exploso
         int explosionStartTime = 0;
         protected Texture2D tileTexture;
         // current game time
-       // protected int curTickCount = 0;
+        // protected int curTickCount = 0;
 
         protected int lastModifiedTime = 0;
         // methods
@@ -55,6 +55,11 @@ namespace Gato_Exploso
             foreach (var obj in objects)
             {
                 obj.Draw(spriteBatch, x, y);
+                if (obj is Tree)
+                {
+                    Tree tree = (Tree)obj;
+                    tree.DrawTop(spriteBatch, x, y - 1);
+                }
             }
         }
         // returns list of tile objects
@@ -129,7 +134,7 @@ namespace Gato_Exploso
         public void startExplosion()
         {
 
-        //    curTickCount = Game1.Instance.GetTime();
+            //    curTickCount = Game1.Instance.GetTime();
             explosionStartTime = Game1.Instance.GetTime(); ;
             isExploding = true;
 

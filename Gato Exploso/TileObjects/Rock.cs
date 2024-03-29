@@ -23,7 +23,7 @@ namespace Gato_Exploso.TileObjects
 
         public void Load()
         {
-            rockTexture = Game1.GameContent.Load<Texture2D>("TemporaryRockTile");
+            rockTexture = Game1.GameContent.Load<Texture2D>("Rock");
 
         }
 

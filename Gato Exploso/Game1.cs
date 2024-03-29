@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using Gato_Exploso.TileObjects;
 using System.Security.Cryptography.X509Certificates;
+using Gato_Exploso.Tiles;
 
 namespace Gato_Exploso
 {
@@ -92,7 +93,7 @@ namespace Gato_Exploso
                 list.Add(curPlayer);
                 curPlayer.Health = (int)player.hp;
                 curPlayer.Facing = player.facing;
-
+                curPlayer.Points = player.points;
             }
             if (!_players.ContainsKey(playerName))
             {
@@ -423,6 +424,7 @@ namespace Gato_Exploso
                 if (curEgg.doneTraveling)
                 {
                     BreakEgg(curEgg);
+                    
                     continue;
                 }
                 // checks what direction the egg is moving and moves it in that direction
@@ -447,8 +449,13 @@ namespace Gato_Exploso
                 {
                     if (CollisionDetection.AreRectsInEachOther(hooman.x, hooman.y, hooman.width, hooman.height, curEgg) && hooman.Name != curEgg.nameOfLauncher)
                     {
+                        
                         hooman.hp -= 17;
-                        BreakEgg(curEgg);
+                        if (hooman.hp <= 0)
+                        {
+                            _players[curEgg.nameOfLauncher].points++;
+                           }
+                            BreakEgg(curEgg);
                     }
                     // checks if the egg collides with a solid tile
 
@@ -515,6 +522,7 @@ namespace Gato_Exploso
                 if (play.hp <= 0)
                 {
                     playersToDie.Add(play.Name);
+                    
                 }
                 else
                 {
