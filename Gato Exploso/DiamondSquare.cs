@@ -20,9 +20,9 @@ namespace Gato_Exploso
             this._seed = seed;
         }
 
-        public double[,] getData()
+        public double[,] getData(int giveSeed)
         {
-            return diamondSquareAlgorithm(1);
+            return diamondSquareAlgorithm(giveSeed);
         }
 
         private double[,] diamondSquareAlgorithm(int seed)

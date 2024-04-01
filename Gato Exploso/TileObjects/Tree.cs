@@ -10,29 +10,27 @@ namespace Gato_Exploso.TileObjects
 {
     public class Tree : TileObject
     {
-        protected Texture2D treeTextureB;
-        protected Texture2D treeTextureT;
-        public Tree()
+        protected Texture2D treeTexture;
+        public Tree(char type)
         {
-            Load();
-            
+            Load(type);
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(treeTextureB, new Vector2(x, y), Color.White);
-        }
-        public void DrawTop(SpriteBatch spriteBatch, int x, int y)
-        {
-            spriteBatch.Draw(treeTextureB, new Vector2(x, y), Color.White);
+            spriteBatch.Draw(treeTexture, new Vector2(x, y), Color.White);
         }
 
 
-        public void Load()
+        public void Load(char type)
         {
-
-            treeTextureB = Game1.GameContent.Load<Texture2D>("TreeBottom");
-            treeTextureT = Game1.GameContent.Load<Texture2D>("TreeTop");
-
+            if(type == 'L')
+            {
+               treeTexture = Game1.GameContent.Load<Texture2D>("LTree");
+            }
+            else
+            {
+                treeTexture = Game1.GameContent.Load<Texture2D>("DTree");
+            }
 
         }
 

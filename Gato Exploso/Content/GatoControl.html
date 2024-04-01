@@ -59,7 +59,7 @@
 
         var playerName = "";
         var tiles = new Array();
-        var tileRows = 100;
+        var tileRows = 256;
         var tileData = "";
         // this player's location
         var mainPlayerX = 0;
@@ -84,13 +84,13 @@
         // makes sure the web sends and recieves data every time it tries
         var tick = Date.now();
 
-            // images
+        // images
         // grass tiles
         var grassImage = new Image(browserTileSize, browserTileSize);
         grassImage.src = "/image/GrassTile.png";
 
         // gato sprites
-        
+
         var gatoLImage = new Image();
         gatoLImage.src = "/image/gato3L.png";
 
@@ -119,8 +119,8 @@
             $.get("/gameworld", function (data) {
                 for (var i = 0; i < data.length; i++) {
                     var c = data.charAt(i);
-                    var rowNum = Math.floor(i / 100);
-                    var colNum = i % 100;
+                    var rowNum = Math.floor(i / tileRows);
+                    var colNum = i % tileRows;
                     tileData = data;
                     tiles[rowNum][colNum].tileID = c;
                 }
@@ -129,7 +129,7 @@
             setInterval(tickGame, 30);
             setInterval(checkJoystick, 50);
             setTimeout(getPlayerLocations, 50);
-            
+
         }
 
         // gets locations of all players
@@ -140,8 +140,7 @@
                 lastFullUpdate = curTime;
                 offsetTime = 0;
             }
-            $.get("/playerinfo?name=" + playerName + "&knonce=" + tick++ + "&time=" + offsetTime, parsePlayers).always(function (d)
-            {
+            $.get("/playerinfo?name=" + playerName + "&knonce=" + tick++ + "&time=" + offsetTime, parsePlayers).always(function (d) {
                 var elapsed = Date.now() - curTime;
                 var msToWait = 30 - elapsed;
                 if (msToWait < 0) {
@@ -159,7 +158,7 @@
 
         }
 
-//        calculates latency and adds to list
+        //        calculates latency and adds to list
         function addAndComputeLatency(latency) {
             lastLatencies.push(latency);
             if (lastLatencies.length > 10) {
@@ -170,7 +169,7 @@
                 all += lastLatencies[i];
             }
             avgLatency = Math.floor(all / lastLatencies.length);
-            
+
         }
 
         // moves eggs and removes eggs
@@ -214,7 +213,7 @@
                 if (player.Name == playerName) {
                     mainPlayerX = player.X;
                     mainPlayerY = player.Y;
-                    
+
                 }
 
                 playerMap.set(player.Name, player);
@@ -335,7 +334,7 @@
                 case 69:
                     shoot();
                     break;
-                
+
             }
         }
         function onKeyUp() {
@@ -358,7 +357,7 @@
                 case 32:
                     attack();
                     break;
-                
+
             }
         }
         function attack() {
@@ -409,7 +408,7 @@
 
         function drawWorld() {
             // image to draw
-            
+
             // Draws background in case player is near the edge of the world
             ctx.fillStyle = 'green';
             ctx.fillRect(0, 0, 900, 900);
@@ -417,13 +416,25 @@
             // Offset Function: 0 - TLPixel.X
             var offsetX = 0 - (mainPlayerX - 216) + 12;
             var offsetY = 0 - (mainPlayerY - 216) - 1;
-            for (var i = 0; i < 100; i++) {
-                for (var j = 0; j < 100; j++) {
+            for (var i = 0; i < tileRows; i++) {
+                for (var j = 0; j < tileRows; j++) {
                     var curTileImage = null;
                     var curTile = tiles[i][j];
                     if (curTile.tileID == '1') {
+                        ctx.fillStyle = 'blue';
+                    }
+                    if (curTile.tileID == '2') {
+                        ctx.fillStyle = 'yellow';
+                    }
+                    if (curTile.tileID == '3') {
                         ctx.fillStyle = 'lime';
                         curTileImage = grassImage;
+                    }
+                    if (curTile.tileID == '4') {
+                        ctx.fillStyle = 'green';
+                    }
+                    if (curTile.tileID == '5') {
+                        ctx.fillStyle = 'green';
                     }
                     if (curTile.hasRock) {
                         ctx.fillStyle = 'gray';
@@ -437,14 +448,14 @@
                         ctx.fillStyle = 'pink';
                         curTileImage = null;
                     }
-                    
+
                     if (curTileImage == null) {
                         ctx.fillRect((100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
                     }
                     else {
                         ctx.drawImage(curTileImage, (100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
                     }
-                    
+
 
                 }
             }
@@ -456,7 +467,7 @@
             // draws self;
             ctx.drawImage(curOstrichImage, 330, 315, 64, 64);
 
-            
+
             ctx.font = "30px serif";
             for (var [curPlayerName, curPlayer] of playerMap) {
 
@@ -469,7 +480,7 @@
                         curOstrichImage = ostrichRImage
                     }
                 }
-                
+
                 if (curPlayer.Name != playerName) {
                     // determines gato image (left/right)
                     if (curPlayer.Name == "gato") {
@@ -515,7 +526,13 @@
             attackCtx.fillStyle = 'red';
             attackCtx.fillRect(20, 20, 150, 150);
             // writes current latency
-            ctx.fillText(playerMap[playerName].Points + " points", 750, 50, 999);
+            if (playerMap.has(playerName)) {
+                var player = playerMap[playerName];
+                if (player != undefined) {
+                    ctx.fillText(playerMap[playerName].Points, 750, 50, 999);
+                }
+                
+            }
         }
 
 
@@ -529,34 +546,33 @@
 <body style="background-color:#a39161" " onload="init()">
 
     <div style="width: 900px;">
-    <div id="gamePanel">
+        <div id="gamePanel">
 
-        <canvas id="myCanvas" height="900" width="900" >
-        </canvas>
-        
-        <div style="width:900px; display: flex;">
-            <div style="width:70%;float:left;">
-                <div style="margin-left: 100px; width: 100px;" id="joystick"></div>
-            </div>
-           
-            <div style="flex grow: 1;touch-action:none;" id="attackContainer">
-                <canvas height="200" width="200" id="attackButtonCanvas" style="margin-top: 50px;">
+            <canvas id="myCanvas" height="900" width="900">
+            </canvas>
 
-                </canvas>
+            <div style="width:900px; display: flex;">
+                <div style="width:70%;float:left;">
+                    <div style="margin-left: 100px; width: 100px;" id="joystick"></div>
+                </div>
+
+                <div style="flex grow: 1;touch-action:none;" id="attackContainer">
+                    <canvas height="200" width="200" id="attackButtonCanvas" style="margin-top: 50px;">
+                    </canvas>
+                </div>
+
             </div>
-       
+
         </div>
 
-    </div>
 
+        <div id="registration" style="width: 900px;">
 
-    <div id="registration" style="width: 900px;">
+            <br />
+            <input id="playerName" />
 
-        <br />
-        <input id="playerName" />
-
-        <button onclick="registerPlayer()">Join!!!!!!!!!</button>
-    </div>
+            <button onclick="registerPlayer()">Join!!!!!!!!!</button>
+        </div>
     </div>
 </body>
 

@@ -26,8 +26,8 @@ namespace Gato_Exploso
         public bool playerBombed = false;
 
         // amount of tiles per row/column
-        public const int xTiles = 128;
-        public const int yTiles = 128;
+        public const int xTiles = 256;
+        public const int yTiles = 256;
         // width/height of each tile
         public const int tileSide = 32;
         // matrix of tiles
@@ -49,7 +49,8 @@ namespace Gato_Exploso
         public Level()
         {
             DiamondSquare diamond = new DiamondSquare(xTiles, 100, 12);
-            data = diamond.getData();
+            // gets world data using a seed
+            data = diamond.getData(-3);
         }
         // methods
 
@@ -85,17 +86,17 @@ namespace Gato_Exploso
             {
                 return tiles[0, y];
             }
-            if (x > 99)
+            if (x > xTiles - 1)
             {
-                return tiles[99, y];
+                return tiles[xTiles - 1, y];
             }
             if (y < 0)
             {
                 return tiles[x, 0];
             }
-            if (y > 99)
+            if (y > yTiles - 1)
             {
-                return tiles[x, 99];
+                return tiles[x, yTiles - 1];
             }
             return tiles[x, y];
         }
@@ -118,7 +119,7 @@ namespace Gato_Exploso
                     var nearbyCoords = GetCoordsAroundTile(i, j, 5);
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
-                        if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= 100 || coord2.Y >= 100) continue;
+                        if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= xTiles || coord2.Y >= yTiles) continue;
                         tiles[(int)coord2.X, (int)coord2.Y].startExplosion();
                         coordsToAdd.Add(coord2);
 
@@ -153,7 +154,7 @@ namespace Gato_Exploso
             }
 
         }
-        // Assigns each tile a type
+        // Assigns each tile a type and places rocks/trees based on data from diamond square algorithm
         public void InitTiles()
         {
             for (int i = 0; i < xTiles; i++)
@@ -166,14 +167,96 @@ namespace Gato_Exploso
                     {
                         tile = new WaterTile();
                     }
-                    if(curTileNum >= 10)
+                    if (curTileNum >= -60)
+                    { 
+                        tile = new SandTile();
+                    }
+                    if(curTileNum >= -40)
+                    {
+                        tile = new GrassTile();
+                    }
+                    if(curTileNum >= 0)
                     {
                         tile = new LForestTile();
                     }
-                    if(curTileNum >= 60)
+                    if(curTileNum >= 40)
                     {
                         tile = new DForestTile();
                     }
+                    Random r = new Random();
+                    switch (r.Next(40))
+                    {
+                        case 0:
+
+                            break;
+                        case 1:
+                            if(tile is GrassTile)
+                            {
+                                tile.PlaceRock();
+                            }
+                            break;
+                        case 2:
+                            if (tile is GrassTile)
+                            {
+                                tile.PlaceRock();
+                            }
+                            if(tile is SandTile && i % 2 == 0)
+                            {
+                                tile.PlaceRock();
+                            }
+                            break;
+                        case 3:
+                            if (tile is LForestTile)
+                            {
+                                tile.PlantTree('L');
+                            }
+                            if (tile is DForestTile)
+                            {
+                                tile.PlantTree('D');
+                            }
+                            break;
+                        case 4:
+                            if (tile is LForestTile)
+                            {
+                                tile.PlantTree('L');
+                            }
+                            if (tile is DForestTile)
+                            {
+                                tile.PlantTree('D');
+                            }
+                            break;
+                        case 5:
+                            if (tile is LForestTile)
+                            {
+                                tile.PlantTree('L');
+                            }
+                            if (tile is DForestTile)
+                            {
+                                tile.PlantTree('D');
+                            }
+                            break;
+                        case 6:
+                            if (tile is DForestTile)
+                            {
+                                tile.PlantTree('D');
+                            }
+                            break;
+                        case 7:
+                            if (tile is DForestTile)
+                            {
+                                tile.PlantTree('D');
+                            }
+                            break;
+                        case 8:
+                            if(tile is LForestTile && i % 2 == 0 && tile.GetTileObjects().Count == 0)
+                            {
+                                tile.PlaceRock();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
                     tiles[i, j] = tile;
                     tiles[i, j].x = i;
                     tiles[i, j].y = j;

@@ -55,11 +55,6 @@ namespace Gato_Exploso.Tiles
             foreach (var obj in objects)
             {
                 obj.Draw(spriteBatch, x, y);
-                if (obj is Tree)
-                {
-                    Tree tree = (Tree)obj;
-                    tree.DrawTop(spriteBatch, x, y - 1);
-                }
             }
         }
         // returns list of tile objects
@@ -128,6 +123,12 @@ namespace Gato_Exploso.Tiles
         public void PlaceRock()
         {
             objects.Add(new Rock());
+            lastModifiedTime = Game1.Instance.GetTime();
+        }
+        // places a tree
+        public void PlantTree(char type)
+        {
+            objects.Add(new Tree(type));
             lastModifiedTime = Game1.Instance.GetTime();
         }
         // starts one-frame animation of bomb explosion

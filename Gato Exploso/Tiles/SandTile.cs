@@ -26,7 +26,14 @@ namespace Gato_Exploso.Tiles
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
             var pos = new Vector2(x, y);
-            spriteBatch.Draw(tileTexture, pos, null, Color.White);
+            if (isExploding)
+            {
+                spriteBatch.Draw(tileTexture, pos, null, Color.Red);
+            }
+            else
+            {
+                spriteBatch.Draw(tileTexture, pos, null, Color.White);
+            }
         }
 
 

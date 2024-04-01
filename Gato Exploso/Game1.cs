@@ -33,7 +33,7 @@ namespace Gato_Exploso
         int targetY = 300;
 
         // Number for how many rows of tiles there are
-        const int tileRows = 100;
+        const int tileRows = 256;
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
@@ -361,7 +361,7 @@ namespace Gato_Exploso
                     Tile l = getTileAt(gato.x, targetY + gato.height - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
                     Tile m = getTileAt(gato.x + (gato.width / 2), gato.y + gato.height);
-                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y < 3168)
+                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y < (tileRows * 32) - gato.height)
                     {
                         gato.MoveY(targetY);
                     }
@@ -374,7 +374,7 @@ namespace Gato_Exploso
                     Tile b = getTileAt(targetX + gato.width - 1, gato.y + gato.height - 1);
                     Tile m = getTileAt(targetX + gato.width - 1, gato.y + 32);
 
-                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x < 3168)
+                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x < (tileRows * 32) - gato.width)
                     {
                         gato.MoveX(targetX);
                     }

@@ -25,7 +25,7 @@ namespace Gato_Exploso.Tiles
         public GrassTile()
         {
             Load();
-            tileID = 1;
+            tileID = 3;
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
