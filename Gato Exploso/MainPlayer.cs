@@ -16,7 +16,7 @@ namespace Gato_Exploso
         public MainPlayer(ContentManager context) : base(context, 0)
         {
             Name = "gato";
-            speed = 10;
+            speed = 5;
         }
         
         public override void Draw(SpriteBatch spriteBatch, int x, int y)

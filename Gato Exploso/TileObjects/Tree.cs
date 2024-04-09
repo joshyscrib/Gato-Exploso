@@ -11,9 +11,9 @@ namespace Gato_Exploso.TileObjects
     public class Tree : TileObject
     {
         protected Texture2D treeTexture;
-        public Tree(char type)
+        public Tree()
         {
-            Load(type);
+            Load();
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
@@ -21,17 +21,9 @@ namespace Gato_Exploso.TileObjects
         }
 
 
-        public void Load(char type)
+        public void Load()
         {
-            if(type == 'L')
-            {
-               treeTexture = Game1.GameContent.Load<Texture2D>("LTree");
-            }
-            else
-            {
-                treeTexture = Game1.GameContent.Load<Texture2D>("DTree");
-            }
-
+               treeTexture = Game1.GameContent.Load<Texture2D>("Tree");
         }
 
     }

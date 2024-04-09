@@ -33,10 +33,10 @@ namespace Gato_Exploso
             Vector2 TL1 = new Vector2(x1, y1);
             Vector2 TL2 = new Vector2(entity.x, entity.y);
             // checks 1st rectangle to 2nd rectangle
-            if ((IsPointInRect((int)TL2.X, (int)TL2.Y, entity.width, entity.height, TL1) ||
+            if (IsPointInRect((int)TL2.X, (int)TL2.Y, entity.width, entity.height, TL1) ||
                 IsPointInRect((int)TL2.X, (int)TL2.Y, entity.width, entity.height, new Vector2(TL1.X + width1, TL1.Y)) ||
                 IsPointInRect((int)TL2.X, (int)TL2.Y, entity.width, entity.height, new Vector2(TL1.X, TL1.Y + height1)) ||
-                IsPointInRect((int)TL2.X, (int)TL2.Y, entity.width, entity.height, new Vector2(TL1.X + width1, TL1.Y + height1))) ||
+                IsPointInRect((int)TL2.X, (int)TL2.Y, entity.width, entity.height, new Vector2(TL1.X + width1, TL1.Y + height1)) ||
                 // checks 2nd rectangle to first rectangle
                 IsPointInRect((int)TL1.X, (int)TL1.Y, width1, height1, TL2) ||
                 IsPointInRect((int)TL1.X, (int)TL1.Y, width1, height1, new Vector2(TL2.X + entity.width, TL2.Y)) ||

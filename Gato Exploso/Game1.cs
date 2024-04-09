@@ -41,7 +41,7 @@ namespace Gato_Exploso
         MoveDirection lastNetDirection = new MoveDirection();
 
         // Makes a Heads-Up Display
-        Hud hud = new Hud();
+        Hud hud;
 
         // makes a new webserver
         WebServer server = new WebServer();
@@ -65,6 +65,7 @@ namespace Gato_Exploso
             GameContent = Content;
             _players.Add(mainPlayerName, new MainPlayer(Content));
             this.Exiting += Game1_Exiting;
+            hud = new Hud(Content);
         }
 
         private void Game1_Exiting(object sender, EventArgs e)
@@ -191,9 +192,17 @@ namespace Gato_Exploso
             // starts main game sequences (makes tiles, begins events, runs web server)
             base.Initialize();
             level1.InitTiles();
+            for(int i = 0; i < tileRows; i++)
+            {
+                for(int j = 0; j < tileRows; j++)
+                {
+                    hud.miniMapData[i, j] = level1.tiles[i, j].tileID;
+                }
+            }
             server.Start();
             server.PlayerAction += Server_PlayerAction;
             server.PlayerRegister += Server_PlayerRegister;
+            
         }
         // registers players on the web
         private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
@@ -515,6 +524,10 @@ namespace Gato_Exploso
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
+            if(tickCount % 15 == 0)
+            {
+                hud.clock.Tick();
+            }
             MoveEggs();
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
@@ -734,7 +747,7 @@ namespace Gato_Exploso
             base.Draw(gameTime);
 
             // draws HUD
-            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, (bombIndX * 32) - (level1.offsetX), (bombIndY * 32) - (level1.offsetY));
+            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y);
             _spriteBatch.End();
 
 

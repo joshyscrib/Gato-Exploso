@@ -50,7 +50,7 @@ namespace Gato_Exploso
         {
             DiamondSquare diamond = new DiamondSquare(xTiles, 100, 12);
             // gets world data using a seed
-            data = diamond.getData(-3);
+            data = diamond.getData(11);
         }
         // methods
 
@@ -116,7 +116,7 @@ namespace Gato_Exploso
                 int j = (int)coord.Y;
                 if (tiles[i, j].bombExploded)
                 {
-                    var nearbyCoords = GetCoordsAroundTile(i, j, 5);
+                    var nearbyCoords = GetCoordsAroundTile(i, j, 2);
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
                         if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= xTiles || coord2.Y >= yTiles) continue;
@@ -163,25 +163,21 @@ namespace Gato_Exploso
                 {
                     Tile tile = new GrassTile();
                     double curTileNum = data[i,j];
-                    if(curTileNum < -60)
+                    if(curTileNum < -40)
                     {
                         tile = new WaterTile();
                     }
-                    if (curTileNum >= -60)
+                    if (curTileNum >= -40)
                     { 
                         tile = new SandTile();
                     }
-                    if(curTileNum >= -40)
+                    if(curTileNum >= -30)
                     {
                         tile = new GrassTile();
                     }
-                    if(curTileNum >= 0)
+                    if(curTileNum >= 10)
                     {
-                        tile = new LForestTile();
-                    }
-                    if(curTileNum >= 40)
-                    {
-                        tile = new DForestTile();
+                        tile = new ForestTile();
                     }
                     Random r = new Random();
                     switch (r.Next(40))
@@ -196,61 +192,21 @@ namespace Gato_Exploso
                             }
                             break;
                         case 2:
-                            if (tile is GrassTile)
+                            if(tile is SandTile && i % 7 == 0)
                             {
                                 tile.PlaceRock();
-                            }
-                            if(tile is SandTile && i % 2 == 0)
-                            {
-                                tile.PlaceRock();
-                            }
-                            break;
-                        case 3:
-                            if (tile is LForestTile)
-                            {
-                                tile.PlantTree('L');
-                            }
-                            if (tile is DForestTile)
-                            {
-                                tile.PlantTree('D');
                             }
                             break;
                         case 4:
-                            if (tile is LForestTile)
+                            if (tile is ForestTile)
                             {
-                                tile.PlantTree('L');
-                            }
-                            if (tile is DForestTile)
-                            {
-                                tile.PlantTree('D');
+                                tile.PlantTree();
                             }
                             break;
                         case 5:
-                            if (tile is LForestTile)
+                            if (tile is ForestTile)
                             {
-                                tile.PlantTree('L');
-                            }
-                            if (tile is DForestTile)
-                            {
-                                tile.PlantTree('D');
-                            }
-                            break;
-                        case 6:
-                            if (tile is DForestTile)
-                            {
-                                tile.PlantTree('D');
-                            }
-                            break;
-                        case 7:
-                            if (tile is DForestTile)
-                            {
-                                tile.PlantTree('D');
-                            }
-                            break;
-                        case 8:
-                            if(tile is LForestTile && i % 2 == 0 && tile.GetTileObjects().Count == 0)
-                            {
-                                tile.PlaceRock();
+                                tile.PlantTree();
                             }
                             break;
                         default:

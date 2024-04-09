@@ -7,7 +7,7 @@ using System.Net.Mime;
 
 namespace Gato_Exploso.Tiles
 {
-    internal class DForestTile : Tile
+    internal class ForestTile : Tile
     {
         // variables
         public bool solid = true;
@@ -15,13 +15,13 @@ namespace Gato_Exploso.Tiles
         // methods 
         public override void Load()
         {
-            tileTexture = Game1.GameContent.Load<Texture2D>("DForestTile");
+            tileTexture = Game1.GameContent.Load<Texture2D>("ForestTile");
 
         }
-        public DForestTile()
+        public ForestTile()
         {
             Load();
-            tileID = 5;
+            tileID = 4;
         }
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {

@@ -506,19 +506,21 @@
 
                 }
                 // draws names
-                ctx.fillText(curPlayer.Name, 100 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 45, 500);
-                // draws healthbars
-                ctx.fillStyle = 'gray';
-                ctx.fillRect(75 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 50, 104, 25);
-
-                if (curPlayer.Name == "gato") {
-                    ctx.fillStyle = 'yellow';
-                    ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+                if (curPlayer.Name = - "gato") {
+                    ctx.fillStyle = 'red'
                 }
                 else {
-                    ctx.fillStyle = 'red';
-                    ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+                    ctx.fillStyle = 'blue';
                 }
+                ctx.fillText(curPlayer.Name, 100 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 45, 500);
+                // draws healthbars
+                // background
+                ctx.fillStyle = 'gray';
+                ctx.fillRect(75 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 50, 104, 25);
+                // fill
+                ctx.fillStyle = 'red';
+                ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+
                 ctx.fillStyle = 'blue';
 
             }
@@ -531,7 +533,7 @@
                 if (player != undefined) {
                     ctx.fillText(playerMap[playerName].Points, 750, 50, 999);
                 }
-                
+
             }
         }
 

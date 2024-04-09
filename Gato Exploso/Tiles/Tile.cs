@@ -75,7 +75,8 @@ namespace Gato_Exploso.Tiles
         {
             for (int i = 0; i < objects.Count; i++)
             {
-                if (objects[i].GetType() == typeof(Rock))
+             if (objects[i].GetType() == typeof(Rock) || objects[i].GetType() == typeof(Tree) || this.GetType() == typeof(WaterTile))
+
                 {
                     return true;
                 }
@@ -126,9 +127,9 @@ namespace Gato_Exploso.Tiles
             lastModifiedTime = Game1.Instance.GetTime();
         }
         // places a tree
-        public void PlantTree(char type)
+        public void PlantTree()
         {
-            objects.Add(new Tree(type));
+            objects.Add(new Tree());
             lastModifiedTime = Game1.Instance.GetTime();
         }
         // starts one-frame animation of bomb explosion
