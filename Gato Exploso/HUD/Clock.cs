@@ -8,7 +8,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gato_Exploso
+namespace Gato_Exploso.HUD
 {
     public class Clock
     {
@@ -23,6 +23,14 @@ namespace Gato_Exploso
             Content = context;
             Load();
         }
+        public bool GetDay()
+        {
+            if (time >= 270 || time < 90)
+            {
+                return true;
+            }
+            return false;
+        }
         public void Draw(SpriteBatch spriteBatch)
         {
             rotation = time * (Math.PI / 180);
@@ -31,8 +39,8 @@ namespace Gato_Exploso
                 new Rectangle(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 128, 136, 256, 256),
                 null,
                 Color.White,
-                (int)rotation,
-                new Vector2(128,128),
+                (float)rotation,
+                new Vector2(128, 128),
                 SpriteEffects.None,
                 0
                 );
@@ -45,11 +53,13 @@ namespace Gato_Exploso
         }
         public void Tick()
         {
-            time++;
+            time += 0.3;
             if (time > 359)
             {
                 time -= 360;
             }
+
+            Console.WriteLine("Clock: " + time);
         }
     }
 }

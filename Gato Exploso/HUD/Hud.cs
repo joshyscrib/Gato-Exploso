@@ -8,7 +8,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gato_Exploso
+namespace Gato_Exploso.HUD
 {
     public class Hud
     {
@@ -23,11 +23,15 @@ namespace Gato_Exploso
             clock = new Clock(Content);
         }
         Texture2D texture;
+        // filter to put over the screen at night
+        Color nightyTime = new Color(0, 0, 30, 150);
         public void Load(GraphicsDeviceManager mgr)
         {
             context = mgr.GraphicsDevice;
             texture = new Texture2D(context, 1, 1);
             texture.SetData(new Color[] { Color.White });
+           
+
         }
         public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY)
         {
@@ -65,12 +69,18 @@ namespace Gato_Exploso
                 }
             }
             // draws gato location on minimap
-            spriteBatch.Draw(texture, new Rectangle((gatoX / 32) + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 272) - 2, (gatoY / 32) + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 297) - 2, 6, 6), Color.Red);
+            spriteBatch.Draw(texture, new Rectangle(gatoX / 32 + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 272) - 2, gatoY / 32 + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 297) - 2, 6, 6), Color.Red);
 
             // draws a clock that shows if it is day or night
             clock.Draw(spriteBatch);
-            
+
+            // dark blue overlay if it is night
+            if (!clock.GetDay())
+            {
+                spriteBatch.Draw(texture, new Rectangle(0, 0, 3000, 3000), nightyTime);
+            }
             // TODO draw inventory
+
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Text;
 using Gato_Exploso.TileObjects;
 using System.Security.Cryptography.X509Certificates;
 using Gato_Exploso.Tiles;
+using Gato_Exploso.HUD;
 
 namespace Gato_Exploso
 {
@@ -53,6 +54,8 @@ namespace Gato_Exploso
         // list of eggs(bullets)
         public List<Egg> eggs = new List<Egg>();
 
+        // if it is day or night
+        public static bool day = true;
         public Game1()
         {
             Instance = this;
@@ -346,7 +349,7 @@ namespace Gato_Exploso
                     Tile l = getTileAt(gato.x, targetY - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
                     Tile m = getTileAt(gato.x + (gato.width/2), gato.y);
-                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y > 0)
+                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y > 0 && l.GetType() != typeof(WaterTile) && r.GetType() != typeof(WaterTile) && m.GetType() != typeof(WaterTile))
                     {
                         gato.MoveY(targetY);
                     }
@@ -358,7 +361,7 @@ namespace Gato_Exploso
                     Tile t = getTileAt(targetX, gato.y);
                     Tile b = getTileAt(targetX, gato.y + gato.height - 1);
                     Tile m = getTileAt(targetX, gato.y + (gato.height/2));
-                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x > 0)
+                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x > 0 && t.GetType() != typeof(WaterTile) && b.GetType() != typeof(WaterTile) && m.GetType() != typeof(WaterTile))
                     {
                         gato.MoveX(targetX);
                     }
@@ -370,7 +373,7 @@ namespace Gato_Exploso
                     Tile l = getTileAt(gato.x, targetY + gato.height - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY + gato.height - 1);
                     Tile m = getTileAt(gato.x + (gato.width / 2), gato.y + gato.height);
-                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y < (tileRows * 32) - gato.height)
+                    if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y < (tileRows * 32) - gato.height && l.GetType() != typeof(WaterTile) && r.GetType() != typeof(WaterTile) && m.GetType() != typeof(WaterTile))
                     {
                         gato.MoveY(targetY);
                     }
@@ -383,7 +386,7 @@ namespace Gato_Exploso
                     Tile b = getTileAt(targetX + gato.width - 1, gato.y + gato.height - 1);
                     Tile m = getTileAt(targetX + gato.width - 1, gato.y + 32);
 
-                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x < (tileRows * 32) - gato.width)
+                    if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x < (tileRows * 32) - gato.width && t.GetType() != typeof(WaterTile) && b.GetType() != typeof(WaterTile) && m.GetType() != typeof(WaterTile))
                     {
                         gato.MoveX(targetX);
                     }
@@ -524,10 +527,12 @@ namespace Gato_Exploso
         // main update function, gets called about every 30 milliseconds
         protected override void Update(GameTime gameTime)
         {
-            if(tickCount % 15 == 0)
+            if(tickCount % 10 == 0)
             {
                 hud.clock.Tick();
+                day = hud.clock.GetDay();
             }
+            
             MoveEggs();
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
