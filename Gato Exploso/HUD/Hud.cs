@@ -24,7 +24,7 @@ namespace Gato_Exploso.HUD
         }
         Texture2D texture;
         // filter to put over the screen at night
-        Color nightyTime = new Color(0, 0, 30, 150);
+        Color nightyTime = new Color(0, 0, 30, 120);
         public void Load(GraphicsDeviceManager mgr)
         {
             context = mgr.GraphicsDevice;

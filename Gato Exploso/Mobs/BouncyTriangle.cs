@@ -16,10 +16,15 @@ namespace Gato_Exploso.Mobs
         bool good = defaultGood;
 
         // methods
-
-        public void Draw(SpriteBatch spriteBatch, int x, int y)
+        public BouncyTriangle(ContentManager cont)
         {
-            spriteBatch.Draw(texture, new Vector2(x,y),Color.White);
+            Content = cont;
+            Load();
+            speed = 3;
+        }
+        public override void Draw(SpriteBatch spriteBatch, int offX, int offY)
+        {
+            spriteBatch.Draw(texture, new Vector2(x + offX,y + offY),Color.White);
         }
         public int Attack()
         {

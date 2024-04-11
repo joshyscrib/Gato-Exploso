@@ -180,31 +180,25 @@ namespace Gato_Exploso
                         tile = new ForestTile();
                     }
                     Random r = new Random();
-                    switch (r.Next(40))
+                    switch (r.Next(18))
                     {
                         case 0:
 
                             break;
                         case 1:
-                            if(tile is GrassTile)
+                            if(tile is GrassTile && i % 3 == 0)
                             {
                                 tile.PlaceRock();
                             }
                             break;
                         case 2:
-                            if(tile is SandTile && i % 7 == 0)
+                            if(tile is SandTile && i % 14 == 0)
                             {
                                 tile.PlaceRock();
                             }
                             break;
                         case 4:
-                            if (tile is ForestTile)
-                            {
-                                tile.PlantTree();
-                            }
-                            break;
-                        case 5:
-                            if (tile is ForestTile)
+                            if (tile is ForestTile && i % 2 == 0)
                             {
                                 tile.PlantTree();
                             }

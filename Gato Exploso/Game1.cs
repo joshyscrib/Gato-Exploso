@@ -11,6 +11,7 @@ using Gato_Exploso.TileObjects;
 using System.Security.Cryptography.X509Certificates;
 using Gato_Exploso.Tiles;
 using Gato_Exploso.HUD;
+using Gato_Exploso.Mobs;
 
 namespace Gato_Exploso
 {
@@ -54,6 +55,8 @@ namespace Gato_Exploso
         // list of eggs(bullets)
         public List<Egg> eggs = new List<Egg>();
 
+        // list of monsters(mobs)
+        public List<Mob> mobs = new();
         // if it is day or night
         public static bool day = true;
         public Game1()
@@ -438,7 +441,7 @@ namespace Gato_Exploso
                     BreakEgg(curEgg);
                     
                     continue;
-                }
+ /*  (:  */               }
                 // checks what direction the egg is moving and moves it in that direction
                 if (curEgg.direction.Up)
                 {
@@ -492,6 +495,51 @@ namespace Gato_Exploso
             }
 
         }
+        // moves all mobs
+        public void MoveMobs()
+        {
+            for(int i = 0; i < mobs.Count; i++)
+            {
+                Mob curMob = mobs[i];
+                if (curMob.x > _players["gato"].x)
+                {
+                    curMob.facing.Left = true;
+                    curMob.facing.Right = false;
+                }
+
+                if (curMob.y > _players["gato"].y)
+                {
+                    curMob.facing.Up = true;
+                    curMob.facing.Down = false;
+                    if (curMob.x < _players["gato"].x)
+                    {
+                        curMob.facing.Right = true;
+                        curMob.facing.Left = false;
+                        if (curMob.y < _players["gato"].y)
+                        {
+                            curMob.facing.Down = true;
+                            curMob.facing.Up = false;
+                        }
+                    }
+                }
+                if (curMob.facing.Up)
+                {
+                    curMob.y -= curMob.speed;
+                }
+                if (curMob.facing.Left)
+                {
+                    curMob.x -= curMob.speed;
+                }
+                if (curMob.facing.Down)
+                {
+                    curMob.y += curMob.speed;
+                }
+                if (curMob.facing.Right)
+                {
+                    curMob.x += curMob.speed;
+                }
+            }
+        }
 
         // what to do when the given egg breaks
         public void BreakEgg(Egg eg)
@@ -525,8 +573,21 @@ namespace Gato_Exploso
         }
 
         // main update function, gets called about every 30 milliseconds
+        Random randy = new Random();
         protected override void Update(GameTime gameTime)
         {
+            if(tickCount % 4 == 0)
+            {
+                MoveMobs();
+            }
+            if(mobs.Count < 15)
+            {
+                BouncyTriangle tri = new BouncyTriangle(Content);
+                tri.x = randy.Next(8192);
+                tri.y = randy.Next(8192);
+                mobs.Add(tri);
+            }
+
             if(tickCount % 10 == 0)
             {
                 hud.clock.Tick();
@@ -750,6 +811,13 @@ namespace Gato_Exploso
                 curEgg.Draw(_spriteBatch, curEgg.x - (int)topLeftPixel.X, curEgg.y - (int)topLeftPixel.Y);
             }
             base.Draw(gameTime);
+
+            // draws monsters/mobs
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                Mob curMob = mobs[i];
+                curMob.Draw(_spriteBatch, -(int)topLeftPixel.X, -(int)topLeftPixel.Y);
+            }
 
             // draws HUD
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y);
