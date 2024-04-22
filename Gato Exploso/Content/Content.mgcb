@@ -25,6 +25,12 @@
 /processorParam:TextureFormat=Color
 /build:AttackButton.png
 
+#begin Bomb.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Bomb.mp3
+
 #begin Bomb1.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -97,6 +103,12 @@
 /processorParam:TextureFormat=Color
 /build:Egg.png
 
+#begin ExplosoFields.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:ExplosoFields.mp3
+
 #begin ForestTile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -156,6 +168,25 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:GrassTile.png
+
+#begin Hammy.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Hammy.png
+
+#begin Norm.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Norm.spritefont
 
 #begin ostrichL1.png
 /importer:TextureImporter

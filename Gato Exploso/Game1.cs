@@ -12,6 +12,9 @@ using System.Security.Cryptography.X509Certificates;
 using Gato_Exploso.Tiles;
 using Gato_Exploso.HUD;
 using Gato_Exploso.Mobs;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
+using System.Reflection.Metadata;
 
 namespace Gato_Exploso
 {
@@ -19,6 +22,7 @@ namespace Gato_Exploso
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private Song music;
 
         // private Player gato;
         private Dictionary<string, Player> _players = new Dictionary<string, Player>();
@@ -59,6 +63,12 @@ namespace Gato_Exploso
         public List<Mob> mobs = new();
         // if it is day or night
         public static bool day = true;
+
+        // current quest to show and all other quests
+        string curQuest = "No current quest.";
+        string quest1 = "Find Squirell at the campsite";
+        string quest2 = "Find and talk to the Elder Turtle";
+        string quest3 = "Defeat Hammy at the marked location";
         public Game1()
         {
             Instance = this;
@@ -140,7 +150,7 @@ namespace Gato_Exploso
                         {
                             objType = "rock";
                         }
-                        // adds the object to a list of objects to give the webser
+                        // adds the object to a list of objects to give the webserF
                         ObjectInfo objectInfo = new ObjectInfo();
                         objectInfo.ObjectType = objType;
                         objectInfos.Add(objectInfo);
@@ -157,9 +167,7 @@ namespace Gato_Exploso
                 ProjectileInfo pInfo = new ProjectileInfo();
                 pInfo.StartX = curEgg.startX;
                 pInfo.StartY = curEgg.startY;
-                pInfo.Id = curEgg.Id;
-                // BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP BUG HELP ...                          ... or i could do a cheating
-                pInfo.Speed = curEgg.speed + 5;
+                pInfo.Id = curEgg.Id;pInfo.Speed = curEgg.speed + 5;
                 if (curEgg.direction.Up)
                 {
                     pInfo.Direction = 1;
@@ -198,9 +206,9 @@ namespace Gato_Exploso
             // starts main game sequences (makes tiles, begins events, runs web server)
             base.Initialize();
             level1.InitTiles();
-            for(int i = 0; i < tileRows; i++)
+            for (int i = 0; i < tileRows; i++)
             {
-                for(int j = 0; j < tileRows; j++)
+                for (int j = 0; j < tileRows; j++)
                 {
                     hud.miniMapData[i, j] = level1.tiles[i, j].tileID;
                 }
@@ -208,7 +216,7 @@ namespace Gato_Exploso
             server.Start();
             server.PlayerAction += Server_PlayerAction;
             server.PlayerRegister += Server_PlayerRegister;
-            
+            StartBossFight();
         }
         // registers players on the web
         private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
@@ -305,7 +313,7 @@ namespace Gato_Exploso
         public void Shoot(Player player)
         {
             // sets cooldown between shots
-            if(Instance.currentTime - player.lastTimeFired >= 400)
+            if (Instance.currentTime - player.lastTimeFired >= 400)
             {
                 player.lastTimeFired = Instance.currentTime;
                 Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000, player.Name);
@@ -313,7 +321,7 @@ namespace Gato_Exploso
 
                 eggs.Add(egg);
             }
-            
+
         }
 
         // loads images for different classes
@@ -322,6 +330,13 @@ namespace Gato_Exploso
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             GetMainPlayer().Load();
             hud.Load(_graphics);
+
+
+            music = Content.Load<Song>("ExplosoFields");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(music);
+            MediaPlayer.IsRepeating = true;
+
         }
         // checks if the provide tile is solid
         private bool isPassableTile(Tile t)
@@ -351,7 +366,7 @@ namespace Gato_Exploso
                     targetY -= gato.speed;
                     Tile l = getTileAt(gato.x, targetY - 1);
                     Tile r = getTileAt(gato.x + gato.width - 1, targetY - 1);
-                    Tile m = getTileAt(gato.x + (gato.width/2), gato.y);
+                    Tile m = getTileAt(gato.x + (gato.width / 2), gato.y);
                     if (isPassableTile(l) && isPassableTile(r) && isPassableTile(m) && gato.y > 0 && l.GetType() != typeof(WaterTile) && r.GetType() != typeof(WaterTile) && m.GetType() != typeof(WaterTile))
                     {
                         gato.MoveY(targetY);
@@ -363,7 +378,7 @@ namespace Gato_Exploso
                     targetX -= gato.speed;
                     Tile t = getTileAt(targetX, gato.y);
                     Tile b = getTileAt(targetX, gato.y + gato.height - 1);
-                    Tile m = getTileAt(targetX, gato.y + (gato.height/2));
+                    Tile m = getTileAt(targetX, gato.y + (gato.height / 2));
                     if (isPassableTile(t) && isPassableTile(b) && isPassableTile(m) && gato.x > 0 && t.GetType() != typeof(WaterTile) && b.GetType() != typeof(WaterTile) && m.GetType() != typeof(WaterTile))
                     {
                         gato.MoveX(targetX);
@@ -439,9 +454,10 @@ namespace Gato_Exploso
                 if (curEgg.doneTraveling)
                 {
                     BreakEgg(curEgg);
-                    
+
                     continue;
- /*  (:  */               }
+                    /*  (:  */
+                }
                 // checks what direction the egg is moving and moves it in that direction
                 if (curEgg.direction.Up)
                 {
@@ -464,13 +480,13 @@ namespace Gato_Exploso
                 {
                     if (CollisionDetection.AreRectsInEachOther(hooman.x, hooman.y, hooman.width, hooman.height, curEgg) && hooman.Name != curEgg.nameOfLauncher)
                     {
-                        
+
                         hooman.hp -= 17;
                         if (hooman.hp <= 0)
                         {
                             _players[curEgg.nameOfLauncher].points++;
-                           }
-                            BreakEgg(curEgg);
+                        }
+                        BreakEgg(curEgg);
                     }
                     // checks if the egg collides with a solid tile
 
@@ -495,52 +511,44 @@ namespace Gato_Exploso
             }
 
         }
+        // uses triginometry to find the distance between 2 things
+        public double FindDistance(double x1, double y1, double x2, double y2)
+        {
+            // finds the distance in terms of X and Y, which represent 2 legs of a right triangle
+            double sideX = x1 - x2;
+            double sideY = y1 - y2;
+            // squares both sides
+            double sx2 = sideX * sideX;
+            double sy2 = sideY * sideY;
+            // adds them and takes the square root to find the hypotenuse, which is the distance
+            double hyp = Math.Sqrt(sx2 + sy2);
+            return hyp;
+        }
         // moves all mobs
         public void MoveMobs()
         {
-            for(int i = 0; i < mobs.Count; i++)
+            for (int i = 0; i < mobs.Count; i++)
             {
                 Mob curMob = mobs[i];
-                if (curMob.x > _players["gato"].x)
+                // moves mobs if they are in range of the player
+                if (FindDistance(_players["gato"].x, _players["gato"].y, curMob.x, curMob.y) <= 1000)
                 {
-                    curMob.facing.Left = true;
-                    curMob.facing.Right = false;
-                }
+                    Player p = _players["gato"];
+                    // finds X and Y distance between player and mob
+                    double sx = p.x - curMob.x;
+                    double sy = p.y - curMob.y;
+                    // uses trig to find the angle at which the mob should moves
+                    double angleInRadians = Math.Atan2(sy , sx);
 
-                if (curMob.y > _players["gato"].y)
-                {
-                    curMob.facing.Up = true;
-                    curMob.facing.Down = false;
-                    if (curMob.x < _players["gato"].x)
-                    {
-                        curMob.facing.Right = true;
-                        curMob.facing.Left = false;
-                        if (curMob.y < _players["gato"].y)
-                        {
-                            curMob.facing.Down = true;
-                            curMob.facing.Up = false;
-                        }
-                    }
-                }
-                if (curMob.facing.Up)
-                {
-                    curMob.y -= curMob.speed;
-                }
-                if (curMob.facing.Left)
-                {
-                    curMob.x -= curMob.speed;
-                }
-                if (curMob.facing.Down)
-                {
-                    curMob.y += curMob.speed;
-                }
-                if (curMob.facing.Right)
-                {
-                    curMob.x += curMob.speed;
+                    curMob.Move(angleInRadians);
                 }
             }
         }
 
+        public double radiansToDegrees(double radians)
+        {
+            return radians * (180 / Math.PI);
+        }
         // what to do when the given egg breaks
         public void BreakEgg(Egg eg)
         {
@@ -576,24 +584,25 @@ namespace Gato_Exploso
         Random randy = new Random();
         protected override void Update(GameTime gameTime)
         {
-            if(tickCount % 4 == 0)
+            if (tickCount % 4 == 0)
             {
                 MoveMobs();
             }
-            if(mobs.Count < 15)
+            if (mobs.Count < 15)
             {
                 BouncyTriangle tri = new BouncyTriangle(Content);
                 tri.x = randy.Next(8192);
                 tri.y = randy.Next(8192);
                 mobs.Add(tri);
             }
+            
 
-            if(tickCount % 10 == 0)
+            if (tickCount % 10 == 0)
             {
                 hud.clock.Tick();
                 day = hud.clock.GetDay();
             }
-            
+
             MoveEggs();
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
@@ -601,14 +610,26 @@ namespace Gato_Exploso
                 if (play.hp <= 0)
                 {
                     playersToDie.Add(play.Name);
-                    
+
                 }
                 else
                 {
                     MovePlayer(play);
                 }
             }
-
+            // removes dead mobs
+            HashSet<Mob> mobsToDie = new HashSet<Mob>();
+            foreach (Mob mm in mobs)
+            {
+                if (mm.hp <= 0)
+                {
+                    mobsToDie.Add(mm);
+                }
+            }
+            foreach (Mob mob in mobsToDie)
+            {
+                mobs.Remove(mob);
+            }
             // resets players' healths and randomly teleports them
             foreach (string s in playersToDie)
             {
@@ -702,7 +723,16 @@ namespace Gato_Exploso
                     p.hp -= 0.4;
                 }
             }
+            foreach (Mob m in mobs)
+            {
+                // set of all tiles the player is touching
+                HashSet<Vector2> playerTiles = GetMobTiles(m);
 
+                if (playerTiles.Intersect(explodingTiles).Count() > 0)
+                {
+                    m.hp -= 0.6;
+                }
+            }
             base.Update(gameTime);
         }
 
@@ -732,29 +762,70 @@ namespace Gato_Exploso
                 };
             return playerTiles;
         }
+        private HashSet<Vector2> GetMobTiles(Mob p)
+        {
+            // set of all tiles the player is touching
+            HashSet<Vector2> playerTiles = new HashSet<Vector2>
+                {
+                        // top left
+                    new Vector2(p.x / tileSide, p.y / tileSide),
+
+                        // mid left
+                    new Vector2(p.x / tileSide, (p.y + (p.height / 2)) / tileSide),
+
+                        // bottom left
+                    new Vector2(p.x / tileSide, (p.y + p.height) / tileSide),
+
+                        // top right
+                    new Vector2((p.x + p.width) / tileSide, p.y / tileSide),
+
+                        // mid right
+                    new Vector2(p.x / tileSide, p.y + (p.height / tileSide)),
+
+                        //bottom right
+                    new Vector2(p.x / tileSide, (p.y + p.height) / tileSide)
+
+                };
+            return playerTiles;
+        }
+        double lastBombTime = 0;
         public void ExexutePlayerAction(PlayerActionArgs act)
         {
             // places bomb when space is pressed
             if (act.placeBomb)
             {
-                if (_players[mainPlayerName].facing.Up)
-                {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y - 16);
-                }
-                else if (_players[mainPlayerName].facing.Left)
-                {
-                    level1.PlaceBomb(_players[mainPlayerName].x - 16, _players[mainPlayerName].y + 48);
 
-                }
-                else if (_players[mainPlayerName].facing.Down)
+
+                if (currentTime - lastBombTime >= 1000)
                 {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 80);
-                }
-                else if (_players[mainPlayerName].facing.Right)
-                {
-                    level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48);
+                    if (_players[mainPlayerName].facing.Up)
+                    {
+                        level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y - 16);
+                    }
+                    else if (_players[mainPlayerName].facing.Left)
+                    {
+                        level1.PlaceBomb(_players[mainPlayerName].x - 16, _players[mainPlayerName].y + 48);
+
+                    }
+                    else if (_players[mainPlayerName].facing.Down)
+                    {
+                        level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 80);
+                    }
+                    else if (_players[mainPlayerName].facing.Right)
+                    {
+                        level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48);
+                    }
+                    lastBombTime = currentTime;
                 }
             }
+        }
+        // spawns hammy and initiates the boss fight
+        public void StartBossFight()
+        {
+            Hammy hammy = new Hammy(Content);
+            hammy.x = 90;
+            hammy.y = 90;
+            mobs.Add(hammy);
         }
         // returns the full list of tiles in a string
         public string GetGameWorld()
@@ -820,7 +891,7 @@ namespace Gato_Exploso
             }
 
             // draws HUD
-            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y);
+            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest);
             _spriteBatch.End();
 
 

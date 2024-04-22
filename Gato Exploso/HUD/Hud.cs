@@ -17,6 +17,8 @@ namespace Gato_Exploso.HUD
         ContentManager Content;
         // clock to tell the player if it is day or night
         public Clock clock;
+        // spritefont to write text on the screen
+        private SpriteFont font;
         public Hud(ContentManager c)
         {
             Content = c;
@@ -30,10 +32,10 @@ namespace Gato_Exploso.HUD
             context = mgr.GraphicsDevice;
             texture = new Texture2D(context, 1, 1);
             texture.SetData(new Color[] { Color.White });
-           
+            font = Content.Load<SpriteFont>("Norm");
 
         }
-        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY)
+        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest)
         {
             // draws health bar
             spriteBatch.Draw(texture, new Rectangle(1100, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 290, 408, 75), Color.Gray);
@@ -79,6 +81,14 @@ namespace Gato_Exploso.HUD
             {
                 spriteBatch.Draw(texture, new Rectangle(0, 0, 3000, 3000), nightyTime);
             }
+            // writes current quest on screen
+            spriteBatch.DrawString
+                (
+                font,
+                quest,
+                new Vector2(55, 25),
+                Color.Black
+                );
             // TODO draw inventory
 
         }

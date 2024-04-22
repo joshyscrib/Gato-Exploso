@@ -11,7 +11,7 @@ namespace Gato_Exploso.Mobs
         protected ContentManager Content;
         protected Texture2D texture;
         // variables   
-        int health = 40;
+        
         const bool defaultGood = true;
         bool good = defaultGood;
 
@@ -20,12 +20,14 @@ namespace Gato_Exploso.Mobs
         {
             Content = cont;
             Load();
-            speed = 3;
+            speed = 6;
+            hp = 40;
         }
         public override void Draw(SpriteBatch spriteBatch, int offX, int offY)
         {
             spriteBatch.Draw(texture, new Vector2(x + offX,y + offY),Color.White);
         }
+
         public int Attack()
         {
             Random r = new Random();

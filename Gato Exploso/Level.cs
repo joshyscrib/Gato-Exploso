@@ -13,14 +13,16 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics.CodeAnalysis;
 using System.Data;
 using Gato_Exploso.Tiles;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
+using System.Reflection.Metadata;
 
 namespace Gato_Exploso
 {
     internal class Level
     {
-        // variables
-
-        // generated world
+        // bomb sounds
+        private SoundEffect bombSound;
         
 
         public bool playerBombed = false;
@@ -116,6 +118,7 @@ namespace Gato_Exploso
                 int j = (int)coord.Y;
                 if (tiles[i, j].bombExploded)
                 {
+                    bombSound.Play();
                     var nearbyCoords = GetCoordsAroundTile(i, j, 2);
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
@@ -130,7 +133,7 @@ namespace Gato_Exploso
                     {
                         coordsToRemove.Add(new Vector2(i, j));
                     }
-
+                    
                 }
 
                 if (IsTileOnScreen(i, j, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, offsetX, offsetY))
@@ -157,6 +160,8 @@ namespace Gato_Exploso
         // Assigns each tile a type and places rocks/trees based on data from diamond square algorithm
         public void InitTiles()
         {
+            // loads sounds
+            bombSound = Game1.Instance.Content.Load<SoundEffect>("Bomb");
             for (int i = 0; i < xTiles; i++)
             {
                 for (int j = 0; j < yTiles; j++)
@@ -192,7 +197,7 @@ namespace Gato_Exploso
                             }
                             break;
                         case 2:
-                            if(tile is SandTile && i % 14 == 0)
+                            if(tile is SandTile && i % 21 == 0)
                             {
                                 tile.PlaceRock();
                             }
@@ -214,29 +219,6 @@ namespace Gato_Exploso
                 }
             }
             
-            /*
-            Random random = new Random(100);
-
-            for (int i = 0; i < xTiles; i++)
-            {
-                for (int j = 0; j < yTiles; j++)
-                {
-                    GrassTile tile = new GrassTile();
-                    tiles[i, j] = tile;
-                    tiles[i, j].x = i;
-                    tiles[i, j].y = j;
-
-                }
-            }
-            for (int r = 0; r < 75; r++)
-            {
-
-                int rockTileX = random.Next(0, 100);
-                int rockTileY = random.Next(0, 100);
-                tiles[rockTileX, rockTileY].PlaceRock();
-
-            }
-            */
         }
 
         // Draws all of the tiles relative to the player's position
