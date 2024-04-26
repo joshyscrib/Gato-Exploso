@@ -38,8 +38,8 @@ namespace Gato_Exploso.HUD
         public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest)
         {
             // draws health bar
-            spriteBatch.Draw(texture, new Rectangle(1100, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 290, 408, 75), Color.Gray);
-            spriteBatch.Draw(texture, new Rectangle(1104, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 286, health * 4, 67), Color.Lime);
+            spriteBatch.Draw(texture, new Rectangle(10, 10, 408, 50), Color.Gray);
+            spriteBatch.Draw(texture, new Rectangle(14, 14, health * 4, 42), Color.Lime);
 
             // background of minimap
             spriteBatch.Draw(texture, new Rectangle(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 275, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 300, 266, 266), Color.Black);

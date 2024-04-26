@@ -166,7 +166,7 @@ namespace Gato_Exploso.Tiles
                 if (bmb.GetType() == typeof(Bomb))
                 {
                     Bomb bomb = (Bomb)bmb;
-                    if (Game1.Instance.GetTime() - 3000 > bomb.createTime)
+                    if (Game1.Instance.GetTime() - 1000 > bomb.createTime)
                     {
                         bombsToDelete.Add(bomb);
                         lastModifiedTime = Game1.Instance.GetTime();

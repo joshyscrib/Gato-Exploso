@@ -20,7 +20,7 @@ namespace Gato_Exploso
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Song music;
 
@@ -49,6 +49,9 @@ namespace Gato_Exploso
         // Makes a Heads-Up Display
         Hud hud;
 
+        // if the boss fight has been initiated
+        public bool bossFightStarted = false;
+
         // makes a new webserver
         WebServer server = new WebServer();
         double currentTime = 0;
@@ -65,9 +68,9 @@ namespace Gato_Exploso
         public static bool day = true;
 
         // current quest to show and all other quests
-        string curQuest = "No current quest.";
+        string curQuest = "";
         string quest1 = "Find Squirell at the campsite";
-        string quest2 = "Find and talk to the Elder Turtle";
+        string quest2 = "Find and talk to Timmy the Turtle";
         string quest3 = "Defeat Hammy at the marked location";
         public Game1()
         {
@@ -216,7 +219,30 @@ namespace Gato_Exploso
             server.Start();
             server.PlayerAction += Server_PlayerAction;
             server.PlayerRegister += Server_PlayerRegister;
-            StartBossFight();
+            
+        }
+        public HashSet<Entity> GetEntities()
+        {
+            HashSet<Entity> entities = new HashSet<Entity>();
+            entities.Add(GetMainPlayer());
+            return entities;
+        }
+        public HashSet<Entity> GetCollidingEntities(Rectangle rect)
+        {
+            HashSet<Entity> entities = new HashSet<Entity>();
+            if(CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, GetMainPlayer()))
+            {
+                entities.Add(GetMainPlayer() );
+            }
+            foreach (Player ost in _players.Values)
+            {
+                if (ost.GetType() != typeof(MainPlayer) && CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, ost))
+                {
+                    entities.Add(ost);
+                }
+
+            }
+            return entities;
         }
         // registers players on the web
         private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
@@ -338,6 +364,18 @@ namespace Gato_Exploso
             MediaPlayer.IsRepeating = true;
 
         }
+
+        public bool IsPassableCoord(int x, int y)
+        {
+            Tile t = getTileAt(x, y);
+            if(t == null)
+            {
+                return false;
+            }
+
+            return isPassableTile(t);
+        }
+
         // checks if the provide tile is solid
         private bool isPassableTile(Tile t)
         {
@@ -582,6 +620,10 @@ namespace Gato_Exploso
 
         // main update function, gets called about every 30 milliseconds
         Random randy = new Random();
+        public void SpawnPlayer()
+        {
+
+        }
         protected override void Update(GameTime gameTime)
         {
             if (tickCount % 4 == 0)
@@ -617,6 +659,7 @@ namespace Gato_Exploso
                     MovePlayer(play);
                 }
             }
+
             // removes dead mobs
             HashSet<Mob> mobsToDie = new HashSet<Mob>();
             foreach (Mob mm in mobs)
@@ -679,7 +722,8 @@ namespace Gato_Exploso
             if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
             if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
             if (state.IsKeyDown(Keys.D)) { direction.Right = true; }
-            if (state.IsKeyDown(Keys.P)) { _players["gato"].hp += 5; }                                                      // HACKS HACKS HACKS HACKS
+            if (state.IsKeyDown(Keys.P)) { _players["gato"].hp += 5; }
+            if (state.IsKeyDown(Keys.B)) { if (!bossFightStarted) { StartBossFight(); } }
 
             if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
 
@@ -822,6 +866,7 @@ namespace Gato_Exploso
         // spawns hammy and initiates the boss fight
         public void StartBossFight()
         {
+            bossFightStarted = true;
             Hammy hammy = new Hammy(Content);
             hammy.x = 90;
             hammy.y = 90;

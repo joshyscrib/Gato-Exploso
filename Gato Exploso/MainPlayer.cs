@@ -13,20 +13,38 @@ namespace Gato_Exploso
     {
         public int hp = 83;
         Texture2D curTexture;
+        int curFrame = 1;
         public MainPlayer(ContentManager context) : base(context, 0)
         {
             Name = "gato";
-            speed = 5;
+            speed = 3;
         }
         
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
+            if(Game1.Instance.GetTime() % 300 == 0)
+            {
+                curFrame++;
+                if(curFrame > 2)
+                {
+                    curFrame = 1;
+                }
+            }
             if (curTexture == null)
             {
                 curTexture = PTextureLeft;
             }
-            if (facing.Right) { curTexture = PTextureRight; }
-            if (facing.Left) { curTexture = PTextureLeft; }
+            switch (curFrame)
+            {
+                case 1:
+                    if (facing.Right) { curTexture = PTextureRight; }
+                    if (facing.Left) { curTexture = PTextureLeft; }
+                    break;
+                case 2:
+                    if (facing.Right) { curTexture = PTexture2Right; }
+                    if (facing.Left) { curTexture = PTexture2Left; }
+                    break;
+            }
             Vector2 playerLocation = new Vector2((GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
             //Vector2 playerLocation = new Vector2 (x, y);
             spriteBatch.Draw(curTexture, playerLocation, Color.White);
@@ -40,6 +58,8 @@ namespace Gato_Exploso
         {
             PTextureLeft = Content.Load<Texture2D>("gato3L");
             PTextureRight = Content.Load<Texture2D>("gato3R");
+            PTexture2Left = Content.Load<Texture2D>("gato3L2");
+            PTexture2Right = Content.Load<Texture2D>("gato3R2");
         }
     }
 

@@ -13,8 +13,7 @@ namespace Gato_Exploso
     {
         private double currentTime = 0;
         private double lastMoveTime = 0;
-        public int x = 2000;
-        public int y = 2000;
+        
         public int width = 60;
         public int height = 48;
         public int speed = 3;
@@ -24,6 +23,8 @@ namespace Gato_Exploso
         protected ContentManager Content;
         protected Texture2D PTextureLeft;
         protected Texture2D PTextureRight;
+        protected Texture2D PTexture2Left;
+        protected Texture2D PTexture2Right;
         public bool moving = false;
         public double lastTimeFired = 0;
         // player health
@@ -32,14 +33,16 @@ namespace Gato_Exploso
         {
             Content = context;
             lastMoveTime = createTime;
-        }
+            x = 2000;
+            y = 2000;
+    }
 
         public void UpdateTime(double milliseconds)
         {
             currentTime = milliseconds;
         }
 
-        public string  Name { get; set; }
+        public string Name { get; set; }
 
         public bool IsTimedOut()
         {
@@ -83,8 +86,17 @@ namespace Gato_Exploso
         public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
 
         public abstract void Attack();
-        
-
+        // takes damage but only every 1/3 of a second
+        double lastDamageTime = 0;
+        public void TakeDamage(int damage)
+        {
+            if(Game1.Instance.GetTime() - lastDamageTime > 600)
+            {
+                hp -= damage;
+                lastDamageTime = Game1.Instance.GetTime();
+            }
+            
+        }
 
     }
 }

@@ -145,6 +145,18 @@
 /processorParam:TextureFormat=Color
 /build:gato3L.png
 
+#begin Gato3L2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Gato3L2.png
+
 #begin gato3R.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -157,6 +169,18 @@
 /processorParam:TextureFormat=Color
 /build:gato3R.png
 
+#begin Gato3R2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Gato3R2.png
+
 #begin GrassTile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -168,6 +192,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:GrassTile.png
+
+#begin Ham.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Ham.png
 
 #begin Hammy.png
 /importer:TextureImporter

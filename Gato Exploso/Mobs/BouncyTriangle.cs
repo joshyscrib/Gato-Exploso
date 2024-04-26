@@ -10,22 +10,26 @@ namespace Gato_Exploso.Mobs
     {
         protected ContentManager Content;
         protected Texture2D texture;
-        // variables   
-        
+         
+        // bouncy triangle is good during the day
         const bool defaultGood = true;
         bool good = defaultGood;
-
+        
         // methods
         public BouncyTriangle(ContentManager cont)
         {
             Content = cont;
             Load();
-            speed = 6;
-            hp = 40;
+            speed = 4;
+            hp = 30;
+            strength = 15;
         }
         public override void Draw(SpriteBatch spriteBatch, int offX, int offY)
         {
+            double healthPercent = hp / 30;
             spriteBatch.Draw(texture, new Vector2(x + offX,y + offY),Color.White);
+            spriteBatch.Draw(drawTexture, new Rectangle(x - 8 + offX, y + 68 + offY, 84, 12), Color.Gray);
+            spriteBatch.Draw(drawTexture, new Rectangle(x - 7 + offX, y + 69 + offY, (int)(healthPercent * 84.0), 10), Color.Red);
         }
 
         public int Attack()

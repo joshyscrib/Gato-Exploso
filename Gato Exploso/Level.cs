@@ -191,7 +191,7 @@ namespace Gato_Exploso
 
                             break;
                         case 1:
-                            if(tile is GrassTile && i % 3 == 0)
+                            if(tile is GrassTile && i % 8 == 0)
                             {
                                 tile.PlaceRock();
                             }
@@ -203,7 +203,7 @@ namespace Gato_Exploso
                             }
                             break;
                         case 4:
-                            if (tile is ForestTile && i % 2 == 0)
+                            if (tile is ForestTile && i % 6 == 0)
                             {
                                 tile.PlantTree();
                             }
