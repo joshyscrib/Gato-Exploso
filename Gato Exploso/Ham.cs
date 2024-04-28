@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,12 +12,16 @@ namespace Gato_Exploso
 {
     public class Ham : Entity
     {
+        ContentManager Content;
         int speed = 10;
-        public Ham()
+        public double angle = 0;
+        Texture2D texture;
+        public Ham(ContentManager cont)
         {
-            
+            Content = cont;
+            Load();
         }
-        public void Move(double angle)
+        public void Move()
         {
             double dx = 0;
             double dy = 0;
@@ -24,6 +32,14 @@ namespace Gato_Exploso
             int proposedX = x + (int)dx;
             int proposedY = y + (int)dy;
              
+        }
+        public void Draw(SpriteBatch spriteBatch, int offX, int offY)
+        {
+            spriteBatch.Draw(texture, new Vector2(x + offX, y + offY), Color.White);
+        }
+        public void Load()
+        {
+            texture = Content.Load<Texture2D>("Ham");
         }
     }
 }

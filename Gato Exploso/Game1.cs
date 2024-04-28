@@ -66,6 +66,8 @@ namespace Gato_Exploso
         public List<Mob> mobs = new();
         // if it is day or night
         public static bool day = true;
+        // boss
+        public Hammy hammy = null;
 
         // current quest to show and all other quests
         string curQuest = "";
@@ -87,6 +89,8 @@ namespace Gato_Exploso
             hud = new Hud(Content);
         }
 
+        // hams
+        public List<Ham> hams = new List<Ham>();
         private void Game1_Exiting(object sender, EventArgs e)
         {
             // stops running the server on the web
@@ -644,7 +648,31 @@ namespace Gato_Exploso
                 hud.clock.Tick();
                 day = hud.clock.GetDay();
             }
-
+            
+            // moves hams
+            if(bossFightStarted)
+            {
+                if(tickCount % 4000 == 0)
+                {
+                    hammy.ShootHam(GetMainPlayer().x, GetMainPlayer().y, Content);
+                }
+                foreach (Ham ham in hams)
+                {
+                    if (tickCount % 5 == 0)
+                    {
+                        double newAngle = hammy.Target(GetMainPlayer().x, GetMainPlayer().y);
+                        if (newAngle < ham.angle)
+                        {
+                            ham.angle--;
+                        }
+                        if (newAngle > ham.angle)
+                        {
+                            ham.angle++;
+                        }
+                    }
+                    ham.Move();
+                }
+            }
             MoveEggs();
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
@@ -867,7 +895,7 @@ namespace Gato_Exploso
         public void StartBossFight()
         {
             bossFightStarted = true;
-            Hammy hammy = new Hammy(Content);
+            hammy = new Hammy(Content);
             hammy.x = 90;
             hammy.y = 90;
             mobs.Add(hammy);
@@ -939,7 +967,11 @@ namespace Gato_Exploso
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest);
             _spriteBatch.End();
 
-
+            // draws ham
+            foreach(Ham hum in hams)
+            {
+                hum.Draw(_spriteBatch, GetMainPlayer().x - (int)topLeftPixel.X, GetMainPlayer().y - (int)topLeftPixel.Y);
+            }
         }
     }
 }

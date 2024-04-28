@@ -19,7 +19,7 @@ namespace Gato_Exploso.Mobs
         {
             Content = cont;
             Load();
-            speed = 3;
+            speed = 2;
             hp = 300;
             strength = 60;
         }
@@ -33,6 +33,20 @@ namespace Gato_Exploso.Mobs
         public void Load()
         {
             texture = Content.Load<Texture2D>("Hammy");
+        }
+        public double Target(int gx, int gy)
+        {
+            double sx = gx - x;
+            double sy = gy - y;
+            // uses trig to find the angle at which the mob should moves
+            return Math.Atan2(sy, sx);
+        }
+        public void ShootHam(int gx, int gy, ContentManager cont)
+        {
+            Ham ham = new Ham(cont);
+            ham.x = x;
+            ham.y = y;
+            ham.angle = Target(gx, gy);
         }
     }
 }
