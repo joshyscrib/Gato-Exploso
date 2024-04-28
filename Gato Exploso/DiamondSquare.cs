@@ -72,7 +72,7 @@ namespace Gato_Exploso
                       //We calculate random value in range of 2h
                       //and then subtract h so the end value is
                       //in the range (-h, +h)
-                      avg + (r.NextDouble() * 2 * h) - h;
+                      avg + (seed * 2 * h) - h;
                     }
                 }
                 //generate the diamond values
@@ -99,7 +99,7 @@ namespace Gato_Exploso
                         //calculate random value in range of 2h
                         //and then subtract h so the end value is
                         //in the range (-h, +h)
-                        avg = avg + (r.NextDouble() * 2 * h) - h;
+                        avg = avg + (seed * 2 * h) - h;
                         //update value for center of diamond
                         data[x, y] = avg;
 

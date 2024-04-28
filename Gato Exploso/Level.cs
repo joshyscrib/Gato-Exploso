@@ -50,9 +50,9 @@ namespace Gato_Exploso
         // constructor
         public Level()
         {
-            DiamondSquare diamond = new DiamondSquare(xTiles, 100, 12);
+            DiamondSquare diamond = new DiamondSquare(xTiles, 100, new Random().Next());
             // gets world data using a seed
-            data = diamond.getData(11);
+            data = diamond.getData(1);
         }
         // methods
 

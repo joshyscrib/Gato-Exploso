@@ -21,12 +21,12 @@ namespace Gato_Exploso.Mobs
             Content = cont;
             Load();
             speed = 4;
-            hp = 30;
+            hp = 55;
             strength = 15;
         }
         public override void Draw(SpriteBatch spriteBatch, int offX, int offY)
         {
-            double healthPercent = hp / 30;
+            double healthPercent = hp / 55;
             spriteBatch.Draw(texture, new Vector2(x + offX,y + offY),Color.White);
             spriteBatch.Draw(drawTexture, new Rectangle(x - 8 + offX, y + 68 + offY, 84, 12), Color.Gray);
             spriteBatch.Draw(drawTexture, new Rectangle(x - 7 + offX, y + 69 + offY, (int)(healthPercent * 84.0), 10), Color.Red);

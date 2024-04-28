@@ -774,7 +774,7 @@ namespace Gato_Exploso
 
                 if (playerTiles.Intersect(explodingTiles).Count() > 0)
                 {
-                    m.hp -= 0.6;
+                    m.hp -= 0.475;
                 }
             }
             base.Update(gameTime);
