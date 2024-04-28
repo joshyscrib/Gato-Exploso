@@ -41,12 +41,13 @@ namespace Gato_Exploso.Mobs
             // uses trig to find the angle at which the mob should moves
             return Math.Atan2(sy, sx);
         }
-        public void ShootHam(int gx, int gy, ContentManager cont)
+        public Ham ShootHam(int gx, int gy, ContentManager cont)
         {
             Ham ham = new Ham(cont);
             ham.x = x;
             ham.y = y;
             ham.angle = Target(gx, gy);
+            return ham;
         }
     }
 }

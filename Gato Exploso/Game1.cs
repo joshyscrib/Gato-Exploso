@@ -652,13 +652,13 @@ namespace Gato_Exploso
             // moves hams
             if(bossFightStarted)
             {
-                if(tickCount % 4000 == 0)
+                if(GetTime() % 4000 == 0)
                 {
-                    hammy.ShootHam(GetMainPlayer().x, GetMainPlayer().y, Content);
+                    hams.Add(hammy.ShootHam(GetMainPlayer().x, GetMainPlayer().y, Content));
                 }
                 foreach (Ham ham in hams)
                 {
-                    if (tickCount % 5 == 0)
+                    if (GetTime() % 5 == 0)
                     {
                         double newAngle = hammy.Target(GetMainPlayer().x, GetMainPlayer().y);
                         if (newAngle < ham.angle)
@@ -962,16 +962,17 @@ namespace Gato_Exploso
                 Mob curMob = mobs[i];
                 curMob.Draw(_spriteBatch, -(int)topLeftPixel.X, -(int)topLeftPixel.Y);
             }
-
-            // draws HUD
-            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest);
-            _spriteBatch.End();
-
             // draws ham
             foreach(Ham hum in hams)
             {
-                hum.Draw(_spriteBatch, GetMainPlayer().x - (int)topLeftPixel.X, GetMainPlayer().y - (int)topLeftPixel.Y);
+                hum.Draw(_spriteBatch, hum.x - (int)topLeftPixel.X, hum.y - (int)topLeftPixel.Y);
             }
+            // draws HUD
+            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest);
+            
+            
+
+            _spriteBatch.End();
         }
     }
 }

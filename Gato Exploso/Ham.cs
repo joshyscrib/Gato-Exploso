@@ -31,6 +31,8 @@ namespace Gato_Exploso
             // moves the mob accordingly
             int proposedX = x + (int)dx;
             int proposedY = y + (int)dy;
+            x = proposedX;
+            y = proposedY;
              
         }
         public void Draw(SpriteBatch spriteBatch, int offX, int offY)
