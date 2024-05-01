@@ -13,7 +13,7 @@ namespace Gato_Exploso
     public class Ham : Entity
     {
         ContentManager Content;
-        int speed = 10;
+        int speed = 4;
         public double angle = 0;
         Texture2D texture;
         public Ham(ContentManager cont)

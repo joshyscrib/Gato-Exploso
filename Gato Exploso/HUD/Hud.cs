@@ -14,6 +14,7 @@ namespace Gato_Exploso.HUD
     {
         GraphicsDevice context;
         public int[,] miniMapData = new int[256, 256];
+
         ContentManager Content;
         // clock to tell the player if it is day or night
         public Clock clock;
@@ -33,6 +34,11 @@ namespace Gato_Exploso.HUD
             texture = new Texture2D(context, 1, 1);
             texture.SetData(new Color[] { Color.White });
             font = Content.Load<SpriteFont>("Norm");
+
+        }
+
+        public void Reset()
+        {
 
         }
         public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest)

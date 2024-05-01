@@ -30,6 +30,10 @@ namespace Gato_Exploso
         public static ContentManager GameContent;
         public static Game1 Instance;
 
+        // pausing the game
+        bool paused = true;
+        double lastPausedTime = 0;
+
         // Location for the bomb placement indicator
         public int bombIndX = 0;
         public int bombIndY = 0;
@@ -43,11 +47,11 @@ namespace Gato_Exploso
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
-        // helps determine which direction the player is facing
-        MoveDirection lastNetDirection = new MoveDirection();
 
         // Makes a Heads-Up Display
         Hud hud;
+        // makes a menu
+        Menu menu;
 
         // if the boss fight has been initiated
         public bool bossFightStarted = false;
@@ -87,6 +91,24 @@ namespace Gato_Exploso
             _players.Add(mainPlayerName, new MainPlayer(Content));
             this.Exiting += Game1_Exiting;
             hud = new Hud(Content);
+            menu = new Menu(Content);
+            menu.SetMenuType("splash");
+            menu.PlayerAction += Menu_PlayerAction;
+            ResetGame();
+        }
+
+        private void Menu_PlayerAction(object sender, string act)
+        {
+            if(act == "cool")
+            {
+                //                ResumeGame();
+                ResetGame();
+            }
+            if(act == "start")
+            {
+                ResetGame();
+            }
+
         }
 
         // hams
@@ -100,6 +122,58 @@ namespace Gato_Exploso
         public int GetTime()
         {
             return (int)currentTime;
+        }
+
+        public void ResetGame()
+        {
+            level1.ResetLevel();
+            // set players scores to 0
+            mobs.Clear();
+            for (int i = 0; i < tileRows; i++)
+            {
+                for (int j = 0; j < tileRows; j++)
+                {
+                    hud.miniMapData[i, j] = level1.tiles[i, j].tileID;
+                }
+            }
+            SpawnPlayer(this.GetMainPlayer());
+            paused = false;
+        }
+
+        // spawns players/mobs
+        public void SpawnMob(Mob dude)
+        {
+            bool landFound = false;
+            Random random = new Random();
+            while (!landFound)
+            {
+                int nx = random.Next(256);
+                int ny = random.Next(256);
+                if (level1.tiles[nx,ny].GetType() != typeof(WaterTile))
+                {
+                    landFound = true;
+                    dude.x = nx * 32;
+                    dude.y = ny * 32;
+                }
+            }
+        }
+        // spawns players/mobs
+        public void SpawnPlayer(Player dude)
+        {
+            bool landFound = false;
+            Random random = new Random();
+            while (!landFound)
+            {
+                int nx = random.Next(256);
+                int ny = random.Next(256);
+                if (level1.tiles[nx,ny].GetType() != typeof(WaterTile))
+                {
+                    landFound = true;
+                    _players[dude.Name].x = nx * 32;
+                    _players[dude.Name].y = ny * 32;
+                }
+            }
+            _players[dude.Name].hp = 100;
         }
 
         public GameInfo GetGameInfo(string playerName, int time)
@@ -157,6 +231,10 @@ namespace Gato_Exploso
                         {
                             objType = "rock";
                         }
+                        if (obj.GetType() == typeof(Tree))
+                        {
+                            objType = "tree";
+                        }
                         // adds the object to a list of objects to give the webserF
                         ObjectInfo objectInfo = new ObjectInfo();
                         objectInfo.ObjectType = objType;
@@ -212,18 +290,12 @@ namespace Gato_Exploso
         {
             // starts main game sequences (makes tiles, begins events, runs web server)
             base.Initialize();
-            level1.InitTiles();
-            for (int i = 0; i < tileRows; i++)
-            {
-                for (int j = 0; j < tileRows; j++)
-                {
-                    hud.miniMapData[i, j] = level1.tiles[i, j].tileID;
-                }
-            }
+           // level1.InitTiles();
+          
             server.Start();
             server.PlayerAction += Server_PlayerAction;
             server.PlayerRegister += Server_PlayerRegister;
-            
+            SpawnPlayer(GetMainPlayer());
         }
         public HashSet<Entity> GetEntities()
         {
@@ -359,14 +431,14 @@ namespace Gato_Exploso
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             GetMainPlayer().Load();
+            // loads menu and hud
             hud.Load(_graphics);
-
+            menu.Load(_graphics);   
 
             music = Content.Load<Song>("ExplosoFields");
-            MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(music);
             MediaPlayer.IsRepeating = true;
-
+            PauseGame("splash");
         }
 
         public bool IsPassableCoord(int x, int y)
@@ -573,7 +645,7 @@ namespace Gato_Exploso
             {
                 Mob curMob = mobs[i];
                 // moves mobs if they are in range of the player
-                if (FindDistance(_players["gato"].x, _players["gato"].y, curMob.x, curMob.y) <= 1000)
+                if (FindDistance(_players["gato"].x, _players["gato"].y, curMob.x, curMob.y) <= 4000)
                 {
                     Player p = _players["gato"];
                     // finds X and Y distance between player and mob
@@ -624,21 +696,42 @@ namespace Gato_Exploso
 
         // main update function, gets called about every 30 milliseconds
         Random randy = new Random();
-        public void SpawnPlayer()
-        {
-
-        }
+        bool beginBossFight = false;
         protected override void Update(GameTime gameTime)
         {
+            MouseState cursor = new MouseState();
+
+            cursor = Mouse.GetState();
+            var state = Keyboard.GetState();
+            if(state.IsKeyDown(Keys.Escape) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
+            {
+                lastPausedTime = gameTime.TotalGameTime.TotalMilliseconds;
+                if(paused)
+                {
+                    ResetGame();
+                    //ResumeGame();
+                }
+                else
+                {
+                    PauseGame("pause");
+                }
+            }
+            if (paused)
+            {
+                if (cursor.LeftButton == ButtonState.Pressed)
+                {
+                    menu.Click(cursor.X, cursor.Y);
+                }
+                    return;
+            }
             if (tickCount % 4 == 0)
             {
                 MoveMobs();
             }
-            if (mobs.Count < 15)
+            if (mobs.Count < 7)
             {
                 BouncyTriangle tri = new BouncyTriangle(Content);
-                tri.x = randy.Next(8192);
-                tri.y = randy.Next(8192);
+                SpawnMob(tri);
                 mobs.Add(tri);
             }
             
@@ -658,18 +751,6 @@ namespace Gato_Exploso
                 }
                 foreach (Ham ham in hams)
                 {
-                    if (GetTime() % 5 == 0)
-                    {
-                        double newAngle = hammy.Target(GetMainPlayer().x, GetMainPlayer().y);
-                        if (newAngle < ham.angle)
-                        {
-                            ham.angle--;
-                        }
-                        if (newAngle > ham.angle)
-                        {
-                            ham.angle++;
-                        }
-                    }
                     ham.Move();
                 }
             }
@@ -677,9 +758,15 @@ namespace Gato_Exploso
             HashSet<string> playersToDie = new HashSet<string>();
             foreach (Player play in _players.Values)
             {
+                
                 if (play.hp <= 0)
                 {
+                    if(play.Name == "gato")
+                    {
+                        PauseGame("dead");
+                    }
                     playersToDie.Add(play.Name);
+                  
 
                 }
                 else
@@ -687,7 +774,7 @@ namespace Gato_Exploso
                     MovePlayer(play);
                 }
             }
-
+            
             // removes dead mobs
             HashSet<Mob> mobsToDie = new HashSet<Mob>();
             foreach (Mob mm in mobs)
@@ -695,7 +782,16 @@ namespace Gato_Exploso
                 if (mm.hp <= 0)
                 {
                     mobsToDie.Add(mm);
+                    GetMainPlayer().points++;
+                    if(GetMainPlayer().points >= 5)
+                    {
+                        beginBossFight = true;
+                    }
                 }
+            }
+            if(beginBossFight && !bossFightStarted)
+            {
+                StartBossFight();
             }
             foreach (Mob mob in mobsToDie)
             {
@@ -706,14 +802,12 @@ namespace Gato_Exploso
             {
 
                 Random ry = new Random();
-                _players[s].x = rand.Next((Level.xTiles - 4) * 32);
-                _players[s].y = ry.Next((Level.yTiles - 4) * 32);
-                _players[s].hp = 100;
+                SpawnPlayer(_players[s]);
             }
             currentTime = gameTime.TotalGameTime.TotalMilliseconds;
             if (_players["gato"].hp < 100)
             {
-                _players["gato"].hp += 0.05;
+                _players["gato"].hp += 0.028;
             }
 
             List<Player> playersToRemove = new List<Player>();
@@ -739,10 +833,10 @@ namespace Gato_Exploso
             }
 
             level1.UpdateTime(gameTime.TotalGameTime.TotalMilliseconds);
-            var state = Keyboard.GetState();
-            MouseState cursor = new MouseState();
+            
+           
             MoveDirection direction = new MoveDirection();
-            cursor = Mouse.GetState();
+            
             PlayerActionArgs actionArgs = new PlayerActionArgs();
             Player player = GetMainPlayer();
             // sets key pressed variables based on recieved key inputs
@@ -755,7 +849,7 @@ namespace Gato_Exploso
 
             if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 Exit();
             if (cursor.LeftButton == ButtonState.Pressed)
             {
@@ -798,16 +892,31 @@ namespace Gato_Exploso
             foreach (Mob m in mobs)
             {
                 // set of all tiles the player is touching
-                HashSet<Vector2> playerTiles = GetMobTiles(m);
+                HashSet<Vector2> mobTiles = GetMobTiles(m);
 
-                if (playerTiles.Intersect(explodingTiles).Count() > 0)
+                if (mobTiles.Intersect(explodingTiles).Any())
                 {
                     m.hp -= 0.475;
                 }
             }
             base.Update(gameTime);
         }
+        // pauses the game
+        public void PauseGame(string type)
+        {
+            menu.SetMenuType(type);
+            paused = true;
+            MediaPlayer.Volume = (float)0.09;
+            
 
+        }
+        // resumes the game
+        public void ResumeGame()
+        {
+            paused = false;
+            MediaPlayer.Volume = (float)0.8;
+
+        }
         private HashSet<Vector2> GetPlayerTiles(Player p)
         {
             // set of all tiles the player is touching
@@ -969,6 +1078,10 @@ namespace Gato_Exploso
             }
             // draws HUD
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest);
+            if (paused)
+            {
+                menu.Draw(_spriteBatch);
+            }
             
             
 

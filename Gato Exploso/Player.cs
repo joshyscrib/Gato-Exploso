@@ -17,7 +17,7 @@ namespace Gato_Exploso
         public int width = 60;
         public int height = 48;
         public int speed = 3;
-        public int points;
+        public int points = 0;
         // which direcion the player is facing
         public MoveDirection facing = new MoveDirection();
         protected ContentManager Content;

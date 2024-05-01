@@ -85,9 +85,34 @@
         var tick = Date.now();
 
         // images
-        // grass tiles
+        // grass tile
         var grassImage = new Image(browserTileSize, browserTileSize);
         grassImage.src = "/image/GrassTile.png";
+
+        // forest tile
+        var forestImage = new Image(browserTileSize, browserTileSize);
+        forestImage.src = "/image/ForestTile.png";
+
+        // water tile
+        var waterImage = new Image(browserTileSize, browserTileSize);
+        waterImage.src = "/image/WaterTile.png";
+
+        // sand tile
+        var sandImage = new Image(browserTileSize, browserTileSize);
+        sandImage.src = "/image/SandTile.png";
+
+        // tile object images
+        var rockImage = new Image(browserTileSize, browserTileSize);
+        rockImage.src = "/image/Rock.png";
+
+        var treeImage = new Image(browserTileSize, browserTileSize);
+        treeImage.src = "/image/Tree.png";
+
+        var bombImage = new Image(browserTileSize, browserTileSize);
+        bombImage.src = "/image/Bomb1.png";
+
+        var eggImage = new Image(browserTileSize, browserTileSize);
+        eggImage.src = "/image/Egg.png";
 
         // gato sprites
 
@@ -206,6 +231,9 @@
         function parsePlayers(data) {
             //  console.log(data);
             var gameInfo = JSON.parse(data);
+            if (gameInfo == null) {
+                return;
+            }
             lastGameTime = gameInfo.GameTime;
             var playerList = gameInfo.PlayerInfos;
             for (var i = 0; i < playerList.length; i++) {
@@ -254,6 +282,7 @@
                 var tile = tiles[tileinfo.X][tileinfo.Y];
                 tile.hasBomb = false;
                 tile.hasRock = false;
+                tile.hasTree = false;
                 tile.isExploding = false;
                 if (tileinfo.State == 1) {
                     tile.isExploding = true;
@@ -267,6 +296,9 @@
                                 break;
                             case "rock":
                                 tile.hasRock = true;
+                                break;
+                            case "tree":
+                                tile.hasTree = true;
                                 break;
                         }
                     }
@@ -419,12 +451,15 @@
             for (var i = 0; i < tileRows; i++) {
                 for (var j = 0; j < tileRows; j++) {
                     var curTileImage = null;
+                    var curObjectImage = null;
                     var curTile = tiles[i][j];
                     if (curTile.tileID == '1') {
                         ctx.fillStyle = 'blue';
+                        curTileImage = waterImage;
                     }
                     if (curTile.tileID == '2') {
                         ctx.fillStyle = 'yellow';
+                        curTileImage = sandImage;
                     }
                     if (curTile.tileID == '3') {
                         ctx.fillStyle = 'lime';
@@ -432,17 +467,16 @@
                     }
                     if (curTile.tileID == '4') {
                         ctx.fillStyle = 'green';
-                    }
-                    if (curTile.tileID == '5') {
-                        ctx.fillStyle = 'green';
+                        curTileImage = forestImage;
                     }
                     if (curTile.hasRock) {
-                        ctx.fillStyle = 'gray';
-                        curTileImage = null;
+                        curObjectImage = rockImage;
                     }
                     if (curTile.hasBomb) {
-                        ctx.fillStyle = 'black';
-                        curTileImage = null;
+                        curObjectImage = bombImage;
+                    }
+                    if (curTile.hasTree) {
+                        curObjectImage = treeImage;
                     }
                     if (curTile.isExploding) {
                         ctx.fillStyle = 'pink';
@@ -455,6 +489,9 @@
                     else {
                         ctx.drawImage(curTileImage, (100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
                     }
+                    if (curObjectImage != null) {
+                        ctx.drawImage(curObjectImage, (100 + (i * browserTileSize)) + offsetX, (100 + (j * browserTileSize)) + offsetY, browserTileSize, browserTileSize);
+                    }
 
 
                 }
@@ -462,7 +499,7 @@
             // draws all eggs
             for (var [curId, curEgg] of projectileMap) {
                 ctx.fillStyle = 'yellow';
-                ctx.fillRect(100 + curEgg.X + offsetX + 1, curEgg.Y + offsetY + 96, 32, 32);
+                ctx.drawImage(eggImage, 100 + curEgg.X + offsetX + 1, curEgg.Y + offsetY + 96);
             }
             // draws self;
             ctx.drawImage(curOstrichImage, 330, 315, 64, 64);
@@ -506,7 +543,7 @@
 
                 }
                 // draws names
-                if (curPlayer.Name = - "gato") {
+                if (curPlayer.Name == "gato") {
                     ctx.fillStyle = 'red'
                 }
                 else {

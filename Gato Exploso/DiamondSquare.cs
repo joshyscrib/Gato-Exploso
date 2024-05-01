@@ -20,9 +20,9 @@ namespace Gato_Exploso
             this._seed = seed;
         }
 
-        public double[,] getData(int giveSeed)
+        public double[,] getData()
         {
-            return diamondSquareAlgorithm(giveSeed);
+            return diamondSquareAlgorithm(1);
         }
 
         private double[,] diamondSquareAlgorithm(int seed)
@@ -36,7 +36,7 @@ namespace Gato_Exploso
               data[DATA_SIZE - 1, DATA_SIZE - 1] = _seed;
 
             double h = _roughness;//the range (-h -> +h) for the average offset - affects roughness
-            Random r = new Random();//for the new value in range of h
+            Random r = new Random(seed);//for the new value in range of h
                                         //side length is distance of a single square side
                                         //or distance of diagonal in diamond
 
@@ -72,7 +72,7 @@ namespace Gato_Exploso
                       //We calculate random value in range of 2h
                       //and then subtract h so the end value is
                       //in the range (-h, +h)
-                      avg + (seed * 2 * h) - h;
+                      avg + (r.NextDouble() * 2 * h) - h;
                     }
                 }
                 //generate the diamond values
@@ -84,10 +84,13 @@ namespace Gato_Exploso
                 {
                     //and y is x offset by half a side, but moved by
                     //the full side length
+                    //NOTE: if the data shouldn't wrap then y < DATA_SIZE
                     //to generate the far edge values
                     for (int y = (x + halfSide) % sideLength; y < DATA_SIZE - 1; y += sideLength)
                     {
                         //x, y is center of diamond
+                        //note we must use mod  and add DATA_SIZE for subtraction 
+                        //so that we can wrap around the array to find the corners
                         double avg =
                           data[(x - halfSide + DATA_SIZE) % DATA_SIZE, y] + //left of center
                           data[(x + halfSide) % DATA_SIZE, y] + //right of center
@@ -96,10 +99,10 @@ namespace Gato_Exploso
                         avg /= 4.0;
 
                         //new value = average plus random offset
-                        //calculate random value in range of 2h
+                        //We calculate random value in range of 2h
                         //and then subtract h so the end value is
                         //in the range (-h, +h)
-                        avg = avg + (seed * 2 * h) - h;
+                        avg = avg + (r.NextDouble() * 2 * h) - h;
                         //update value for center of diamond
                         data[x, y] = avg;
 

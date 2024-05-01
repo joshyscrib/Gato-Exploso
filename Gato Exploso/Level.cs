@@ -50,9 +50,61 @@ namespace Gato_Exploso
         // constructor
         public Level()
         {
-            DiamondSquare diamond = new DiamondSquare(xTiles, 100, new Random().Next());
+            data = new double[xTiles, yTiles];
+            // loads sounds
+
+        }
+
+        public void ResetLevel()
+        {
+            FastNoise noise = new FastNoise(new Random().Next());
+            noise.SetNoiseType(FastNoise.NoiseType.Simplex);
+            noise.SetFrequency(0.008f);
+
+            //   DiamondSquare diamond = new DiamondSquare(xTiles, 100, new Random().Next());
             // gets world data using a seed
-            data = diamond.getData(1);
+            //  data = diamond.getData();
+         
+            double minValue = Double.MaxValue;
+            double maxValue = Double.MinValue;
+            for (int i = 0; i < xTiles; i++)
+            {
+                for (int j = 0; j < yTiles; j++)
+                {
+                    double curValue = noise.GetSimplex(i, j);
+                    data[i, j] = curValue;
+                    if (curValue < minValue)
+                    {
+                        minValue = curValue;
+                    }
+                    if (curValue > maxValue)
+                    {
+                        maxValue = curValue;
+                    }
+                }
+            }
+
+            double range = maxValue - minValue;
+            double divider = range / (double)100;
+            double minOffset = 0;
+            if (minValue > 0)
+            {
+                minOffset = -1 * minValue;
+            }
+            else
+            {
+                minOffset = Math.Abs(minValue);
+            }
+
+            for (int i = 0; i < xTiles; i++)
+            {
+                for (int j = 0; j < yTiles; j++)
+                {
+                    data[i, j] += minOffset;
+                    data[i, j] /= divider;
+                }
+            }
+            InitTiles();
         }
         // methods
 
@@ -60,6 +112,7 @@ namespace Gato_Exploso
         {
             return activeTileCoords;
         }
+
         // updates the offset x&y
         public void UpdateOffset(int x, int y)
         {
@@ -160,30 +213,33 @@ namespace Gato_Exploso
         // Assigns each tile a type and places rocks/trees based on data from diamond square algorithm
         public void InitTiles()
         {
-            // loads sounds
-            bombSound = Game1.Instance.Content.Load<SoundEffect>("Bomb");
+            if (bombSound == null)
+            {
+                bombSound = Game1.Instance.Content.Load<SoundEffect>("Bomb");
+            }
             for (int i = 0; i < xTiles; i++)
             {
                 for (int j = 0; j < yTiles; j++)
                 {
                     Tile tile = new GrassTile();
                     double curTileNum = data[i,j];
-                    if(curTileNum < -40)
+                    if (curTileNum < 25)
                     {
                         tile = new WaterTile();
                     }
-                    if (curTileNum >= -40)
+                    if (curTileNum >= 25 && curTileNum < 40)
                     { 
                         tile = new SandTile();
                     }
-                    if(curTileNum >= -30)
+                    if(curTileNum >= 40 && curTileNum < 70)
                     {
                         tile = new GrassTile();
                     }
-                    if(curTileNum >= 10)
+                    if(curTileNum >= 70)
                     {
                         tile = new ForestTile();
                     }
+                    
                     Random r = new Random();
                     switch (r.Next(18))
                     {

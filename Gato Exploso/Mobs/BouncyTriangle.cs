@@ -23,6 +23,8 @@ namespace Gato_Exploso.Mobs
             speed = 4;
             hp = 55;
             strength = 15;
+            width = 64;
+            height = 64;
         }
         public override void Draw(SpriteBatch spriteBatch, int offX, int offY)
         {
