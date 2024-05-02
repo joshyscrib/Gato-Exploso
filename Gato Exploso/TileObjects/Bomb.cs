@@ -17,7 +17,7 @@ namespace Gato_Exploso.TileObjects
         protected Texture2D bombTexture;
         // determines which bomb sprite to use
         public bool bombText = false;
-        public int range = 1;
+        public int range = 2;
         public Bomb(double ticks)
         {
             Load();

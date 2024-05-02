@@ -42,6 +42,8 @@ namespace Gato_Exploso
         int targetX = 300;
         int targetY = 300;
 
+        // difficulty
+        public static int difficultyNumber = 1;
         // Number for how many rows of tiles there are
         const int tileRows = 256;
         public const int tileSide = 32;
@@ -101,8 +103,7 @@ namespace Gato_Exploso
         {
             if(act == "cool")
             {
-                //                ResumeGame();
-                ResetGame();
+                ResumeGame();
             }
             if(act == "start")
             {
@@ -136,8 +137,9 @@ namespace Gato_Exploso
                     hud.miniMapData[i, j] = level1.tiles[i, j].tileID;
                 }
             }
-            SpawnPlayer(this.GetMainPlayer());
+            SpawnPlayer(GetMainPlayer());
             paused = false;
+            MediaPlayer.Volume = (float)0.8;
         }
 
         // spawns players/mobs
@@ -173,6 +175,7 @@ namespace Gato_Exploso
                     _players[dude.Name].y = ny * 32;
                 }
             }
+            dude.points = 0;
             _players[dude.Name].hp = 100;
         }
 
@@ -645,7 +648,7 @@ namespace Gato_Exploso
             {
                 Mob curMob = mobs[i];
                 // moves mobs if they are in range of the player
-                if (FindDistance(_players["gato"].x, _players["gato"].y, curMob.x, curMob.y) <= 4000)
+                if (FindDistance(_players["gato"].x, _players["gato"].y, curMob.x, curMob.y) <= 2800 + (difficultyNumber * 500))
                 {
                     Player p = _players["gato"];
                     // finds X and Y distance between player and mob
@@ -708,8 +711,7 @@ namespace Gato_Exploso
                 lastPausedTime = gameTime.TotalGameTime.TotalMilliseconds;
                 if(paused)
                 {
-                    ResetGame();
-                    //ResumeGame();
+                    ResumeGame();
                 }
                 else
                 {
@@ -1080,7 +1082,7 @@ namespace Gato_Exploso
             hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest);
             if (paused)
             {
-                menu.Draw(_spriteBatch);
+                menu.Draw(_spriteBatch, GetMainPlayer().points);
             }
             
             

@@ -109,7 +109,7 @@ namespace Gato_Exploso.Tiles
             bool hasBomb = false;
             foreach (var tileObj in objects)
             {
-                if (tileObj.GetType() == typeof(Bomb)) ;
+                if (tileObj.GetType() == typeof(Bomb) && tileObj.GetType() == typeof(MightyBomb))
                 {
                     hasBomb = true;
                 }
@@ -147,6 +147,11 @@ namespace Gato_Exploso.Tiles
                 if (tileObj.GetType() == typeof(Bomb))
                 {
                     Bomb b = tileObj as Bomb;
+                    b.DetonateBomb();
+                }
+                else if (tileObj.GetType() == typeof(MightyBomb))
+                {
+                    MightyBomb b = tileObj as MightyBomb;
                     b.DetonateBomb();
                 }
                 else

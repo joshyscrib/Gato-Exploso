@@ -173,6 +173,11 @@ namespace Gato_Exploso
                 {
                     bombSound.Play();
                     var nearbyCoords = GetCoordsAroundTile(i, j, 2);
+                    if (tiles[i, j].GetTileObjects()[0].GetType() == typeof(Bomb))
+                    {
+                        Bomb bb = tiles[i, j].GetTileObjects()[0] as Bomb;
+                        nearbyCoords = GetCoordsAroundTile(i, j, bb.range);
+                    }
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
                         if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= xTiles || coord2.Y >= yTiles) continue;

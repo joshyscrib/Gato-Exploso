@@ -18,7 +18,7 @@ namespace Gato_Exploso.HUD
         ContentManager Content;
         // clock to tell the player if it is day or night
         public Clock clock;
-        // spritefont to write text on the screen
+        // spritefonts to write text on the screen
         private SpriteFont font;
         public Hud(ContentManager c)
         {
@@ -34,7 +34,6 @@ namespace Gato_Exploso.HUD
             texture = new Texture2D(context, 1, 1);
             texture.SetData(new Color[] { Color.White });
             font = Content.Load<SpriteFont>("Norm");
-
         }
 
         public void Reset()

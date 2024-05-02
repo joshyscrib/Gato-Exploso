@@ -12,6 +12,7 @@ namespace Gato_Exploso.Mobs
         public MoveDirection facing = new MoveDirection();
         public int speed = 0;
         public double hp = 9999;
+        public double maxHp = 9999;
         public bool hasBeenTalkedTo = false;
         double dx = 0;
         double dy = 0;
@@ -68,7 +69,7 @@ namespace Gato_Exploso.Mobs
                     {
                         knockBackStartTime = Game1.Instance.GetTime();
                         lastChangeDirectionTime = Game1.Instance.GetTime();
-                        moveReactionDelay = 120;
+                        moveReactionDelay = 140 - (Game1.difficultyNumber * 13);
                         MainPlayer p = entity as MainPlayer;
                         p.TakeDamage(strength);
                         double reverseAngle = angle2 + 3;
