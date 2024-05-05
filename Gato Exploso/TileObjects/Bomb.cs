@@ -18,10 +18,11 @@ namespace Gato_Exploso.TileObjects
         // determines which bomb sprite to use
         public bool bombText = false;
         public int range = 2;
+        
         public Bomb(double ticks)
         {
             Load();
-
+            type = "bomb";
             // sets the time that the bomb was created
             createTime = ticks;
         }

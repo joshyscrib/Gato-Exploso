@@ -1,10 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gato_Exploso.TileObjects
 {
@@ -17,6 +12,8 @@ namespace Gato_Exploso.TileObjects
             range = 4;
             // sets the time that the bomb was created
             createTime = ticks;
+            // so that other classes can easily tell what type of bomb it is
+            type = "mighty";
         }
         public void Load()
         {

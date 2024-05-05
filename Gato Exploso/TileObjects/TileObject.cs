@@ -11,7 +11,7 @@ namespace Gato_Exploso.TileObjects
     {
         // sets a variable for if the variable exists
         protected bool deleted = false;
-
+        public string type = "nuh uh";
         public abstract void Draw(SpriteBatch spriteBatch, int x, int y);
     }
 }

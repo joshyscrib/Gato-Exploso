@@ -109,7 +109,7 @@ namespace Gato_Exploso.Tiles
             bool hasBomb = false;
             foreach (var tileObj in objects)
             {
-                if (tileObj.GetType() == typeof(Bomb) && tileObj.GetType() == typeof(MightyBomb))
+                if (tileObj.GetType() == typeof(Bomb) || tileObj.GetType() == typeof(MightyBomb))
                 {
                     hasBomb = true;
                 }
@@ -168,15 +168,28 @@ namespace Gato_Exploso.Tiles
             HashSet<Bomb> bombsToDelete = new HashSet<Bomb>();
             foreach (TileObject bmb in objects)
             {
-                if (bmb.GetType() == typeof(Bomb))
+                switch (bmb.type)
                 {
-                    Bomb bomb = (Bomb)bmb;
-                    if (Game1.Instance.GetTime() - 1000 > bomb.createTime)
-                    {
-                        bombsToDelete.Add(bomb);
-                        lastModifiedTime = Game1.Instance.GetTime();
-                    }
+                    case "bomb":
+                        Bomb bomb = (Bomb)bmb;
+                        if (Game1.Instance.GetTime() - 1000 > bomb.createTime)
+                        {
+                            bombsToDelete.Add(bomb);
+                            lastModifiedTime = Game1.Instance.GetTime();
+                        }
+                        break;
+                    case "mighty":
+                        MightyBomb mighty = (MightyBomb)bmb;
+                        if (Game1.Instance.GetTime() - 1700 > mighty.createTime)
+                        {
+                            bombsToDelete.Add(mighty);
+                            lastModifiedTime = Game1.Instance.GetTime();
+                        }
+                        break;
+                        
                 }
+                    
+                
             }
             foreach (Bomb bmb in bombsToDelete)
             {

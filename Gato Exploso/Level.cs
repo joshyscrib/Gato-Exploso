@@ -173,10 +173,18 @@ namespace Gato_Exploso
                 {
                     bombSound.Play();
                     var nearbyCoords = GetCoordsAroundTile(i, j, 2);
-                    if (tiles[i, j].GetTileObjects()[0].GetType() == typeof(Bomb))
+                    if(tiles[i, j].GetTileObjects().Count > 0)
                     {
-                        Bomb bb = tiles[i, j].GetTileObjects()[0] as Bomb;
-                        nearbyCoords = GetCoordsAroundTile(i, j, bb.range);
+                        if (tiles[i, j].GetTileObjects()[0].GetType() == typeof(Bomb) && tiles[i, j].GetTileObjects()[0].GetType() != typeof(MightyBomb))
+                        {
+                            Bomb bb = tiles[i, j].GetTileObjects()[0] as Bomb;
+                            nearbyCoords = GetCoordsAroundTile(i, j, bb.range);
+                        }
+                        if (tiles[i, j].GetTileObjects()[0].GetType() == typeof(MightyBomb))
+                        {
+                            MightyBomb bb = tiles[i, j].GetTileObjects()[0] as MightyBomb;
+                            nearbyCoords = GetCoordsAroundTile(i, j, bb.range);
+                        }
                     }
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
@@ -354,13 +362,32 @@ namespace Gato_Exploso
         }
 
         // Places a bomb when space is pressed
-        public void PlaceBomb(int x, int y)
+        public void PlaceBomb(int x, int y, int type)
         {
             Vector2 vec = GetTilePosition(x, y);
             if (!IsCoordInBounds(vec)) { return; }
-            Bomb b = new Bomb(gameTime);
             Tile curTile = tiles[(int)vec.X, (int)vec.Y];
-            curTile.AddBomb(b);
+            switch (type)
+            {
+                case 0:
+                    curTile.AddBomb(new Bomb(gameTime));
+                    break;
+                case 1:
+                    curTile.AddBomb(new MightyBomb(gameTime));
+                    break;
+                case 2:
+                 //   curTile.AddBomb(new Bomb(gameTime));
+                    break;
+                case 3:
+                 //   curTile.AddBomb(new Bomb(gameTime));
+                    break;
+                case 4:
+                  //  curTile.AddBomb(new Bomb(gameTime));
+                    break;
+                case 5:
+                 //   curTile.AddBomb(new Bomb(gameTime));
+                    break;
+            }
             activeTileCoords.Add(vec);
 
         }

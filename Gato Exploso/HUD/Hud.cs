@@ -25,7 +25,25 @@ namespace Gato_Exploso.HUD
             Content = c;
             clock = new Clock(Content);
         }
+
+        // draws rects
         Texture2D texture;
+
+        // inventory
+        Texture2D inventexture;
+
+        // inventory selected item
+        Texture2D invecture;
+        public int scrollAmt = 3;
+
+        // Bomb sprites for inventory
+        Texture2D bombTexture;
+        Texture2D mightyTexture;
+        Texture2D grenadeTexture;
+        Texture2D landMineTexture;
+        Texture2D missileTexture;
+        Texture2D gravTexture;
+
         // filter to put over the screen at night
         Color nightyTime = new Color(0, 0, 30, 120);
         public void Load(GraphicsDeviceManager mgr)
@@ -34,6 +52,12 @@ namespace Gato_Exploso.HUD
             texture = new Texture2D(context, 1, 1);
             texture.SetData(new Color[] { Color.White });
             font = Content.Load<SpriteFont>("Norm");
+            inventexture = Content.Load<Texture2D>("Inventory");
+            invecture = Content.Load<Texture2D>("Invect");
+            bombTexture = Content.Load<Texture2D>("Bomb1");
+            landMineTexture = Content.Load<Texture2D>("LandMine");
+            mightyTexture = Content.Load<Texture2D>("MightyBomb");
+            gravTexture = Content.Load<Texture2D>("GravBomb");
         }
 
         public void Reset()
@@ -94,8 +118,13 @@ namespace Gato_Exploso.HUD
                 new Vector2(55, 25),
                 Color.Black
                 );
-            // TODO draw inventory
-
+            // draw inventory
+            spriteBatch.Draw(inventexture, new Rectangle(870, 1255, 824, 144), Color.White);
+            spriteBatch.Draw(invecture, new Rectangle(870 + (scrollAmt * 136), 1255, 144, 144), Color.White);
+            spriteBatch.Draw(bombTexture, new Rectangle(874 + (0 * 136), 1259, 128, 128), Color.White);
+            spriteBatch.Draw(mightyTexture, new Rectangle(874 + (1 * 136), 1259, 128, 128), Color.White);
+            spriteBatch.Draw(landMineTexture, new Rectangle(874 + (3 * 136), 1259, 128, 128), Color.White);
+            spriteBatch.Draw(gravTexture, new Rectangle(874 + (5 * 136), 1259, 128, 128), Color.White);
         }
     }
 }

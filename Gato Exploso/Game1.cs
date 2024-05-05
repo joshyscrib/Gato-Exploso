@@ -703,7 +703,6 @@ namespace Gato_Exploso
         protected override void Update(GameTime gameTime)
         {
             MouseState cursor = new MouseState();
-
             cursor = Mouse.GetState();
             var state = Keyboard.GetState();
             if(state.IsKeyDown(Keys.Escape) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
@@ -809,7 +808,7 @@ namespace Gato_Exploso
             currentTime = gameTime.TotalGameTime.TotalMilliseconds;
             if (_players["gato"].hp < 100)
             {
-                _players["gato"].hp += 0.028;
+                _players["gato"].hp += 0.023;
             }
 
             List<Player> playersToRemove = new List<Player>();
@@ -846,16 +845,22 @@ namespace Gato_Exploso
             if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
             if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
             if (state.IsKeyDown(Keys.D)) { direction.Right = true; }
+            if (state.IsKeyDown(Keys.D1)) { hud.scrollAmt = 0 ; }
+            if (state.IsKeyDown(Keys.D2)) { hud.scrollAmt = 1; }
+            if (state.IsKeyDown(Keys.D3)) { hud.scrollAmt = 2; }
+            if (state.IsKeyDown(Keys.D4)) { hud.scrollAmt = 3; }
+            if (state.IsKeyDown(Keys.D5)) { hud.scrollAmt = 4; }
+            if (state.IsKeyDown(Keys.D6)) { hud.scrollAmt = 5; }
             if (state.IsKeyDown(Keys.P)) { _players["gato"].hp += 5; }
             if (state.IsKeyDown(Keys.B)) { if (!bossFightStarted) { StartBossFight(); } }
 
-            if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
+            if (state.IsKeyDown(Keys.Space)) {  }
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 Exit();
             if (cursor.LeftButton == ButtonState.Pressed)
             {
-                level1.PlaceRock();
+                actionArgs.placeBomb = true;
             }
             if (direction.IsDirectionSet())
             {
@@ -983,20 +988,20 @@ namespace Gato_Exploso
                 {
                     if (_players[mainPlayerName].facing.Up)
                     {
-                        level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y - 16);
+                        level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y - 16, hud.scrollAmt);
                     }
                     else if (_players[mainPlayerName].facing.Left)
                     {
-                        level1.PlaceBomb(_players[mainPlayerName].x - 16, _players[mainPlayerName].y + 48);
+                        level1.PlaceBomb(_players[mainPlayerName].x - 16, _players[mainPlayerName].y + 48, hud.scrollAmt);
 
                     }
                     else if (_players[mainPlayerName].facing.Down)
                     {
-                        level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 80);
+                        level1.PlaceBomb(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 80, hud.scrollAmt);
                     }
                     else if (_players[mainPlayerName].facing.Right)
                     {
-                        level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48);
+                        level1.PlaceBomb(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48, hud.scrollAmt);
                     }
                     lastBombTime = currentTime;
                 }
