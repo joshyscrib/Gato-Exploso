@@ -14,7 +14,7 @@ namespace Gato_Exploso
         private double currentTime = 0;
         private double lastMoveTime = 0;
         
-        public int width = 60;
+        public int width = 64;
         public int height = 48;
         public int speed = 3;
         public int points = 0;

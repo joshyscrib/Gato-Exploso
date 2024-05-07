@@ -7,6 +7,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 
 namespace Gato_Exploso.HUD
 {
@@ -20,6 +21,14 @@ namespace Gato_Exploso.HUD
 
         // splash screen image(game poster)
         Texture2D splashTexture;
+
+        // dialogues
+        Texture2D i1;
+        Texture2D i2;
+        Texture2D i3;
+        Texture2D t1;
+        Texture2D t2;
+        Texture2D m1;
 
         // spritefont to write text on the screen
         private SpriteFont font;
@@ -59,9 +68,15 @@ namespace Gato_Exploso.HUD
             titleFont = Content.Load<SpriteFont>("Title");
             splashTexture = Content.Load<Texture2D>("GatoPosterMenu");
             credits = Content.Load<Texture2D>("cReDiTsSs");
+            i1 = Content.Load<Texture2D>("IntroD");
+            i2 = Content.Load<Texture2D>("IntroD2");
+            i3 = Content.Load<Texture2D>("IntroD3");
+            t1 = Content.Load<Texture2D>("TimmyD");
+            t2 = Content.Load<Texture2D>("TimmyD2");
+            m1 = Content.Load<Texture2D>("MurdererD");
         }
 
-        public void Draw(SpriteBatch spriteBatch, int ps)
+        public void Draw(SpriteBatch spriteBatch, Vector2 turtle)
         {
             menuTicks++;
             if (menuType == "splash")
@@ -110,7 +125,7 @@ namespace Gato_Exploso.HUD
             if (menuType == "pause")
             {
                 // background of pause menu
-                spriteBatch.Draw(texture, new Rectangle(150, 150, width - 300, height - 300), Color.Gray);
+                spriteBatch.Draw(texture, new Rectangle(150, 150, width - 300, height - 300), Color.White);
                 // exit game button
                 spriteBatch.Draw(texture, new Rectangle(width - 400, 170, 80, 80), Color.Lime);
                 spriteBatch.DrawString(font, "Quit", new Vector2(width - 380, 200), Color.Black);
@@ -125,13 +140,9 @@ namespace Gato_Exploso.HUD
             }
             if (menuType == "dead")
             {
-                if (!hasGatoPoints)
-                {
-                    gatoPointsDead = ps;
-                }
                 hasGatoPoints = true;
                 // background of menu
-                spriteBatch.Draw(texture, new Rectangle(150, 150, width - 300, height - 300), Color.Gray);
+                spriteBatch.Draw(texture, new Rectangle(150, 150, width - 300, height - 300), Color.White);
                 spriteBatch.DrawString
                 (
                 titleFont,
@@ -139,20 +150,45 @@ namespace Gato_Exploso.HUD
                 new Vector2((width / 2) - 200, 200),
                 Color.Black
                 );
+                DrawScoreboard(spriteBatch);
+                spriteBatch.Draw(texture, new Rectangle(width - 400, 170, 80, 80), Color.Lime);
+                spriteBatch.DrawString(font, "Quit", new Vector2(width - 380, 200), Color.Black);
+            }
+            if (menuType == "win")
+            {
+                hasGatoPoints = true;
+                // background of menu
+                spriteBatch.Draw(texture, new Rectangle(150, 150, width - 300, height - 300), Color.White);
                 spriteBatch.DrawString
                 (
-                font,
-                "score: " + ps,
-                new Vector2((width / 2) - 200, 450),
+                titleFont,
+                "You Win!",
+                new Vector2((width / 2) - 200, 200),
                 Color.Black
                 );
                 DrawScoreboard(spriteBatch);
                 spriteBatch.Draw(texture, new Rectangle(width - 400, 170, 80, 80), Color.Lime);
                 spriteBatch.DrawString(font, "Quit", new Vector2(width - 380, 200), Color.Black);
             }
+            if(menuType == "diallog")
+            {
+                spriteBatch.Draw(i1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
         }
         public void Click(int x, int y)
         {
+            if(menuType == "turtleIntro")
+            {
+                PlayerAction(this, "cool");
+            }
+
             // start button
             coords = x + " : " + y;
             if (x > 900 && x < 1670 && y > 870 && y < 1225 && menuType == "splash")
@@ -165,6 +201,8 @@ namespace Gato_Exploso.HUD
             {
                 PlayerAction(this, "start");
                 Game1.Instance.PauseGame("splash");
+                MediaPlayer.Play(Game1.Instance.menuMusic);
+                MediaPlayer.Volume = (float).8;
             }
 
 
@@ -203,21 +241,24 @@ namespace Gato_Exploso.HUD
                 );
             for (int i = 0; i < playerList.Count; i++)
             {
-                spriteBatch.DrawString
+                if (playerList[i].Name != "squirrell")
+                {
+                    spriteBatch.DrawString
                 (
                 font,
                 playerList[i].Name,
                 new Vector2(205, offY),
                 Color.Black
                 );
-                spriteBatch.DrawString
-                (
-                font,
-                playerList[i].Points.ToString(),
-                new Vector2(255, offY),
-                Color.Black
-                );
-                offY += 20;
+                    spriteBatch.DrawString
+                    (
+                    font,
+                    playerList[i].Points.ToString(),
+                    new Vector2(295, offY),
+                    Color.Black
+                    );
+                    offY += 20;
+                }
             }
         }
     }

@@ -52,8 +52,17 @@
             Id;
             EndTime;
         };
+
+        class MobInfo {
+            Type;
+            X;
+            Y;
+            Id;
+            Health;
+        }
         // map of all projectiles
         const projectileMap = new Map();
+        const mobMap = new Map();
         // joystick
         var joystick;
 
@@ -114,6 +123,9 @@
         var eggImage = new Image(browserTileSize, browserTileSize);
         eggImage.src = "/image/Egg.png";
 
+        var triangleImage = new Image(browserTileSize, browserTileSize);
+        triangleImage.src = "/image/BadBouncyTriangle.png";
+
         // gato sprites
 
         var gatoLImage = new Image();
@@ -132,8 +144,12 @@
 
         var curOstrichImage = ostrichLImage;
         function sendMove(dir) {
+            if (dir != lastMove) {
+                lastMove = dir;
+                $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
+            }
             // this is how you call a url
-            $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
+
         }
         function registerPlayer() {
             $("#registration").hide();
@@ -247,6 +263,24 @@
                 playerMap.set(player.Name, player);
 
             }
+
+            var mobList = gameInfo.MobInfos;
+            for (var i = 0; i < mobList.length; i++) {
+                var mob = mobList[i];
+                if (!mobMap.has(mob.Id)) {
+                    var mobInfo = new MobInfo();
+                    mobInfo.Type = mob.Type;
+                    mobMap.set(mob.Id, mobInfo);
+                }
+
+                var mobInMap = mobMap.get(mob.Id);
+                mobInMap.X = mob.X;
+                mobInMap.Y = mob.Y;
+
+                mobMap.set(i, mobInfo);
+            }
+
+
             var currentProjectiles = new Set();
             for (var i = 0; i < gameInfo.ProjectileInfos.length; i++) {
                 var curInfo = gameInfo.ProjectileInfos[i];
@@ -268,6 +302,9 @@
                     projectileMap.set(proj.Id, proj);
                 }
             }
+
+
+        
 
             // going through all projectiles known to the js file
             for (var [curId, curEgg] of projectileMap) {
@@ -398,13 +435,20 @@
         function shoot() {
             $.get("/action?command=shoot&name=" + playerName);
         }
+        var isMoving = false;
+        var lastMove = "";
         function checkJoystick() {
 
             //  console.log(joystick.GetX());
             if (joystick.GetX() == 0 && !wDown && !aDown && !sDown && !dDown) {
-                sendMove("stop");
+                if (isMoving) {
+                    sendMove("stop");
+                    isMoving = false;
+                }
+
             }
             else {
+                isMoving = true;
                 if (wDown) {
                     sendMove("up");
                 }
@@ -504,6 +548,13 @@
             // draws self;
             ctx.drawImage(curOstrichImage, 330, 315, 64, 64);
 
+            // draw mobs
+            for (var [curId, curMob] of mobMap) {
+                if (curMob != undefined) {
+                    ctx.fillStyle = 'red';
+                    ctx.drawImage(triangleImage, 100 + curMob.X + offsetX + 1, curMob.Y + offsetY + 96);
+                }
+            }
 
             ctx.font = "30px serif";
             for (var [curPlayerName, curPlayer] of playerMap) {

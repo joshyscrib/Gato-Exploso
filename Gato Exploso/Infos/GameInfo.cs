@@ -13,5 +13,7 @@ namespace Gato_Exploso.Infos
         public List<TileInfo> TileInfos { get; set; }
         public List<ProjectileInfo> ProjectileInfos { get; set; }
 
+        public List<MobInfo> MobInfos { get; set; }
+
     }
 }

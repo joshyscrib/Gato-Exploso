@@ -34,7 +34,7 @@ namespace Gato_Exploso.HUD
 
         // inventory selected item
         Texture2D invecture;
-        public int scrollAmt = 3;
+        public int scrollAmt = 0;
 
         // Bomb sprites for inventory
         Texture2D bombTexture;
@@ -64,14 +64,18 @@ namespace Gato_Exploso.HUD
         {
 
         }
-        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest)
+        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest, List<Mobs.Mob> mobList, List<Player> playerList)
         {
+            int minimapWidth = 270;
+            int minimapHeight = 295;
+            int minimapLeft = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - minimapWidth;
+            int minimapTop = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - minimapHeight;
             // draws health bar
             spriteBatch.Draw(texture, new Rectangle(10, 10, 510, 72), Color.Gray);
             spriteBatch.Draw(texture, new Rectangle(14, 14, health * 5, 64), Color.Lime);
 
             // background of minimap
-            spriteBatch.Draw(texture, new Rectangle(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 275, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 300, 266, 266), Color.Black);
+            spriteBatch.Draw(texture, new Rectangle(minimapLeft - 5, minimapTop - 5, 266, 266), Color.Black);
             // Decides tiles-colors and draws minimap
             Color miniColor;
             for (int i = 0; i < miniMapData.GetLength(0); i++)
@@ -96,12 +100,24 @@ namespace Gato_Exploso.HUD
                             miniColor = new Color(255, 255, 255);
                             break;
                     }
-                    spriteBatch.Draw(texture, new Rectangle(i + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 270), j + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 295), 1, 1), miniColor);
+                    spriteBatch.Draw(texture, new Rectangle(i + (minimapLeft), j + (minimapTop), 1, 1), miniColor);
                 }
             }
             // draws gato location on minimap
-            spriteBatch.Draw(texture, new Rectangle(gatoX / 32 + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - 272) - 2, gatoY / 32 + (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - 297) - 2, 6, 6), Color.Red);
+            spriteBatch.Draw(texture, new Rectangle(gatoX / 32 + (minimapLeft) - 3, gatoY / 32 + (minimapTop) - 3, 6, 6), Color.Blue);
 
+            // draws mobs on minimap
+            foreach(var mob in mobList)
+            {
+                spriteBatch.Draw(texture, new Rectangle(mob.x / 32 + (minimapLeft) - 1, mob.y / 32 + (minimapTop) - 1, 3, 3), Color.Red);
+                if(mob.GetType() == typeof(Mobs.Hammy))
+                {
+                    spriteBatch.Draw(texture, new Rectangle(mob.x / 32 + (minimapLeft) - 3, mob.y / 32 + (minimapTop) - 3, 6, 6), Color.Gold);
+                
+                }
+            }
+            // draws ostriches on minimap
+            foreach(Player player in playerList)
             // draws a clock that shows if it is day or night
             clock.Draw(spriteBatch);
 

@@ -18,26 +18,34 @@ namespace Gato_Exploso.Tiles
         // location of tile
         int x = 0;
         int y = 0;
+
         // sets variables for the height and width of tiles
         public const int tileSide = 32;
         public int width = tileSide;
         public int height = tileSide;
+
         // var for if the player can walk through the tile
         public bool solid;
+
         // vars for collision with bomb explosions
         public bool bombExploded = false;
         public bool bombExplodeRad = false;
+
         // Id for each different tile type(e.g. grass=1,forest=1, etc)
         public int tileID;
+
         // list of tile objects
         private List<TileObject> objects = new List<TileObject>();
+
         // bool for if the tile has a bomb that is currently explodng
         protected bool isExploding = false;
+
         // tick when the explosion started
         int explosionStartTime = 0;
         protected Texture2D tileTexture;
-        // current game time
-        // protected int curTickCount = 0;
+
+        // range to explode a bomb when it is placed on the tile
+        public int range = 0;
 
         protected int lastModifiedTime = 0;
         // methods
@@ -70,6 +78,7 @@ namespace Gato_Exploso.Tiles
         {
             return isExploding;
         }
+
         // checks if the tile is solid 
         public bool IsSolid()
         {
@@ -109,14 +118,27 @@ namespace Gato_Exploso.Tiles
             bool hasBomb = false;
             foreach (var tileObj in objects)
             {
-                if (tileObj.GetType() == typeof(Bomb) || tileObj.GetType() == typeof(MightyBomb))
+                if (tileObj.GetType() == typeof(Bomb))
                 {
                     hasBomb = true;
                 }
+                
             }
             if (!hasBomb)
             {
                 objects.Add(b);
+            }
+            foreach (var tileObj in objects)
+            {
+
+                if (tileObj.GetType() == typeof(MightyBomb))
+                {
+                    range = 4;
+                }
+                else if (tileObj.GetType() == typeof(Bomb))
+                {
+                    range = 2;
+                }
             }
             lastModifiedTime = Game1.Instance.GetTime();
         }
@@ -136,7 +158,6 @@ namespace Gato_Exploso.Tiles
         public void startExplosion()
         {
 
-            //    curTickCount = Game1.Instance.GetTime();
             explosionStartTime = Game1.Instance.GetTime(); ;
             isExploding = true;
 
@@ -180,7 +201,7 @@ namespace Gato_Exploso.Tiles
                         break;
                     case "mighty":
                         MightyBomb mighty = (MightyBomb)bmb;
-                        if (Game1.Instance.GetTime() - 1700 > mighty.createTime)
+                        if (Game1.Instance.GetTime() - 1400 > mighty.createTime)
                         {
                             bombsToDelete.Add(mighty);
                             lastModifiedTime = Game1.Instance.GetTime();

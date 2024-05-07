@@ -172,20 +172,8 @@ namespace Gato_Exploso
                 if (tiles[i, j].bombExploded)
                 {
                     bombSound.Play();
-                    var nearbyCoords = GetCoordsAroundTile(i, j, 2);
-                    if(tiles[i, j].GetTileObjects().Count > 0)
-                    {
-                        if (tiles[i, j].GetTileObjects()[0].GetType() == typeof(Bomb) && tiles[i, j].GetTileObjects()[0].GetType() != typeof(MightyBomb))
-                        {
-                            Bomb bb = tiles[i, j].GetTileObjects()[0] as Bomb;
-                            nearbyCoords = GetCoordsAroundTile(i, j, bb.range);
-                        }
-                        if (tiles[i, j].GetTileObjects()[0].GetType() == typeof(MightyBomb))
-                        {
-                            MightyBomb bb = tiles[i, j].GetTileObjects()[0] as MightyBomb;
-                            nearbyCoords = GetCoordsAroundTile(i, j, bb.range);
-                        }
-                    }
+                    var nearbyCoords = GetCoordsAroundTile(i, j, tiles[i,j].range);
+                    
                     foreach (Vector2 coord2 in nearbyCoords)
                     {
                         if (coord2.X < 0 || coord2.Y < 0 || coord2.X >= xTiles || coord2.Y >= yTiles) continue;

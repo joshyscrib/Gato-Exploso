@@ -25,6 +25,30 @@
 /processorParam:TextureFormat=Color
 /build:AttackButton.png
 
+#begin BadBouncyTriangle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BadBouncyTriangle.png
+
+#begin BadPorcupine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BadPorcupine.png
+
 #begin Bomb.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -253,6 +277,42 @@
 /processorParam:TextureFormat=Color
 /build:Hammy.png
 
+#begin IntroD.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:IntroD.png
+
+#begin IntroD2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:IntroD2.png
+
+#begin IntroD3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:IntroD3.png
+
 #begin Invect.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -289,6 +349,12 @@
 /processorParam:TextureFormat=Color
 /build:Landmine.png
 
+#begin MenuMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:MenuMusic.mp3
+
 #begin MightyBomb.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -300,6 +366,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:MightyBomb.png
+
+#begin MurdererD.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:MurdererD.png
 
 #begin Norm.spritefont
 /importer:FontDescriptionImporter
@@ -332,6 +410,18 @@
 /processorParam:TextureFormat=Color
 /build:ostrichR1.png
 
+#begin Porcupine.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Porcupine.png
+
 #begin Rock.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -355,6 +445,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:SandTile.png
+
+#begin Squirrell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Squirrell.png
 
 #begin TempGatoRight.png
 /importer:TextureImporter
@@ -403,6 +505,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:TestGato.png
+
+#begin TimmyD.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TimmyD.png
+
+#begin TimmyD2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TimmyD2.png
 
 #begin Title.spritefont
 /importer:FontDescriptionImporter

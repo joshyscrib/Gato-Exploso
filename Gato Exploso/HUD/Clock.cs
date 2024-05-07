@@ -14,7 +14,7 @@ namespace Gato_Exploso.HUD
     {
         ContentManager Content;
         // rotation to draw the clock at
-        public double time = 0;
+        public double time = 270;
         double rotation = 0;
         Texture2D clockTexture;
         Texture2D arrowTexture;
@@ -53,7 +53,7 @@ namespace Gato_Exploso.HUD
         }
         public void Tick()
         {
-            time += 0.3d;
+            time += 0.1d;
             if (time > 359)
             {
                 time -= 360;

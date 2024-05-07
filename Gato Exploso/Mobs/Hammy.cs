@@ -26,6 +26,8 @@ namespace Gato_Exploso.Mobs
             strength = 30 + (Game1.difficultyNumber * 13);
             width = 96;
             height = 96;
+            defaultGood = false;
+            good = defaultGood;
         }
         public override void Draw(SpriteBatch spriteBatch, int offX, int offY)
         {

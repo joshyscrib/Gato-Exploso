@@ -9,7 +9,7 @@ namespace Gato_Exploso.TileObjects
         {
             
             Load();
-            range = 4;
+            range = 3;
             // sets the time that the bomb was created
             createTime = ticks;
             // so that other classes can easily tell what type of bomb it is
