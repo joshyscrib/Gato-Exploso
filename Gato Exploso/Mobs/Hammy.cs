@@ -59,9 +59,9 @@ namespace Gato_Exploso.Mobs
         public Ham ShootHam(int gx, int gy, ContentManager cont)
         {
             Ham ham = new Ham(cont);
+            ham.angle = Target(gx, gy);
             ham.x = x;
             ham.y = y;
-            ham.angle = Target(gx, gy);
             return ham;
         }
     }

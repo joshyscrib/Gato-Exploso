@@ -394,14 +394,19 @@ namespace Gato_Exploso
             return entities;
         }
 
-        public void PlayerTouchedTurle()
+        public void PlayerTouchedTurle( bool kazuya)
         {
+            if (kazuya)
+            {
+                curDiall--;
+            }
             switch (curDiall)
             {
                 case 1:
                     PauseGame("introDial");
                     curDiall = 2;
                     return;
+                   
                 case 2:
                     PauseGame("introDial2");
                     curDiall = 3;
@@ -417,17 +422,18 @@ namespace Gato_Exploso
                //     curDiall++;
                     return;
                 case 5:
-                    PauseGame("diallog");
+                    PauseGame("pause");
                     curDiall++;
                     return;
 
 
                 case 6:
-                    PauseGame("diallog");
+                    PauseGame("pause");
                     curDiall++;
                     return;
-
+                
             }
+            curDiall++;
         }
         public void ChangeCurDiallog()
         {
@@ -908,7 +914,12 @@ namespace Gato_Exploso
                     PauseGame("pause");
                 }
             }
-            if (paused)
+            if (state.IsKeyDown(Keys.Q) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
+            {
+                SpawnTurtle();
+                PlayerTouchedTurle(true);
+            }
+                if (paused)
             {
                 if (cursor.LeftButton == ButtonState.Pressed)
                 {
@@ -983,8 +994,9 @@ namespace Gato_Exploso
                 {
                     mobsToDie.Add(mm);
                     GetMainPlayer().points++;
-                    if (GetMainPlayer().points >= 5)
+                    if (GetMainPlayer().points >= 2)
                     {
+                        SpawnTurtle();
                         beginBossFight = true;
                     }
                 }
@@ -995,7 +1007,7 @@ namespace Gato_Exploso
                 var turtle = _players["squirrell"];
                 if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, 90, 90, turtle) && !hasBeenTouched)
                 {
-                    PlayerTouchedTurle();
+                    PlayerTouchedTurle(false);
                     hasBeenTouched = true;
                 }
                 else
@@ -1061,6 +1073,7 @@ namespace Gato_Exploso
             if (state.IsKeyDown(Keys.A)) { direction.Left = true; }
             if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
             if (state.IsKeyDown(Keys.D)) { direction.Right = true; }
+            if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
             if (state.IsKeyDown(Keys.D1)) { hud.scrollAmt = 0; }
             if (state.IsKeyDown(Keys.D2)) { hud.scrollAmt = 1; }
             if (state.IsKeyDown(Keys.D3)) { hud.scrollAmt = 2; }

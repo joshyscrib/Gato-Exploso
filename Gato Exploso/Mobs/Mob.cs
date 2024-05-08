@@ -32,6 +32,9 @@ namespace Gato_Exploso.Mobs
         public const bool alwaysGood = false;
         // when the mob hit a player
         double knockBackStartTime = 0;
+
+        // how many times the mob has healed the player
+        int healsdropped = 0;
         protected Mob()
         {
             id = mobId++;
