@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,11 @@ namespace Gato_Exploso
         public int hp = 83;
         Texture2D curTexture;
         int curFrame = 1;
+        protected Texture2D PTexture3Left;
+        protected Texture2D PTexture3Right;
+        protected Texture2D PTexture4Left;
+        protected Texture2D PTexture4Right;
+        char face = 'r';
         public MainPlayer(ContentManager context) : base(context, 0)
         {
             Name = "gato";
@@ -22,10 +28,18 @@ namespace Gato_Exploso
         
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            if(Game1.Instance.GetTime() % 300 == 0)
+            if (facing.Right)
+            {
+                face = 'r';
+            }
+            if (facing.Left)
+            {
+                face = 'l';
+            }
+            if (Game1.Instance.GetTime() % 250 == 0)
             {
                 curFrame++;
-                if(curFrame > 2)
+                if(curFrame > 4)
                 {
                     curFrame = 1;
                 }
@@ -37,13 +51,26 @@ namespace Gato_Exploso
             switch (curFrame)
             {
                 case 1:
-                    if (facing.Right) { curTexture = PTextureRight; }
-                    if (facing.Left) { curTexture = PTextureLeft; }
+                    if (face == 'r') { curTexture = PTextureRight; }
+                    if (face == 'l') { curTexture = PTextureLeft; }
                     break;
                 case 2:
-                    if (facing.Right) { curTexture = PTexture2Right; }
-                    if (facing.Left) { curTexture = PTexture2Left; }
+                    if (face == 'r') { curTexture = PTexture2Right; }
+                    if (face == 'l') { curTexture = PTexture2Left; }
                     break;
+                case 3:
+                    if (face == 'r') { curTexture = PTexture3Right; }
+                    if (face == 'l') { curTexture = PTexture3Left; }
+                    break;
+                case 4:
+                    if (face == 'r') { curTexture = PTexture4Right; }
+                    if (face == 'l') { curTexture = PTexture4Left; }
+                    break;
+            }
+            if (!moving)
+            {
+                if (face == 'r') { curTexture = PTexture4Right; }
+                if (face == 'l') { curTexture = PTexture4Left; }
             }
             Vector2 playerLocation = new Vector2((GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
             //Vector2 playerLocation = new Vector2 (x, y);
@@ -56,10 +83,14 @@ namespace Gato_Exploso
 
         public override void Load()
         {
-            PTextureLeft = Content.Load<Texture2D>("gato3L");
-            PTextureRight = Content.Load<Texture2D>("gato3R");
-            PTexture2Left = Content.Load<Texture2D>("gato3L2");
-            PTexture2Right = Content.Load<Texture2D>("gato3R2");
+            PTextureLeft = Content.Load<Texture2D>("Gato4L1");
+            PTextureRight = Content.Load<Texture2D>("Gato4R1");
+            PTexture2Left = Content.Load<Texture2D>("Gato4L2");
+            PTexture2Right = Content.Load<Texture2D>("Gato4R2");
+            PTexture3Left = Content.Load<Texture2D>("Gato4L3");
+            PTexture3Right = Content.Load<Texture2D>("Gato4R3");
+            PTexture4Left = Content.Load<Texture2D>("Gato4L4");
+            PTexture4Right = Content.Load<Texture2D>("Gato4R4");
         }
     }
 
