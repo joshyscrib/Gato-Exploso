@@ -33,7 +33,7 @@ namespace Gato_Exploso.HUD
         // spritefont to write text on the screen
         private SpriteFont font;
         private SpriteFont titleFont;
-        private string menuType = "";
+        public string menuType = "";
         public string coords = "";
 
         // regulates difficulty change speed
@@ -170,9 +170,9 @@ namespace Gato_Exploso.HUD
                 spriteBatch.Draw(texture, new Rectangle(width - 400, 170, 80, 80), Color.Lime);
                 spriteBatch.DrawString(font, "Quit", new Vector2(width - 380, 200), Color.Black);
             }
-            if(menuType == "diallog")
+            if (menuType == "introDial")
             {
-                spriteBatch.Draw(i1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.Draw(i1, new Vector2(turtle.X - 400, turtle.Y - 50), Color.White);
                 spriteBatch.DrawString
                 (
                 font,
@@ -181,6 +181,40 @@ namespace Gato_Exploso.HUD
                 Color.Black
                 );
             }
+            if (menuType == "introDial2")
+            {
+                spriteBatch.Draw(i2, new Vector2(turtle.X - 470, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
+            if (menuType == "introDial3")
+            {
+                spriteBatch.Draw(i3, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
+            if (menuType == "bossDial")
+            {
+                spriteBatch.Draw(m1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
+
         }
         public void Click(int x, int y)
         {
