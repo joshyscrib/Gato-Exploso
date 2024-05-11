@@ -64,7 +64,7 @@ namespace Gato_Exploso.HUD
         {
 
         }
-        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest, List<Mobs.Mob> mobList, List<Player> playerList)
+        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest, List<Mobs.Mob> mobList, List<Player> playerList, int mig, int land, int grav)
         {
             int minimapWidth = 270;
             int minimapHeight = 295;
@@ -135,12 +135,23 @@ namespace Gato_Exploso.HUD
                 Color.Black
                 );
             // draw inventory
-            spriteBatch.Draw(inventexture, new Rectangle(870, 1255, 824, 144), Color.White);
-            spriteBatch.Draw(invecture, new Rectangle(870 + (scrollAmt * 136), 1255, 144, 144), Color.White);
-            spriteBatch.Draw(bombTexture, new Rectangle(874 + (0 * 136), 1259, 128, 128), Color.White);
-            spriteBatch.Draw(mightyTexture, new Rectangle(874 + (1 * 136), 1259, 128, 128), Color.White);
-            spriteBatch.Draw(landMineTexture, new Rectangle(874 + (3 * 136), 1259, 128, 128), Color.White);
-            spriteBatch.Draw(gravTexture, new Rectangle(874 + (5 * 136), 1259, 128, 128), Color.White);
+            spriteBatch.Draw(inventexture, new Vector2(990,1255), Color.White);
+            spriteBatch.Draw(invecture, new Rectangle(990 + (scrollAmt * 136), 1255, 144, 144), Color.White);
+            spriteBatch.Draw(bombTexture, new Rectangle(998 + (0 * 136), 1259, 128, 128), Color.White);
+            if (mig > 0)
+            {
+                spriteBatch.Draw(mightyTexture, new Rectangle(998 + (1 * 136), 1259, 128, 128), Color.White);
+                
+            }
+            if (land > 0)
+            {
+                spriteBatch.Draw(landMineTexture, new Rectangle(998 + (2 * 136), 1259, 128, 128), Color.White);
+            }
+            if (grav > 0)
+            {
+                spriteBatch.Draw(gravTexture, new Rectangle(998 + (3 * 136), 1259, 128, 128), Color.White);
+
+            }
         }
     }
 }

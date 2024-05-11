@@ -481,7 +481,8 @@
 
             drawWorld();
         }
-
+        var minimapLeft = 900;
+        var minimapTop = 900;
         function drawWorld() {
             // image to draw
 
@@ -494,6 +495,7 @@
             var offsetY = 0 - (mainPlayerY - 216) - 1;
             for (var i = 0; i < tileRows; i++) {
                 for (var j = 0; j < tileRows; j++) {
+
                     var curTileImage = null;
                     var curObjectImage = null;
                     var curTile = tiles[i][j];
@@ -622,6 +624,27 @@
                     ctx.fillText(playerMap[playerName].Points, 750, 50, 999);
                 }
 
+            }
+            for (var i = 0; i < tileRows; i++) {
+                for (var j = 0; j < tileRows; j++) {
+                    var curTile = tiles[i][j];
+                    if (curTile.tileID == '1') {
+                        ctx.fillStyle = 'blue';
+                    }
+                    if (curTile.tileID == '2') {
+                        ctx.fillStyle = 'yellow';
+                    }
+                    if (curTile.tileID == '3') {
+                        ctx.fillStyle = 'lime';
+                    }
+                    if (curTile.tileID == '4') {
+                        ctx.fillStyle = 'green';
+                    }
+                    if (curTile.isExploding) {
+                        ctx.fillStyle = 'pink';
+                    }
+                    ctx.fillRect(i + (minimapLeft), j + (minimapTop), 1, 1);
+                }
             }
         }
 

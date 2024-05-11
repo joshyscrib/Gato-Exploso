@@ -369,12 +369,6 @@ namespace Gato_Exploso
                 case 3:
                  //   curTile.AddBomb(new Bomb(gameTime));
                     break;
-                case 4:
-                  //  curTile.AddBomb(new Bomb(gameTime));
-                    break;
-                case 5:
-                 //   curTile.AddBomb(new Bomb(gameTime));
-                    break;
             }
             activeTileCoords.Add(vec);
 

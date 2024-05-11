@@ -20,6 +20,7 @@ namespace Gato_Exploso
         protected Texture2D PTexture4Left;
         protected Texture2D PTexture4Right;
         char face = 'r';
+        
         public MainPlayer(ContentManager context) : base(context, 0)
         {
             Name = "gato";

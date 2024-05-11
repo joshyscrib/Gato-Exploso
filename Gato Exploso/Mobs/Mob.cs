@@ -79,7 +79,7 @@ namespace Gato_Exploso.Mobs
                 {
                     if (Game1.Instance.GetTime() - lastKnockTime > 600)
                     {
-                        if (entity.GetType() == typeof(MainPlayer) || entity.GetType() == typeof(Ostrich))
+                        if (entity.GetType() == typeof(MainPlayer) && !good)
                         {
                             knockBackStartTime = Game1.Instance.GetTime();
                             lastChangeDirectionTime = Game1.Instance.GetTime();
@@ -90,6 +90,21 @@ namespace Gato_Exploso.Mobs
                                 MainPlayer p = entity as MainPlayer;
                                 p.TakeDamage(strength);
                             }
+                            double reverseAngle = angle2 + 3;
+                            angle2 += 3;
+                            // reverses the angle(makes it face away from the player)
+                            dy = 20 * Math.Sin(reverseAngle);
+                            dx = 20 * Math.Cos(reverseAngle);
+                            // moves the mob accordingly
+                            proposedX = x + (int)dx;
+                            proposedY = y + (int)dy;
+                        }
+                        if (entity.GetType() == typeof(Ostrich) && good)
+                        {
+                            knockBackStartTime = Game1.Instance.GetTime();
+                            lastChangeDirectionTime = Game1.Instance.GetTime();
+                            moveReactionDelay = 140 - (Game1.difficultyNumber * 13);
+
                             if (entity.GetType() == typeof(Ostrich))
                             {
                                 Ostrich p = entity as Ostrich;
@@ -105,7 +120,7 @@ namespace Gato_Exploso.Mobs
                             proposedY = y + (int)dy;
                         }
 
-                 
+
                     }
 
 

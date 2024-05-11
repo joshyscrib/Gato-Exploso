@@ -147,7 +147,7 @@ namespace Gato_Exploso
                             case "shoot":
                                 HandleAttack(name,"shoot");
                                 break;
-                                
+                                    
 
                         }
                     }

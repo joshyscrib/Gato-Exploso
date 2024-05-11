@@ -15,6 +15,7 @@ using Gato_Exploso.Mobs;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using System.Reflection.Metadata;
+using System.Net.Http.Headers;
 
 namespace Gato_Exploso
 {
@@ -76,6 +77,11 @@ namespace Gato_Exploso
         public static bool day = true;
         // boss
         public Hammy hammy = null;
+
+        // how many bombs the player has
+        public int mightys = 0;
+        public int mines = 0;
+        public int gravs = 0;
 
         // if it is the first time the game has been unpaused
         bool hasCooled = false;
@@ -394,7 +400,7 @@ namespace Gato_Exploso
             return entities;
         }
 
-        public void PlayerTouchedTurle( bool kazuya)
+        public void PlayerTouchedTurle(bool kazuya)
         {
             if (kazuya)
             {
@@ -406,7 +412,7 @@ namespace Gato_Exploso
                     PauseGame("introDial");
                     curDiall = 2;
                     return;
-                   
+
                 case 2:
                     PauseGame("introDial2");
                     curDiall = 3;
@@ -419,7 +425,7 @@ namespace Gato_Exploso
 
                 case 4:
                     PauseGame("bossDial");
-               //     curDiall++;
+                    //     curDiall++;
                     return;
                 case 5:
                     PauseGame("pause");
@@ -431,7 +437,7 @@ namespace Gato_Exploso
                     PauseGame("pause");
                     curDiall++;
                     return;
-                
+
             }
             curDiall++;
         }
@@ -892,6 +898,8 @@ namespace Gato_Exploso
         // main update function, gets called about every 30 milliseconds
         Random randy = new Random();
         bool beginBossFight = false;
+        // dtermines what type of bomb the player will get
+        Random bombRand = new Random();
         protected override void Update(GameTime gameTime)
         {
             bool hasBeenTouched = false;
@@ -919,7 +927,7 @@ namespace Gato_Exploso
                 SpawnTurtle();
                 PlayerTouchedTurle(true);
             }
-                if (paused)
+            if (paused)
             {
                 if (cursor.LeftButton == ButtonState.Pressed)
                 {
@@ -958,12 +966,22 @@ namespace Gato_Exploso
                 }
                 foreach (Ham ham in hams)
                 {
-                    ham.Move();
+                    if (false)
+                    {
+                        int f = 0;
+                    }
+                    //                ham.Move();
+                    if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, GetMainPlayer().width, GetMainPlayer().height, ham))
+                    {
+                        hams.Remove(ham);
+                        GetMainPlayer().TakeDamage(40);
+                    }
                 }
                 if (hammy.hp <= 0)
                 {
                     PauseGame("win");
                 }
+
             }
             MoveEggs();
             HashSet<string> playersToDie = new HashSet<string>();
@@ -990,15 +1008,41 @@ namespace Gato_Exploso
             HashSet<Mob> mobsToDie = new HashSet<Mob>();
             foreach (Mob mm in mobs)
             {
+
                 if (mm.hp <= 0)
                 {
                     mobsToDie.Add(mm);
                     GetMainPlayer().points++;
-                    if (GetMainPlayer().points >= 2)
+                    if (GetMainPlayer().points >= 10)
                     {
                         SpawnTurtle();
                         beginBossFight = true;
                     }
+                    int br = bombRand.Next(1, 7);
+
+                    switch (br)
+                    {
+                        case 1:
+                            mightys++;
+                            break;
+                        case 2:
+                            mightys++;
+                            break;
+                        case 3:
+                            mines++;
+                            break;
+                        case 4:
+                            mines++;
+                            break;
+                        case 5:
+                            gravs++;
+                            break;
+                        case 6:
+                            gravs++;
+                            break;
+
+                    }
+
                 }
             }
 
@@ -1078,8 +1122,6 @@ namespace Gato_Exploso
             if (state.IsKeyDown(Keys.D2)) { hud.scrollAmt = 1; }
             if (state.IsKeyDown(Keys.D3)) { hud.scrollAmt = 2; }
             if (state.IsKeyDown(Keys.D4)) { hud.scrollAmt = 3; }
-            if (state.IsKeyDown(Keys.D5)) { hud.scrollAmt = 4; }
-            if (state.IsKeyDown(Keys.D6)) { hud.scrollAmt = 5; }
             if (state.IsKeyDown(Keys.P)) { _players["gato"].hp += 5; }
             if (state.IsKeyDown(Keys.B)) { if (!bossFightStarted) { StartBossFight(); } }
 
@@ -1214,14 +1256,39 @@ namespace Gato_Exploso
             return playerTiles;
         }
         double lastBombTime = 0;
+        // if the player has enough bombs to place one
+        bool hasEnoughBombs = false;
         public void ExexutePlayerAction(PlayerActionArgs act)
         {
             // places bomb when space is pressed
             if (act.placeBomb)
             {
+                switch (hud.scrollAmt)
+                {
+                    case 0:
+                        hasEnoughBombs = true;
+                        break;
+                    case 1:
+                        if (mightys > 0)
+                        {
+                            hasEnoughBombs = true;
+                        }
+                        break;
+                    case 2:
+                        if (mines > 0)
+                        {
+                            hasEnoughBombs = true;
+                        }
+                        break;
+                    case 3:
+                        if (gravs > 0)
+                        {
+                            hasEnoughBombs = true;
+                        }
+                        break;
+                }
 
-
-                if (currentTime - lastBombTime >= 1000)
+                if (currentTime - lastBombTime >= 1000 && hasEnoughBombs)
                 {
                     if (_players[mainPlayerName].facing.Up)
                     {
@@ -1279,6 +1346,7 @@ namespace Gato_Exploso
             return eggString.ToString();
         }
 
+
         // tells each class to draw themselves
         protected override void Draw(GameTime gameTime)
         {
@@ -1324,8 +1392,13 @@ namespace Gato_Exploso
             {
                 hum.Draw(_spriteBatch, hum.x - (int)topLeftPixel.X, hum.y - (int)topLeftPixel.Y);
             }
+            MainPlayer player = new MainPlayer(Content);
+            if (p.GetType() == typeof(MainPlayer))
+            {
+                player = (MainPlayer)p;
+            }
             // draws HUD
-            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest, mobs, GetPlayers());
+            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest, mobs, GetPlayers(), mightys, mines, gravs);
             if (paused)
             {
                 if (_players.ContainsKey("squirrell"))
