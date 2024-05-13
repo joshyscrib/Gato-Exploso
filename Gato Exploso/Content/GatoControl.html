@@ -129,10 +129,10 @@
         // gato sprites
 
         var gatoLImage = new Image();
-        gatoLImage.src = "/image/gato3L.png";
+        gatoLImage.src = "/image/gato4L1.png";
 
         var gatoRImage = new Image();
-        gatoRImage.src = "/image/gato3R.png";
+        gatoRImage.src = "/image/gato4R1.png";
 
         var curGatoImage = gatoLImage;
 
@@ -145,7 +145,8 @@
         var curOstrichImage = ostrichLImage;
         var lastGameUpdate = Date.now();
         function sendMove(dir) {
-            if (dir != lastMove) {
+            //if (dir != lastMove)
+            {
                 lastMove = dir;
                 $.get("/action?command=move&direction=" + dir + "&name=" + playerName);
             }
@@ -253,6 +254,44 @@
                 return;
             }
             lastGameTime = gameInfo.GameTime;
+            var playerInfoString = gameInfo.PlayerInfoString;
+            var playerInfoListRaw = playerInfoString.split(":");
+            for (var i = 0; i < playerInfoListRaw.length; i++) {
+                var playerChunks = playerInfoListRaw[i].split(",");
+                var name = playerChunks[0];
+                var player = new PlayerInfo();
+                player.Name = name;
+                player.X = parseInt(playerChunks[1]);
+                player.Y = parseInt(playerChunks[2]);
+                player.Health = parseInt(playerChunks[3]);
+
+                var facing = parseInt(playerChunks[4]);
+                player.Facing = "right";
+                if (facing == 1) {
+                    player.Facing = "up";
+                }
+                if (facing == 2) {
+                    player.Facing = "down";
+                }
+                if (facing == 3) {
+                    player.Facing = "left";
+                }
+                if (facing == 4) {
+                    player.Facing = "right";
+                }
+                if (name == playerName) {
+                    mainPlayerX = parseInt(playerChunks[1]);
+                    mainPlayerY = parseInt(playerChunks[2]);
+                }
+
+                playerMap.set(name, player);
+                //x
+                //y
+                //health
+                // facing
+            }
+
+            /*
             var playerList = gameInfo.PlayerInfos;
             for (var i = 0; i < playerList.length; i++) {
                 var player = playerList[i];
@@ -264,14 +303,24 @@
 
                 playerMap.set(player.Name, player);
 
-            }
+            }*/
 
-            var mobList = gameInfo.MobInfos;
-            for (var i = 0; i < mobList.length; i++) {
-                var mob = mobList[i];
+            var mobInfoString = gameInfo.MobInfoString;
+            var mobInfoListRaw = mobInfoString.split(":");
+            mobMap.clear();
+            for (var i = 0; i < mobInfoListRaw.length; i++) {
+                var mob = new MobInfo();
+                var mobChunks = mobInfoListRaw[i].split(",");
+                if (mobChunks.length == 5) {
+                    mob.Id = parseInt(mobChunks[0]);
+                    mob.Type = mobChunks[1].trim();
+                    mob.X = parseInt(mobChunks[2]);
+                    mob.Y = parseInt(mobChunks[3]);
+                    var health = mobChunks[4];
+                }
                 if (!mobMap.has(mob.Id)) {
                     var mobInfo = new MobInfo();
-                    mobInfo.Type = mob.Type;
+                     mobInfo.Type = mob.Type;
                     mobMap.set(mob.Id, mobInfo);
                 }
 
@@ -281,6 +330,23 @@
 
                 mobMap.set(i, mobInfo);
             }
+            /*
+            var mobList = gameInfo.MobInfos;
+            for (var i = 0; i < mobList.length; i++) {
+                var mob = mobList[i];
+                if (!mobMap.has(mob.Id)) {
+                    var mobInfo = new MobInfo();
+                   // mobInfo.Type = mob.Type;
+                    mobMap.set(mob.Id, mobInfo);
+                }
+
+                var mobInMap = mobMap.get(mob.Id);
+                mobInMap.X = mob.X;
+                mobInMap.Y = mob.Y;
+
+                mobMap.set(i, mobInfo);
+            }
+            */
 
 
             var currentProjectiles = new Set();
@@ -315,6 +381,40 @@
                 }
             }
 
+            var objectInfoListRaw = gameInfo.ObjectInfoString.split(":");
+            for (var i = 0; i < objectInfoListRaw.length; i++) {
+
+                var objInfo = objectInfoListRaw[i].split(",");
+                if (objInfo.length == 3) {
+                    var x = parseInt(objInfo[0]);
+                    var y = parseInt(objInfo[1]);
+                    var objType = objInfo[2].trim();
+
+                    var tile = tiles[x][y];
+                    tile.hasBomb = false;
+                    tile.isExploding = false;
+                    tile.hasTree = false;
+                    tile.hasRock = false;
+                    switch (objType) {
+                        case "b":
+                            tile.hasBomb = true;
+                            break;
+                        case "r":
+                            tile.hasRock = true;
+                            break;
+
+                        case "t":
+                            tile.hasTree = true;
+                            break;
+                    }
+                }
+            
+
+          
+            }
+
+            /*
+
             var tileList = gameInfo.TileInfos;
             for (var i = 0; i < tileList.length; i++) {
                 var tileinfo = tileList[i];
@@ -343,6 +443,7 @@
                     }
                 }
             }
+            */
 
         }
 
@@ -436,6 +537,7 @@
         }
         function shoot() {
             $.get("/action?command=shoot&name=" + playerName);
+            lastMove = "";
         }
         var isMoving = false;
         var lastMove = "";
@@ -565,10 +667,10 @@
 
                 // determines which direction ostriches are facing
                 if (curPlayer.Name != "gato") {
-                    if (curPlayer.Facing.Left) {
-                        curOstrichImage = ostrichLImage;
-                    }
-                    if (curPlayer.Facing.Right) {
+                 
+                    curOstrichImage = ostrichLImage;
+                    
+                    if (curPlayer.Facing == "right") {
                         curOstrichImage = ostrichRImage
                     }
                 }
@@ -576,14 +678,21 @@
                 if (curPlayer.Name != playerName) {
                     // determines gato image (left/right)
                     if (curPlayer.Name == "gato") {
-                        if (curPlayer.Facing.Left) {
-                            curGatoImage = gatoLImage
-                        }
-                        if (curPlayer.Facing.Right) {
+                       
+                           curGatoImage = gatoLImage
+                        
+                        if (curPlayer.Facing == "right") {
                             curGatoImage = gatoRImage
                         }
                         // draw gato
-                        ctx.drawImage(curGatoImage, 100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96);
+                        if (curGatoImage != null) {
+                            try {
+                                ctx.drawImage(curGatoImage, 100 + curPlayer.X + offsetX + 1, curPlayer.Y + offsetY + 96);
+                            }
+                            catch (e) {
+                                console.log(e);
+                            }
+                        }
                     }
                     else {
                         ctx.fillStyle = 'blue';
@@ -611,7 +720,11 @@
                 ctx.fillRect(75 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 50, 104, 25);
                 // fill
                 ctx.fillStyle = 'red';
-                ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, curPlayer.Health, 21);
+                var displayHealth = 100;
+                if (curPlayer.Health < 100) {
+                    displayHealth = curPlayer.Health;
+                }
+                ctx.fillRect(77 + curPlayer.X + offsetX - 5, curPlayer.Y + offsetY + 52, displayHealth, 21);
 
                 ctx.fillStyle = 'blue';
 

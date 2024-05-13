@@ -228,7 +228,7 @@ namespace Gato_Exploso
         // spawns players/mobs
         public void SpawnPlayer(Player dude)
         {
-            if (!randSeed)
+            if (!randSeed  && dude.Name == "gato")
             {
                 dude.x = 200;
                 dude.y = 6000;
@@ -267,6 +267,7 @@ namespace Gato_Exploso
         {
             GameInfo info = new GameInfo();
             var list = new List<PlayerInfo>();
+            var playerInfoStrings = new List<String>();
             foreach (var name in _players.Keys)
             {
                 // sets data for each player to return to the server
@@ -276,9 +277,11 @@ namespace Gato_Exploso
                 curPlayer.X = player.x;
                 curPlayer.Y = player.y;
                 list.Add(curPlayer);
+       
                 curPlayer.Health = (int)player.hp;
                 curPlayer.Facing = player.facing;
                 curPlayer.Points = player.points;
+                playerInfoStrings.Add(curPlayer.CreateInfoString());
             }
             if (!_players.ContainsKey(playerName))
             {
@@ -294,6 +297,8 @@ namespace Gato_Exploso
                 lastFullUpdateTime.Add(playerName, (int)currentTime);
             }
 
+            var tileInfoStrings = new List<string>();
+            var objectInfoStrings = new List<string>();
             // optimize by only sending new stuff
             foreach (Tile tile in updatedTiles)
             {
@@ -333,6 +338,8 @@ namespace Gato_Exploso
                         ObjectInfo objectInfo = new ObjectInfo();
                         objectInfo.ObjectType = objType;
                         objectInfos.Add(objectInfo);
+
+                        objectInfoStrings.Add(objectInfo.CreateInfoString(tile.x, tile.y));
                     }
                     information.ObjectInfos = objectInfos;
                     tileInfos.Add(information);
@@ -342,13 +349,16 @@ namespace Gato_Exploso
                 //  if (fullUpdate)
                 {
                     tileInfos.Add(information);
+                   // tileInfoStrings.Add(information.CreateInfoString());
                 }
             }
             
             List<MobInfo> mobInfos = new List<MobInfo>();
-          /*  foreach (var curMob in mobs)
+            var mobInfoStrings = new List<string>();
+            
+           foreach (var curMob in mobs)
             {
-                if (FindDistance(curMob.x, curMob.y, _players[playerName].x, _players[playerName].y) < 600)
+               // if (FindDistance(curMob.x, curMob.y, _players[playerName].x, _players[playerName].y) < 600)
                 {
                 MobInfo mobInfo = new MobInfo();
                 mobInfo.X = curMob.x;
@@ -356,18 +366,20 @@ namespace Gato_Exploso
                 mobInfo.Id = curMob.id;
                 if (curMob.GetType() == typeof(BouncyTriangle))
                 {
-                    mobInfo.Type = "bouncytriangle";
+                        mobInfo.Type = MobType.Triangle;
                 }
                 if (curMob.GetType() == typeof(Porcupine))
                 {
-                    mobInfo.Type = "porcupine";
+                        mobInfo.Type = MobType.Porcupine;
                 }
 
 
-                mobInfos.Add(mobInfo);
+                    mobInfos.Add(mobInfo);
+                    mobInfoStrings.Add(mobInfo.CreateInfoString());
                 }
                 
-            }*/
+            }
+            
 
             List<ProjectileInfo> eggInfos = new List<ProjectileInfo>();
             for (int i = eggs.Count - 1; i >= 0; i--)
@@ -398,10 +410,57 @@ namespace Gato_Exploso
                 eggInfos.Add(pInfo);
             }
             info.ProjectileInfos = eggInfos;
-            info.TileInfos = tileInfos;
-            info.MobInfos = mobInfos;
-            info.PlayerInfos = list;
+          //  info.TileInfos = tileInfos;
+          //  info.MobInfos = mobInfos;
+          //  info.PlayerInfos = list;
             info.GameTime = (int)currentTime;
+
+         
+            
+            StringBuilder tileInfoBuilder = new StringBuilder();
+            for (int i = 0; i < tileInfoStrings.Count; i++)
+            {
+                tileInfoBuilder.Append(tileInfoStrings[i]);
+                if (i < tileInfoStrings.Count - 1)
+                {
+                    tileInfoBuilder.Append(':');
+                }
+            }
+            info.TileInfoString = tileInfoBuilder.ToString();
+
+            StringBuilder playerInfoBuilder = new StringBuilder();
+            for (int i = 0; i < playerInfoStrings.Count; i++)
+            {
+                playerInfoBuilder.Append(playerInfoStrings[i]);
+                if (i < playerInfoStrings.Count - 1)
+                {
+                    playerInfoBuilder.Append(':');
+                }
+            }
+            info.PlayerInfoString = playerInfoBuilder.ToString();
+
+            StringBuilder mobInfoBuilder = new StringBuilder();
+            for (int i = 0; i < mobInfoStrings.Count; i++)
+            {
+                mobInfoBuilder.Append(mobInfoStrings[i]);
+                if (i < mobInfoStrings.Count - 1)
+                {
+                    mobInfoBuilder.Append(':');
+                }
+            }
+            info.MobInfoString = mobInfoBuilder.ToString();
+
+
+            StringBuilder objectInfoBuilder = new StringBuilder();
+            for (int i = 0; i < objectInfoStrings.Count; i++)
+            {
+                objectInfoBuilder.Append(objectInfoStrings[i]);
+                if (i < objectInfoStrings.Count - 1)
+                {
+                    objectInfoBuilder.Append(':');
+                }
+            }
+            info.ObjectInfoString = objectInfoBuilder.ToString();
             return info;
 
         }

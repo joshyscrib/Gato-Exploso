@@ -13,5 +13,10 @@ namespace Gato_Exploso.Infos
         public int Y { get; set; }
         public List<ObjectInfo> ObjectInfos { get; set; }
         public int State { get; set; }
+
+        public String CreateInfoString()
+        {
+            return String.Format("{0},{1},{2}. {3}", X, Y, State);
+        }
     }
 }

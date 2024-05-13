@@ -350,7 +350,7 @@ namespace Gato_Exploso.HUD
         public void DrawScoreboard(SpriteBatch spriteBatch)
         {
             var info = Game1.Instance.GetGameInfo("gato", Game1.Instance.GetTime());
-            List<Infos.PlayerInfo> playerList = info.PlayerInfos;
+            List<Infos.PlayerInfo> playerList = new List<Infos.PlayerInfo>();// info.PlayerInfos;
             int offY = 200;
             spriteBatch.DrawString
                 (

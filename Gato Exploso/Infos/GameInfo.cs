@@ -9,11 +9,17 @@ namespace Gato_Exploso.Infos
     public class GameInfo
     {
         public int GameTime { get; set; }
-        public List<PlayerInfo> PlayerInfos { get; set; }
+       // public List<PlayerInfo> PlayerInfos { get; set; }
         public List<TileInfo> TileInfos { get; set; }
         public List<ProjectileInfo> ProjectileInfos { get; set; }
 
-        public List<MobInfo> MobInfos { get; set; }
+       // public List<MobInfo> MobInfos { get; set; }
 
+        public  String MobInfoString { get; set; }
+
+        public String PlayerInfoString { get; set; }
+        public String TileInfoString { get; set; }
+
+        public String ObjectInfoString { get; set; }
     }
 }
