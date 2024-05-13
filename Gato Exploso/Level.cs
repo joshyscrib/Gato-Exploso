@@ -30,6 +30,8 @@ namespace Gato_Exploso
         // amount of tiles per row/column
         public const int xTiles = 256;
         public const int yTiles = 256;
+        private int campX = -1;
+        private  int campY = -1;
         // width/height of each tile
         public const int tileSide = 32;
         // matrix of tiles
@@ -47,6 +49,11 @@ namespace Gato_Exploso
         // variable to store procedurally generated world data
         double[,] data;
 
+        // seed(random)
+        public int randSeedDisp = new Random().Next();
+
+        // preset seed
+        public int presetSeed = 1782312026;
         // constructor
         public Level()
         {
@@ -57,9 +64,16 @@ namespace Gato_Exploso
 
         public void ResetLevel()
         {
-            FastNoise noise = new FastNoise(new Random().Next());
+            randSeedDisp = new Random().Next();
+            FastNoise noise = new FastNoise(randSeedDisp);
+            if (!Game1.randSeed)
+            {
+                noise = new FastNoise(presetSeed);
+                campX = 5;
+                campY = 205;
+            }
             noise.SetNoiseType(FastNoise.NoiseType.Simplex);
-            noise.SetFrequency(0.008f);
+            noise.SetFrequency(0.0078f);
 
             //   DiamondSquare diamond = new DiamondSquare(xTiles, 100, new Random().Next());
             // gets world data using a seed
@@ -242,7 +256,7 @@ namespace Gato_Exploso
                     }
                     
                     Random r = new Random();
-                    switch (r.Next(18))
+                    switch (r.Next(17))
                     {
                         case 0:
 
@@ -260,7 +274,7 @@ namespace Gato_Exploso
                             }
                             break;
                         case 4:
-                            if (tile is ForestTile && i % 6 == 0)
+                            if (tile is ForestTile && i % 2 == 0)
                             {
                                 tile.PlantTree();
                             }
@@ -268,7 +282,10 @@ namespace Gato_Exploso
                         default:
                             break;
                     }
-
+                    if(i == campX && j == campY)
+                    {
+                        tile = new CampTile();
+                    }
                     tiles[i, j] = tile;
                     tiles[i, j].x = i;
                     tiles[i, j].y = j;
@@ -297,6 +314,7 @@ namespace Gato_Exploso
                 }
                 for (int j = ((playerY - SHeight / 2) / tileSide) - 1; j <= ((playerY + SHeight / 2) / tileSide); j++)
                 {
+                    
                     // checks if tiles are outside of the screen
                     if (j < 0)
                     {
@@ -306,6 +324,7 @@ namespace Gato_Exploso
                     {
                         continue;
                     }
+       
                     // draws the on-screen tiles
                     if (IsTileOnScreen(i, j, SWidth + 300, SHeight + 300, TLPixel.X - 300, TLPixel.Y - 300))
                     {
@@ -317,6 +336,13 @@ namespace Gato_Exploso
 
 
                 }
+            }
+            if(campX > 0)
+            {
+       
+                    int drawX = (campX * tileSide) + tileXOffset;
+                    int drawY = (campY * tileSide) + tileYOffset;
+                    tiles[campX, campY].Draw(spritebatch, drawX, drawY);
             }
         }
         // checks if the coordinate is in bounds

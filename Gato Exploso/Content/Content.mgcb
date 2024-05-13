@@ -91,6 +91,24 @@
 /processorParam:TextureFormat=Color
 /build:BouncyTriangle.png
 
+#begin BrownTent.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:BrownTent.png
+
+#begin Campsite.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Campsite.mp3
+
 #begin Clock.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -289,6 +307,18 @@
 /processorParam:TextureFormat=Color
 /build:GravBomb.png
 
+#begin GreenTent.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:GreenTent.png
+
 #begin Ham.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -470,6 +500,18 @@
 /processorParam:TextureFormat=Color
 /build:Rock.png
 
+#begin Sampcite.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sampcite.png
+
 #begin SandTile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -542,6 +584,18 @@
 /processorParam:TextureFormat=Color
 /build:TestGato.png
 
+#begin Timmy.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Timmy.png
+
 #begin TimmyD.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -585,6 +639,30 @@
 /processorParam:TextureFormat=Color
 /build:Tree.png
 
+#begin VolDown.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:VolDown.png
+
+#begin VolUp.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:VolUp.png
+
 #begin WaterTile.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -596,4 +674,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:WaterTile.png
+
+#begin YellowTent.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:YellowTent.png
 

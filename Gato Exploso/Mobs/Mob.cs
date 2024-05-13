@@ -33,6 +33,10 @@ namespace Gato_Exploso.Mobs
         // when the mob hit a player
         double knockBackStartTime = 0;
 
+        // spawnpoint of mob
+        public int spawnX = 0;
+        public int spawnY = 0;
+
         // how many times the mob has healed the player
         int healsdropped = 0;
         protected Mob()

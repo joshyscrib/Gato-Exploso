@@ -26,6 +26,8 @@ namespace Gato_Exploso
         private SpriteBatch _spriteBatch;
         private Song music;
         public Song menuMusic;
+        public Song curSong;
+        public Song campSong;
 
         // private Player gato;
         private Dictionary<string, Player> _players = new Dictionary<string, Player>();
@@ -45,6 +47,8 @@ namespace Gato_Exploso
         int targetX = 300;
         int targetY = 300;
 
+        
+
         // difficulty
         public static int difficultyNumber = 1;
         // Number for how many rows of tiles there are
@@ -52,6 +56,9 @@ namespace Gato_Exploso
         public const int tileSide = 32;
         Level level1 = new Level();
         int tickCount = 0;
+
+        // random seed or not
+        public static bool randSeed = false;
 
         // Makes a Heads-Up Display
         Hud hud;
@@ -130,22 +137,31 @@ namespace Gato_Exploso
         }
 
         // spawn turtle
-        public void SpawnTurtle()
+        public void SpawnTurtle(string which)
         {
-            if (!_players.ContainsKey("squirrell"))
+            if (which == "squirrell")
             {
-                var newTurtle = new Turtle(Content, 0);
-                newTurtle.Name = "squirrell";
-                _players.Add("squirrell", newTurtle);
-            }
+                if (!_players.ContainsKey("squirrell"))
+                {
+                    var newTurtle = new Turtle(Content, 0, "squirrell");
+                    _players.Add("squirrell", newTurtle);
+                }
 
-            Turtle squirrell = (Turtle)_players["squirrell"];
-            squirrell.x = GetMainPlayer().x + 130;
-            squirrell.y = GetMainPlayer().y + 130;
-            while (getTileAt(squirrell.x, squirrell.y).GetType() == typeof(WaterTile))
+                Turtle squirrell = (Turtle)_players["squirrell"];
+                squirrell.x = GetMainPlayer().x - 130;
+                squirrell.y = GetMainPlayer().y - 130;
+            }
+            if(which == "timmy")
             {
-                squirrell.x--;
-                squirrell.y--;
+                if (!_players.ContainsKey("timmy"))
+                {
+                    var newTurtle = new Turtle(Content, 0, "timmy");
+                    _players.Add("timmy", newTurtle);
+                }
+
+                Turtle squirrell = (Turtle)_players["timmy"];
+                squirrell.x = 800;
+                squirrell.y = 7000;
             }
         }
         // hams
@@ -182,11 +198,11 @@ namespace Gato_Exploso
                 if (p.GetType() != typeof(Turtle))
                 {
                     SpawnPlayer(p);
+                
                 }
             }
             paused = false;
-            MediaPlayer.Volume = (float)0.8;
-            SpawnTurtle();
+            SpawnTurtle("squirrell");
 
         }
 
@@ -204,25 +220,43 @@ namespace Gato_Exploso
                     landFound = true;
                     dude.x = nx * 32;
                     dude.y = ny * 32;
+                    dude.spawnX = dude.x;
+                    dude.spawnY = dude.y;
                 }
             }
         }
         // spawns players/mobs
         public void SpawnPlayer(Player dude)
         {
-            bool landFound = false;
-            Random random = new Random();
-            while (!landFound)
+            if (!randSeed)
             {
-                int nx = random.Next(256);
-                int ny = random.Next(256);
-                if (level1.tiles[nx, ny].GetType() != typeof(WaterTile))
-                {
-                    landFound = true;
-                    _players[dude.Name].x = nx * 32;
-                    _players[dude.Name].y = ny * 32;
-                }
+                dude.x = 200;
+                dude.y = 6000;
             }
+            else
+            {
+                bool landFound = false;
+                Random random = new Random();
+                while (!landFound)
+                {
+                    int nx = random.Next(256);
+                    int ny = random.Next(256);
+                    if (level1.tiles[nx, ny].GetType() != typeof(WaterTile))
+                    {
+                        landFound = true;
+                        _players[dude.Name].x = nx * 32;
+                        _players[dude.Name].y = ny * 32;
+                    }
+                }
+               
+            }
+            dude.points = 0;
+            _players[dude.Name].hp = 100;
+        }
+        public void SpawnPlayer(Player dude, int spx, int spy)
+        {
+            _players[dude.Name].x = spx * 32;
+            _players[dude.Name].y = spy * 32;
             dude.points = 0;
             _players[dude.Name].hp = 100;
         }
@@ -283,7 +317,7 @@ namespace Gato_Exploso
                     {
                         // returns the type of tile objects for the server
                         string objType = "";
-                        if (obj.GetType() == typeof(Bomb))
+                        if (obj.GetType() == typeof(Bomb) || obj.GetType() == typeof(MightyBomb) || obj.GetType() == typeof(GravityBomb))
                         {
                             objType = "bomb";
                         }
@@ -310,10 +344,12 @@ namespace Gato_Exploso
                     tileInfos.Add(information);
                 }
             }
-
+            
             List<MobInfo> mobInfos = new List<MobInfo>();
-            foreach (var curMob in mobs)
+          /*  foreach (var curMob in mobs)
             {
+                if (FindDistance(curMob.x, curMob.y, _players[playerName].x, _players[playerName].y) < 600)
+                {
                 MobInfo mobInfo = new MobInfo();
                 mobInfo.X = curMob.x;
                 mobInfo.Y = curMob.y;
@@ -329,7 +365,9 @@ namespace Gato_Exploso
 
 
                 mobInfos.Add(mobInfo);
-            }
+                }
+                
+            }*/
 
             List<ProjectileInfo> eggInfos = new List<ProjectileInfo>();
             for (int i = eggs.Count - 1; i >= 0; i--)
@@ -375,10 +413,13 @@ namespace Gato_Exploso
         public List<Player> GetPlayers()
         {
             List<Player> li = new List<Player>();
-            foreach (Player p in _players.Values)
-            {
-                li.Add(p);
+            try {
+                foreach (Player p in _players.Values)
+                {
+                    li.Add(p);
+                }
             }
+            catch (Exception e) { }
             return li;
         }
 
@@ -391,7 +432,14 @@ namespace Gato_Exploso
             server.Start();
             server.PlayerAction += Server_PlayerAction;
             server.PlayerRegister += Server_PlayerRegister;
-            SpawnPlayer(GetMainPlayer());
+            if (!randSeed)
+            {
+                SpawnPlayer(GetMainPlayer(),7810, 7112);
+            }
+            else
+            {
+                SpawnPlayer(GetMainPlayer());
+            }
         }
         public HashSet<Entity> GetEntities()
         {
@@ -400,12 +448,26 @@ namespace Gato_Exploso
             return entities;
         }
 
+        // dialog after kazoo
+        public void ShowPastDial()
+        {
+            switch (curDiall)
+            {
+                case 4:
+                    PauseGame("introDial2");
+                    break;
+                case 6:
+                    PauseGame("timmyDial2");
+                    break;
+                case 7:
+                    PauseGame("bossDial");
+                    break;
+                default:
+                    break;
+            }
+        }
         public void PlayerTouchedTurle(bool kazuya)
         {
-            if (kazuya)
-            {
-                curDiall--;
-            }
             switch (curDiall)
             {
                 case 1:
@@ -424,17 +486,17 @@ namespace Gato_Exploso
 
 
                 case 4:
-                    PauseGame("bossDial");
-                    //     curDiall++;
+                    PauseGame("timmyDial");
+                         curDiall++;
                     return;
                 case 5:
-                    PauseGame("pause");
+                    PauseGame("timmyDial2");
                     curDiall++;
                     return;
 
 
                 case 6:
-                    PauseGame("pause");
+                    PauseGame("bossDial");
                     curDiall++;
                     return;
 
@@ -582,10 +644,13 @@ namespace Gato_Exploso
 
             music = Content.Load<Song>("ExplosoFields");
             menuMusic = Content.Load<Song>("MenuMusic");
+            campSong = Content.Load<Song>("CampSite");
+            curSong = music;
             MediaPlayer.Play(menuMusic);
             MediaPlayer.IsRepeating = true;
             PauseGame("splash");
-            MediaPlayer.Volume = (float).8;
+            MediaPlayer.Volume = (float).5;
+            SpawnTurtle("timmy");
         }
 
         public bool IsPassableCoord(int x, int y)
@@ -675,6 +740,22 @@ namespace Gato_Exploso
                 // updates the offset between screen and world coordinates
                 if (gato is MainPlayer)
                 {
+                    if(gato.x < 1500 && gato.y > 6500)
+                    {
+                        if(curSong != campSong)
+                        {
+                            MediaPlayer.Play(campSong);
+                            curSong = campSong;
+                        }
+                    }
+                    else
+                    {
+                        if(curSong != music)
+                        {
+                            MediaPlayer.Play(music);
+                            curSong = music;
+                        }
+                    }
                     level1.UpdateOffset(gato.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), gato.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
                     // sets location of the bomb placement indicator
                     if (gato.facing.Up)
@@ -809,7 +890,7 @@ namespace Gato_Exploso
                     }
                     else
                     {
-                        MoveMobTowardPlayer(curMob, FindNearestOstrich(curMob));
+                        MoveMobTowardSpawn(curMob);
                     }
                 }
                 if (curMob.GetType() == typeof(Hammy))
@@ -860,6 +941,15 @@ namespace Gato_Exploso
                 curMob.Move(angleInRadians);
             }
         }
+        // mobs go back to where they came from
+        public void MoveMobTowardSpawn(Mob curMob)
+        {
+            double sx = curMob.spawnX - curMob.x;
+            double sy = curMob.spawnY - curMob.y;
+            // uses trig to find the angle at which the mob should moves
+            double angleInRadians = Math.Atan2(sy, sx);
+            curMob.Move(angleInRadians);
+        }
         public double radiansToDegrees(double radians)
         {
             return radians * (180 / Math.PI);
@@ -902,16 +992,29 @@ namespace Gato_Exploso
         Random bombRand = new Random();
         protected override void Update(GameTime gameTime)
         {
+
             bool hasBeenTouched = false;
             MouseState cursor = new MouseState();
             cursor = Mouse.GetState();
+            hud.scrollAmt = cursor.ScrollWheelValue / 120;
+            if (hud.scrollAmt > 3)
+            {
+                hud.scrollAmt -= 4;
+            }
+            if (hud.scrollAmt < 0)
+            {
+                hud.scrollAmt += 3;
+            }
             var state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Escape) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
             {
                 lastPausedTime = gameTime.TotalGameTime.TotalMilliseconds;
                 if (paused)
                 {
-                    ResumeGame();
+                    if(menu.menuType != "splash")
+                    {
+                        ResumeGame();
+                    }
                     if ((menu.menuType == "introDial3" || menu.menuType == "timmyDial2" || menu.menuType == "bossDial") && _players.ContainsKey("squirrell"))
                     {
                         _players.Remove("squirrell");
@@ -924,8 +1027,7 @@ namespace Gato_Exploso
             }
             if (state.IsKeyDown(Keys.Q) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
             {
-                SpawnTurtle();
-                PlayerTouchedTurle(true);
+                ShowPastDial();
             }
             if (paused)
             {
@@ -941,6 +1043,7 @@ namespace Gato_Exploso
             }
             if (mobs.Count < 6 * (1 + (difficultyNumber / 2)))
             {
+                
                 BouncyTriangle tri = new BouncyTriangle(Content);
                 SpawnMob(tri);
                 mobs.Add(tri);
@@ -948,6 +1051,7 @@ namespace Gato_Exploso
                 Porcupine pork = new Porcupine(Content);
                 SpawnMob(pork);
                 mobs.Add(pork);
+                
             }
 
 
@@ -964,13 +1068,12 @@ namespace Gato_Exploso
                 {
                     hams.Add(hammy.ShootHam(GetMainPlayer().x, GetMainPlayer().y, Content));
                 }
-                foreach (Ham ham in hams)
-                {
-                    if (false)
+              
+                    for(int i = hams.Count - 1; i >= 0; i--)
                     {
-                        int f = 0;
-                    }
-                    //                ham.Move();
+                        Ham ham = hams[i];
+                  
+                        ham.Move();
                     if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, GetMainPlayer().width, GetMainPlayer().height, ham))
                     {
                         hams.Remove(ham);
@@ -1015,10 +1118,10 @@ namespace Gato_Exploso
                     GetMainPlayer().points++;
                     if (GetMainPlayer().points >= 10)
                     {
-                        SpawnTurtle();
+                        SpawnTurtle("squirrell");
                         beginBossFight = true;
                     }
-                    int br = bombRand.Next(1, 7);
+                    int br = bombRand.Next(1, 10);
 
                     switch (br)
                     {
@@ -1040,6 +1143,10 @@ namespace Gato_Exploso
                         case 6:
                             gravs++;
                             break;
+                        case 7:
+                            mightys++;
+                            break;
+                        default: break;
 
                     }
 
@@ -1052,12 +1159,14 @@ namespace Gato_Exploso
                 if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, 90, 90, turtle) && !hasBeenTouched)
                 {
                     PlayerTouchedTurle(false);
-                    hasBeenTouched = true;
                 }
-                else
+            }
+            if (_players.ContainsKey("timmy"))
+            {
+                var turtle = _players["timmy"];
+                if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, 90, 90, turtle))
                 {
-                    //
-                    //  MoveMobTowardPlayer(turtle, GetMainPlayer());
+                    PlayerTouchedTurle(false);
                 }
             }
 
@@ -1192,7 +1301,6 @@ namespace Gato_Exploso
         {
             menu.SetMenuType(type);
             paused = true;
-            MediaPlayer.Volume = (float)0.1;
 
 
         }
@@ -1200,8 +1308,6 @@ namespace Gato_Exploso
         public void ResumeGame()
         {
             paused = false;
-            MediaPlayer.Volume = (float)0.8;
-
         }
         private HashSet<Vector2> GetPlayerTiles(Player p)
         {
@@ -1249,7 +1355,7 @@ namespace Gato_Exploso
                         // mid right
                     new Vector2(p.x / tileSide, p.y + (p.height / tileSide)),
 
-                        //bottom right
+                        // bottom right
                     new Vector2(p.x / tileSide, (p.y + p.height) / tileSide)
 
                 };
@@ -1272,18 +1378,33 @@ namespace Gato_Exploso
                         if (mightys > 0)
                         {
                             hasEnoughBombs = true;
+                            if(currentTime - lastBombTime >= 1000)
+                            {
+                                mightys--;
+                            }
+                            
                         }
                         break;
                     case 2:
                         if (mines > 0)
                         {
                             hasEnoughBombs = true;
+                            if (currentTime - lastBombTime >= 1000)
+                            {
+                                mines--;
+                            }
+                            
                         }
                         break;
                     case 3:
                         if (gravs > 0)
                         {
                             hasEnoughBombs = true;
+                            if (currentTime - lastBombTime >= 1000)
+                            {
+                                gravs--;
+                            }
+                            
                         }
                         break;
                 }
@@ -1310,6 +1431,7 @@ namespace Gato_Exploso
                     lastBombTime = currentTime;
                 }
             }
+            hasEnoughBombs = false;
         }
         // spawns hammy and initiates the boss fight
         public void StartBossFight()
@@ -1390,7 +1512,7 @@ namespace Gato_Exploso
             // draws ham
             foreach (Ham hum in hams)
             {
-                hum.Draw(_spriteBatch, hum.x - (int)topLeftPixel.X, hum.y - (int)topLeftPixel.Y);
+                hum.Draw(_spriteBatch,  -(int)topLeftPixel.X,  -(int)topLeftPixel.Y);
             }
             MainPlayer player = new MainPlayer(Content);
             if (p.GetType() == typeof(MainPlayer))
@@ -1403,11 +1525,11 @@ namespace Gato_Exploso
             {
                 if (_players.ContainsKey("squirrell"))
                 {
-                    menu.Draw(_spriteBatch, new Vector2(_players["squirrell"].x - topLeftPixel.X, _players["squirrell"].y - topLeftPixel.Y));
+                    menu.Draw(_spriteBatch, new Vector2(_players["squirrell"].x - topLeftPixel.X, _players["squirrell"].y - topLeftPixel.Y), level1.randSeedDisp);
                 }
                 else
                 {
-                    menu.Draw(_spriteBatch, new Vector2(3000, 3000));
+                    menu.Draw(_spriteBatch, new Vector2(3000, 3000),  level1.randSeedDisp);
                 }
             }
 

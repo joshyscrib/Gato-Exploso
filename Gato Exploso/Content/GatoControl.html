@@ -143,6 +143,7 @@
         ostrichRImage.src = "/image/ostrichR1.png";
 
         var curOstrichImage = ostrichLImage;
+        var lastGameUpdate = Date.now();
         function sendMove(dir) {
             if (dir != lastMove) {
                 lastMove = dir;
@@ -167,6 +168,7 @@
                 }
             }
             );
+            tickGame();
             setInterval(tickGame, 30);
             setInterval(checkJoystick, 50);
             setTimeout(getPlayerLocations, 50);
@@ -482,7 +484,7 @@
             drawWorld();
         }
         var minimapLeft = 900;
-        var minimapTop = 900;
+        var minimapTop = 0;
         function drawWorld() {
             // image to draw
 
@@ -625,6 +627,7 @@
                 }
 
             }
+            /*
             for (var i = 0; i < tileRows; i++) {
                 for (var j = 0; j < tileRows; j++) {
                     var curTile = tiles[i][j];
@@ -646,6 +649,7 @@
                     ctx.fillRect(i + (minimapLeft), j + (minimapTop), 1, 1);
                 }
             }
+            */
         }
 
 

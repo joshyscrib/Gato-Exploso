@@ -18,6 +18,9 @@ namespace Gato_Exploso.HUD
         GraphicsDevice context;
         ContentManager Content;
         Texture2D texture;
+        Texture2D greenColor;
+        Texture2D volUp;
+        Texture2D volDown;
 
         // splash screen image(game poster)
         Texture2D splashTexture;
@@ -38,6 +41,9 @@ namespace Gato_Exploso.HUD
 
         // regulates difficulty change speed
         int lastDiffChange = 0;
+
+        // regulates seed change speed
+        int lastSeedChange = 0;
 
         // credits
         Texture2D credits;
@@ -74,9 +80,11 @@ namespace Gato_Exploso.HUD
             t1 = Content.Load<Texture2D>("TimmyD");
             t2 = Content.Load<Texture2D>("TimmyD2");
             m1 = Content.Load<Texture2D>("MurdererD");
+            volUp = Content.Load<Texture2D>("VolUp");
+            volDown = Content.Load<Texture2D>("VolDown");
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 turtle)
+        public void Draw(SpriteBatch spriteBatch, Vector2 turtle, int seed)
         {
             menuTicks++;
             if (menuType == "splash")
@@ -111,6 +119,10 @@ namespace Gato_Exploso.HUD
                 new Vector2(55, 25),
                 Color.Black
                 );
+                if (Game1.randSeed)
+                {
+                    spriteBatch.Draw(texture, new Rectangle(2060, 820, 155, 155), new Color(12, 174, 0));
+                }
                 if (credits != null && creditsPlaying)
                 {
                     spriteBatch.Draw(credits, new Vector2(0, creditY), Color.White);
@@ -121,9 +133,11 @@ namespace Gato_Exploso.HUD
                         creditY = height;
                     }
                 }
+                
             }
             if (menuType == "pause")
             {
+
                 // background of pause menu
                 spriteBatch.Draw(texture, new Rectangle(150, 150, width - 300, height - 300), Color.White);
                 // exit game button
@@ -132,8 +146,28 @@ namespace Gato_Exploso.HUD
                 spriteBatch.DrawString
                 (
                 font,
-                "Paused",
+                coords,
                 new Vector2(55, 25),
+                Color.Black
+                );
+
+                // volume controls
+                spriteBatch.Draw(volUp, new Rectangle(width - 625, 170, 80, 80), Color.White);
+                spriteBatch.Draw(volDown, new Rectangle(width - 850, 170, 80, 80), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Volume: " + Math.Round(MediaPlayer.Volume * 100) + "%",
+                new Vector2(width - 750, 200),
+                Color.Black
+                );
+
+                // shows seed
+                spriteBatch.DrawString
+                (
+                font,
+                "seed:  " + seed.ToString(),
+                new Vector2(160, height - 600),
                 Color.Black
                 );
                 DrawScoreboard(spriteBatch);
@@ -203,6 +237,28 @@ namespace Gato_Exploso.HUD
                 Color.Black
                 );
             }
+            if (menuType == "timmyDial")
+            {
+                spriteBatch.Draw(t1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
+            if (menuType == "timmyDial2")
+            {
+                spriteBatch.Draw(t2, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
             if (menuType == "bossDial")
             {
                 spriteBatch.Draw(m1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
@@ -231,13 +287,36 @@ namespace Gato_Exploso.HUD
             }
 
             // quit button
-            if (x > 2160 && x < 2240 && y > 170 && y < 250 && (menuType == "pause" || menuType == "dead"))
+            if (x > 2160 && x < 2240 && y > 170 && y < 250 && (menuType == "pause" || menuType == "dead" || menuType == "win"))
             {
                 PlayerAction(this, "start");
                 Game1.Instance.PauseGame("splash");
                 MediaPlayer.Play(Game1.Instance.menuMusic);
-                MediaPlayer.Volume = (float).8;
             }
+
+            // volume controls
+
+            //  spriteBatch.Draw(volUp, new Rectangle(width - 625, 170, 80, 80), Color.White);
+            //  spriteBatch.Draw(volDown, new Rectangle(width - 850, 170, 80, 80), Color.White);
+            if (x > 1935 && x < 2015 && y > 170 && y < 250 && menuType == "pause" &&  menuTicks - lastSeedChange > 20)
+            {
+                lastSeedChange = menuTicks;
+                MediaPlayer.Volume += 0.1f;
+            }
+            if (x > 1710 && x < 1790 && y > 170 && y < 250 && menuType == "pause" && menuTicks - lastSeedChange > 20)
+            {
+                lastSeedChange = menuTicks;
+                MediaPlayer.Volume -= 0.1f;
+            }
+            if (MediaPlayer.Volume > 1)
+            {
+                MediaPlayer.Volume = 1;
+            }
+            if (MediaPlayer.Volume < 0)
+            {
+                MediaPlayer.Volume = 0;
+            }
+
 
 
             // credits button
@@ -246,8 +325,15 @@ namespace Gato_Exploso.HUD
                 creditsPlaying = true;
             }
 
+            // random seed? button
+            if (x > 2057 && x < 2214 && y > 818 && y < 973 && menuType == "splash" && menuTicks - lastSeedChange > 20)
+            {
+                lastSeedChange = menuTicks;
+                Game1.randSeed = !Game1.randSeed;
+            }
+
             // difficulty button
-            if (x > 152 && y > 969 && x < 754 && y < 1146 && menuTicks - lastDiffChange > 20)
+            if (x > 152 && y > 969 && x < 754 && y < 1146 && menuTicks - lastDiffChange > 20 && menuType == "splash")
             {
                 lastDiffChange = menuTicks;
                 Game1.difficultyNumber++;

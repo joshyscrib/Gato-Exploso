@@ -26,7 +26,10 @@ namespace Gato_Exploso.HUD
             clock = new Clock(Content);
         }
 
-        // draws rects
+        // scroll wheel amount
+        public int scrollAmt = 0;
+
+        // draws rects 
         Texture2D texture;
 
         // inventory
@@ -34,7 +37,11 @@ namespace Gato_Exploso.HUD
 
         // inventory selected item
         Texture2D invecture;
-        public int scrollAmt = 0;
+        public int 
+            
+            
+            
+            Amt = 0;
 
         // Bomb sprites for inventory
         Texture2D bombTexture;
@@ -78,6 +85,8 @@ namespace Gato_Exploso.HUD
             spriteBatch.Draw(texture, new Rectangle(minimapLeft - 5, minimapTop - 5, 266, 266), Color.Black);
             // Decides tiles-colors and draws minimap
             Color miniColor;
+            int campX = -1;
+            int campY = -1;
             for (int i = 0; i < miniMapData.GetLength(0); i++)
             {
                 for (int j = 0; j < miniMapData.GetLength(1); j++)
@@ -96,6 +105,11 @@ namespace Gato_Exploso.HUD
                         case 4:
                             miniColor = new Color(0, 150, 30);
                             break;
+                        case 5:
+                            campX = i;
+                            campY = j;
+                            miniColor = new Color(0, 0, 0);
+                            break;
                         default:
                             miniColor = new Color(255, 255, 255);
                             break;
@@ -103,6 +117,19 @@ namespace Gato_Exploso.HUD
                     spriteBatch.Draw(texture, new Rectangle(i + (minimapLeft), j + (minimapTop), 1, 1), miniColor);
                 }
             }
+
+            if (campX >= 0)
+            {
+                Color campColor = new Color(255, 255, 255); ;
+                if (Game1.Instance.GetTime() % 500 < 250)
+                {
+                    campColor = new Color(111, 111, 0);
+                }
+               
+                spriteBatch.Draw(texture, new Rectangle(campX + (minimapLeft), campY + (minimapTop), 4, 4), campColor);
+            }
+
+
             // draws gato location on minimap
             spriteBatch.Draw(texture, new Rectangle(gatoX / 32 + (minimapLeft) - 3, gatoY / 32 + (minimapTop) - 3, 6, 6), Color.Blue);
 
@@ -141,16 +168,35 @@ namespace Gato_Exploso.HUD
             if (mig > 0)
             {
                 spriteBatch.Draw(mightyTexture, new Rectangle(998 + (1 * 136), 1259, 128, 128), Color.White);
-                
+                spriteBatch.DrawString
+                (
+                font,
+                mig.ToString(),
+                new Vector2(998 + (1 * 136) + 108, 1259 + 108),
+                Color.White
+                );
             }
             if (land > 0)
             {
                 spriteBatch.Draw(landMineTexture, new Rectangle(998 + (2 * 136), 1259, 128, 128), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                land.ToString(),
+                new Vector2(998 + (2 * 136) + 108, 1259 + 108),
+                Color.White
+                );
             }
             if (grav > 0)
             {
                 spriteBatch.Draw(gravTexture, new Rectangle(998 + (3 * 136), 1259, 128, 128), Color.White);
-
+                spriteBatch.DrawString
+                (
+                font,
+                grav.ToString(),
+                new Vector2(998 + (3 * 136) + 108, 1259 + 108),
+                Color.White
+                );
             }
         }
     }

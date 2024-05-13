@@ -6,13 +6,14 @@ namespace Gato_Exploso
 {
     public class Turtle : Player
     {
-        public Turtle(ContentManager context, double createTime) : base(context, createTime)
+        public Turtle(ContentManager context, double createTime, string nam) : base(context, createTime)
         {
             hp = 999999;
             speed = 4;
             Load();
             width = 64;
             height = 64;
+            Name = nam;
         }
 
         public override void Attack()
@@ -27,7 +28,18 @@ namespace Gato_Exploso
 
         public override void Load()
         {
-            PTextureLeft = Content.Load<Texture2D>("Squirrell");
+            if (Name == "squirrell")
+            {
+                PTextureLeft = Content.Load<Texture2D>("Squirrell");
+            }
+            else if (Name == "timmy" || (x < 1000 && y > 6500))
+            {
+                PTextureLeft = Content.Load<Texture2D>("Timmy");
+            }
+            else
+            {
+                PTextureLeft = Content.Load<Texture2D>("Squirrell");
+            }
         }
     }
 }
