@@ -952,9 +952,12 @@ namespace Gato_Exploso
                 {
                     MoveMobTowardPlayer(curMob, GetMainPlayer());
                 }
-                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32))
+                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
                 {
+                    if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    {
                 
+                    }
                 }
 
             }
