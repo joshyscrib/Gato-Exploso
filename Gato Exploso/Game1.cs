@@ -959,25 +959,53 @@ namespace Gato_Exploso
                         GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).startExplosion();
                     }
                 }
-                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
+                else if((GetTileAt((int)curMob.x + 32) / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
+                {
+                    if((GetTileAt((int)curMob.x + 32) / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    {
+                        GetTileAt((int)curMob.x + 32) / 32,(int)curMob.y / 32).GetTileObjects().startExplosion();
+                    }
+                }
+                else if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 32) / 32).GetTileObjects().Count > 0)
+                {
+                    if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 32) / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    {
+                        GetTileAt((int)curMob.x / 32,(int)(curMob.y + 32) / 32).GetTileObjects().startExplosion();
+                    }
+                }
+                else if(GetTileAt((int)(curMob.x + 32) / 32,(int)(curMob.y + 32) / 32).GetTileObjects().Count > 0)
+                {
+                    if(GetTileAt((int)(curMob.x + 32) / 32,(int)(curMob.y + 32) / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    {
+                        GetTileAt((int)(curMob.x + 32) / 32,(int)(curMob.y + 32) / 32).GetTileObjects().startExplosion();
+                    }
+                }
+                else if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
                 {
                     if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
                     {
                         GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).startExplosion();
                     }
                 }
-                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
+                else if((GetTileAt((int)curMob.x + 64) / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
                 {
-                    if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    if(((GetTileAt((int)curMob.x + 64) / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
                     {
-                        GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).startExplosion();
+                        (GetTileAt((int)curMob.x + 64) / 32,(int)curMob.y / 32).GetTileObjects().startExplosion();
                     }
                 }
-                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
+                else if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 64) / 32).GetTileObjects().Count > 0)
                 {
-                    if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 64) / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
                     {
-                        GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).startExplosion();
+                        GetTileAt((int)curMob.x / 32,(int)(curMob.y + 64) / 32).GetTileObjects().startExplosion();
+                    }
+                }
+                else if(GetTileAt((int)(curMob.x + 64) / 32,(int)(curMob.y + 64) / 32).GetTileObjects().Count > 0)
+                {
+                    if(GetTileAt((int)(curMob.x + 64) / 32,(int)(curMob.y + 64) / 32)[0].GetType() == typeof(LandMine))
+                    {
+                        GetTileAt((int)(curMob.x + 64) / 32,(int)(curMob.y + 64) / 32).startExplosion();
                     }
                 }
 
