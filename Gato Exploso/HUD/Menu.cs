@@ -84,8 +84,17 @@ namespace Gato_Exploso.HUD
             volDown = Content.Load<Texture2D>("VolDown");
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 turtle, int seed)
+        public void Draw(SpriteBatch spriteBatch, Vector2 turtle, int seed, List<Player> plays, Vector2 offsetpix)
         {
+            Vector2 turtleTim = new Vector2();
+            for(int i = 0; i < plays.Count; i++)
+            {
+                if (plays[i].Name == "timmy")
+                {
+                    turtleTim.X = plays[i].x;
+                    turtleTim.Y = plays[i].y;
+                }
+            }
             menuTicks++;
             if (menuType == "splash")
             {
@@ -170,7 +179,7 @@ namespace Gato_Exploso.HUD
                 new Vector2(160, height - 600),
                 Color.Black
                 );
-                DrawScoreboard(spriteBatch);
+                DrawScoreboard(spriteBatch, plays);
             }
             if (menuType == "dead")
             {
@@ -184,7 +193,7 @@ namespace Gato_Exploso.HUD
                 new Vector2((width / 2) - 200, 200),
                 Color.Black
                 );
-                DrawScoreboard(spriteBatch);
+                DrawScoreboard(spriteBatch, plays);
                 spriteBatch.Draw(texture, new Rectangle(width - 400, 170, 80, 80), Color.Lime);
                 spriteBatch.DrawString(font, "Quit", new Vector2(width - 380, 200), Color.Black);
             }
@@ -200,7 +209,7 @@ namespace Gato_Exploso.HUD
                 new Vector2((width / 2) - 200, 200),
                 Color.Black
                 );
-                DrawScoreboard(spriteBatch);
+                DrawScoreboard(spriteBatch, plays);
                 spriteBatch.Draw(texture, new Rectangle(width - 400, 170, 80, 80), Color.Lime);
                 spriteBatch.DrawString(font, "Quit", new Vector2(width - 380, 200), Color.Black);
             }
@@ -217,51 +226,51 @@ namespace Gato_Exploso.HUD
             }
             if (menuType == "introDial2")
             {
-                spriteBatch.Draw(i2, new Vector2(turtle.X - 470, turtle.Y - 50), Color.White);
+                spriteBatch.Draw(i2, new Vector2(turtle.X - 490, turtle.Y - 50), Color.White);
                 spriteBatch.DrawString
                 (
                 font,
                 "Press esc to continue",
-                new Vector2(turtle.X - 295, turtle.Y - 70),
+                new Vector2(turtle.X - 350, turtle.Y - 70),
                 Color.Black
                 );
             }
             if (menuType == "introDial3")
             {
-                spriteBatch.Draw(i3, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.Draw(i3, new Vector2(turtle.X - 500, turtle.Y - 50), Color.White);
                 spriteBatch.DrawString
                 (
                 font,
                 "Press esc to continue",
-                new Vector2(turtle.X - 295, turtle.Y - 70),
+                new Vector2(turtle.X - 350, turtle.Y - 70),
                 Color.Black
                 );
             }
             if (menuType == "timmyDial")
             {
-                spriteBatch.Draw(t1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.Draw(t1, new Vector2(turtleTim.X - 500 - (int)offsetpix.X, turtleTim.Y - 50 - (int)offsetpix.Y), Color.White);
                 spriteBatch.DrawString
                 (
                 font,
                 "Press esc to continue",
-                new Vector2(turtle.X - 295, turtle.Y - 70),
+                new Vector2(turtleTim.X - 295, turtleTim.Y - 70),
                 Color.Black
                 );
             }
             if (menuType == "timmyDial2")
             {
-                spriteBatch.Draw(t2, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.Draw(t2, new Vector2(turtleTim.X - 400 - (int)offsetpix.X, turtleTim.Y - 50 - (int)offsetpix.Y), Color.White);
                 spriteBatch.DrawString
                 (
                 font,
                 "Press esc to continue",
-                new Vector2(turtle.X - 295, turtle.Y - 70),
+                new Vector2(turtleTim.X - 295, turtleTim.Y - 70),
                 Color.Black
                 );
             }
             if (menuType == "bossDial")
             {
-                spriteBatch.Draw(m1, new Vector2(turtle.X - 300, turtle.Y - 50), Color.White);
+                spriteBatch.Draw(m1, new Vector2(turtle.X - 480, turtle.Y - 50), Color.White);
                 spriteBatch.DrawString
                 (
                 font,
@@ -347,10 +356,16 @@ namespace Gato_Exploso.HUD
         {
             menuType = type;
         }
-        public void DrawScoreboard(SpriteBatch spriteBatch)
+        public void DrawScoreboard(SpriteBatch spriteBatch, List<Player> p)
         {
-            var info = Game1.Instance.GetGameInfo("gato", Game1.Instance.GetTime());
-            List<Infos.PlayerInfo> playerList = new List<Infos.PlayerInfo>();// info.PlayerInfos;
+            List<Player> playerList = new List<Player>();
+            for(int i = 0; i < p.Count; i++)
+            {
+                if (p[i].GetType() != typeof(Turtle) && !playerList.Contains(p[i]))
+                {
+                    playerList.Add(p[i]);
+                }
+            }
             int offY = 200;
             spriteBatch.DrawString
                 (
@@ -361,7 +376,7 @@ namespace Gato_Exploso.HUD
                 );
             for (int i = 0; i < playerList.Count; i++)
             {
-                if (playerList[i].Name != "squirrell")
+                if (playerList[i].GetType() != typeof(Turtle))
                 {
                     spriteBatch.DrawString
                 (
@@ -373,8 +388,8 @@ namespace Gato_Exploso.HUD
                     spriteBatch.DrawString
                     (
                     font,
-                    playerList[i].Points.ToString(),
-                    new Vector2(295, offY),
+                    playerList[i].points.ToString(),
+                    new Vector2(356, offY),
                     Color.Black
                     );
                     offY += 20;

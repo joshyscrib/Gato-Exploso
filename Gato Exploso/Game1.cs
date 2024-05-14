@@ -525,7 +525,7 @@ namespace Gato_Exploso
                     break;
             }
         }
-        public void PlayerTouchedTurle(bool kazuya)
+        public void PlayerTouchedTurle()
         {
             switch (curDiall)
             {
@@ -546,25 +546,20 @@ namespace Gato_Exploso
 
                 case 4:
                     PauseGame("timmyDial");
-                         curDiall++;
+                    curDiall = 5;
                     return;
                 case 5:
                     PauseGame("timmyDial2");
-                    curDiall++;
+                    curDiall = 6;
                     return;
 
 
                 case 6:
                     PauseGame("bossDial");
-                    curDiall++;
+                    curDiall = 7;
                     return;
 
             }
-            curDiall++;
-        }
-        public void ChangeCurDiallog()
-        {
-            curDiall++;
         }
         public HashSet<Entity> GetCollidingEntities(Rectangle rect, Player play)
         {
@@ -1049,6 +1044,23 @@ namespace Gato_Exploso
         bool beginBossFight = false;
         // dtermines what type of bomb the player will get
         Random bombRand = new Random();
+        protected void ResetScrollAmt()
+        {
+            if (hud.scrollAmt > 3)
+            {
+                hud.scrollAmt -= 4;
+                ResetScrollAmt();
+            }
+            else if (hud.scrollAmt < 0)
+            {
+                hud.scrollAmt += 3;
+                ResetScrollAmt();
+            }
+            else
+            {
+                return;
+            }
+        }
         protected override void Update(GameTime gameTime)
         {
 
@@ -1056,14 +1068,7 @@ namespace Gato_Exploso
             MouseState cursor = new MouseState();
             cursor = Mouse.GetState();
             hud.scrollAmt = cursor.ScrollWheelValue / 120;
-            if (hud.scrollAmt > 3)
-            {
-                hud.scrollAmt -= 4;
-            }
-            if (hud.scrollAmt < 0)
-            {
-                hud.scrollAmt += 3;
-            }
+            ResetScrollAmt();
             var state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Escape) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
             {
@@ -1074,9 +1079,13 @@ namespace Gato_Exploso
                     {
                         ResumeGame();
                     }
-                    if ((menu.menuType == "introDial3" || menu.menuType == "timmyDial2" || menu.menuType == "bossDial") && _players.ContainsKey("squirrell"))
+                    if ((menu.menuType == "introDial3" || menu.menuType == "bossDial") && _players.ContainsKey("squirrell"))
                     {
                         _players.Remove("squirrell");
+                    }
+                    if (menu.menuType == "timmyDial2" && _players.ContainsKey("timmy"))
+                    {
+                        _players.Remove("timmy");
                     }
                 }
                 else
@@ -1217,7 +1226,7 @@ namespace Gato_Exploso
                 var turtle = _players["squirrell"];
                 if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, 90, 90, turtle) && !hasBeenTouched)
                 {
-                    PlayerTouchedTurle(false);
+                    PlayerTouchedTurle();
                 }
             }
             if (_players.ContainsKey("timmy"))
@@ -1225,7 +1234,7 @@ namespace Gato_Exploso
                 var turtle = _players["timmy"];
                 if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, 90, 90, turtle))
                 {
-                    PlayerTouchedTurle(false);
+                    PlayerTouchedTurle();
                 }
             }
 
@@ -1262,7 +1271,7 @@ namespace Gato_Exploso
                     curPlayer.hp += 0.015;
                 }
                 // waits to remove idle players as not to disrupt the rest of the loop
-                if (curPlayer.IsTimedOut() && curPlayer.Name != "gato")
+                if (curPlayer.IsTimedOut() && curPlayer.GetType() == typeof(Ostrich))
                 {
                     playersToRemove.Add(curPlayer);
                 }
@@ -1286,10 +1295,6 @@ namespace Gato_Exploso
             if (state.IsKeyDown(Keys.S)) { direction.Down = true; }
             if (state.IsKeyDown(Keys.D)) { direction.Right = true; }
             if (state.IsKeyDown(Keys.Space)) { actionArgs.placeBomb = true; }
-            if (state.IsKeyDown(Keys.D1)) { hud.scrollAmt = 0; }
-            if (state.IsKeyDown(Keys.D2)) { hud.scrollAmt = 1; }
-            if (state.IsKeyDown(Keys.D3)) { hud.scrollAmt = 2; }
-            if (state.IsKeyDown(Keys.D4)) { hud.scrollAmt = 3; }
             if (state.IsKeyDown(Keys.P)) { _players["gato"].hp += 5; }
             if (state.IsKeyDown(Keys.B)) { if (!bossFightStarted) { StartBossFight(); } }
 
@@ -1527,7 +1532,8 @@ namespace Gato_Exploso
             return eggString.ToString();
         }
 
-
+        // players in a list instead of a dictionary
+        List<Player> playerL = new List<Player>();
         // tells each class to draw themselves
         protected override void Draw(GameTime gameTime)
         {
@@ -1584,11 +1590,16 @@ namespace Gato_Exploso
             {
                 if (_players.ContainsKey("squirrell"))
                 {
-                    menu.Draw(_spriteBatch, new Vector2(_players["squirrell"].x - topLeftPixel.X, _players["squirrell"].y - topLeftPixel.Y), level1.randSeedDisp);
+                    foreach(Player pp in _players.Values)
+                    {
+                            playerL.Add(pp);
+                        
+                    }
+                    menu.Draw(_spriteBatch, new Vector2(_players["squirrell"].x - topLeftPixel.X, _players["squirrell"].y - topLeftPixel.Y), level1.randSeedDisp, playerL, topLeftPixel);
                 }
                 else
                 {
-                    menu.Draw(_spriteBatch, new Vector2(3000, 3000),  level1.randSeedDisp);
+                    menu.Draw(_spriteBatch, new Vector2(3000, 3000),  level1.randSeedDisp, playerL, topLeftPixel);
                 }
             }
 

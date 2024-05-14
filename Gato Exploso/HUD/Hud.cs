@@ -126,7 +126,7 @@ namespace Gato_Exploso.HUD
                     campColor = new Color(111, 111, 0);
                 }
                
-                spriteBatch.Draw(texture, new Rectangle(campX + (minimapLeft), campY + (minimapTop), 4, 4), campColor);
+                spriteBatch.Draw(texture, new Rectangle(campX + (minimapLeft), campY + (minimapTop), 6, 6), campColor);
             }
 
 

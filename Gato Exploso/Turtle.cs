@@ -10,10 +10,10 @@ namespace Gato_Exploso
         {
             hp = 999999;
             speed = 4;
-            Load();
             width = 64;
             height = 64;
             Name = nam;
+            Load();
         }
 
         public override void Attack()
@@ -32,13 +32,9 @@ namespace Gato_Exploso
             {
                 PTextureLeft = Content.Load<Texture2D>("Squirrell");
             }
-            else if (Name == "timmy" || (x < 1000 && y > 6500))
-            {
-                PTextureLeft = Content.Load<Texture2D>("Timmy");
-            }
             else
             {
-                PTextureLeft = Content.Load<Texture2D>("Squirrell");
+                PTextureLeft = Content.Load<Texture2D>("Timmy");
             }
         }
     }
