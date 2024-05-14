@@ -956,7 +956,7 @@ namespace Gato_Exploso
                 {
                     if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
                     {
-                
+                        GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).StartExplosion();
                     }
                 }
 
