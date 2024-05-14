@@ -952,7 +952,10 @@ namespace Gato_Exploso
                 {
                     MoveMobTowardPlayer(curMob, GetMainPlayer());
                 }
-
+                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32))
+                {
+                
+                }
 
             }
         }
