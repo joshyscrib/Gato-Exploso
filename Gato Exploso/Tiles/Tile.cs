@@ -175,6 +175,11 @@ namespace Gato_Exploso.Tiles
                     MightyBomb b = tileObj as MightyBomb;
                     b.DetonateBomb();
                 }
+                else if (tileObj.GetType() == typeof(LandMine))
+                {
+                    LandMine b = tileObj as LandMine;
+                    b.DetonateBomb();
+                }
                 else
                 {
                     objects.RemoveAt(i);
