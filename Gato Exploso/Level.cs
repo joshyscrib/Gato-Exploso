@@ -390,7 +390,7 @@ namespace Gato_Exploso
                     curTile.AddBomb(new MightyBomb(gameTime));
                     break;
                 case 2:
-                 //   curTile.AddBomb(new Bomb(gameTime));
+                    curTile.AddBomb(new LandMine(gameTime));
                     break;
                 case 3:
                  //   curTile.AddBomb(new Bomb(gameTime));
