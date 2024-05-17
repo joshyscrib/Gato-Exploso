@@ -62,7 +62,7 @@ namespace Gato_Exploso.HUD
             inventexture = Content.Load<Texture2D>("Inventory");
             invecture = Content.Load<Texture2D>("Invect");
             bombTexture = Content.Load<Texture2D>("Bomb1");
-            landMineTexture = Content.Load<Texture2D>("LandMine");
+            landMineTexture = Content.Load<Texture2D>("Landmine");
             mightyTexture = Content.Load<Texture2D>("MightyBomb");
             gravTexture = Content.Load<Texture2D>("GravBomb");
         }
@@ -126,7 +126,7 @@ namespace Gato_Exploso.HUD
                     campColor = new Color(111, 111, 0);
                 }
                
-                spriteBatch.Draw(texture, new Rectangle(campX + (minimapLeft), campY + (minimapTop), 6, 6), campColor);
+                spriteBatch.Draw(texture, new Rectangle(campX + (minimapLeft) + 14, campY + (minimapTop) + 11, 7, 7), campColor);
             }
 
 

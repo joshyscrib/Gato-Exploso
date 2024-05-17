@@ -180,9 +180,18 @@
         function getPlayerLocations() {
             var curTime = Date.now();
             var offsetTime = lastGameTime;
+   
             if (curTime - lastFullUpdate > 1000) {
                 lastFullUpdate = curTime;
                 offsetTime = 0;
+                for (var i = 0; i < 256; i++) {
+                    for (var j = 0; j < 256; j++) {
+                        var tile = tiles[i][j];
+                        tile.hasBomb = false;
+                        tile.hasRock = false;
+                        tile.hasTree = false;
+                    }
+                }
             }
             $.get("/playerinfo?name=" + playerName + "&knonce=" + tick++ + "&time=" + offsetTime, parsePlayers).always(function (d) {
                 var elapsed = Date.now() - curTime;
@@ -708,7 +717,40 @@
                 }
                 // draws names
                 if (curPlayer.Name == "gato") {
-                    ctx.fillStyle = 'red'
+                    ctx.fillStyle = 'red';
+
+                    var xDelta = mainPlayerX - curPlayer.X;
+                    var yDelta = mainPlayerY - curPlayer.Y;
+                    /*
+                    // hypotenuse is 50
+                    var amt = yDelta / xDelta;
+                    var angle = Math.atan(amt);
+                    // we have angle and hypotenuse
+                    var newX = Math.sin(angle) * 50;
+                    var newY = Math.cos(angle) * 50;
+
+                    console.log(angle);
+                    */
+                    var newX = 0;
+                    var newY = 0;
+                    if (xDelta > 0) {
+                        newX -= 35;
+                    }
+                    else {
+                        newX += 35;
+                    }
+
+                    if (yDelta > 0) {
+                        newY -= 35;
+                    }
+                    else {
+                        newY += 35;
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(362+newX,347+newY);
+                    
+                    ctx.lineTo(362 + (newX*2), 347 + (newY*2));
+                    ctx.stroke();
                 }
                 else {
                     ctx.fillStyle = 'blue';
@@ -740,6 +782,9 @@
                 }
 
             }
+
+            // draw an error pointing to cur player
+        
             /*
             for (var i = 0; i < tileRows; i++) {
                 for (var j = 0; j < tileRows; j++) {

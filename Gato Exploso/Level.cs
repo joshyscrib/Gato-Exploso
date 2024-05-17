@@ -32,6 +32,8 @@ namespace Gato_Exploso
         public const int yTiles = 256;
         private int campX = -1;
         private  int campY = -1;
+        int hammyX = -1;
+        int hammyY = -1;
         // width/height of each tile
         public const int tileSide = 32;
         // matrix of tiles
@@ -174,6 +176,7 @@ namespace Gato_Exploso
             return GetTile((int)loc.X, (int)loc.Y);
         }
         // updates the total gametime variable
+        int lastMineSoundTime = 0;
         public void UpdateTime(double time)
         {
             gameTime = time;
@@ -185,7 +188,16 @@ namespace Gato_Exploso
                 int j = (int)coord.Y;
                 if (tiles[i, j].bombExploded)
                 {
-                    bombSound.Play();
+                    tiles[i, j].bombExploded = false;
+                    if(Game1.Instance.GetTime() - lastMineSoundTime > 100 && tiles[i, j].range == 3)
+                    {
+                        lastMineSoundTime = Game1.Instance.GetTime();
+                        bombSound.Play();
+                    }
+                    else if(tiles[i, j].range != 3)
+                    {
+                        bombSound.Play();
+                    }
                     var nearbyCoords = GetCoordsAroundTile(i, j, tiles[i,j].range);
                     
                     foreach (Vector2 coord2 in nearbyCoords)
@@ -196,7 +208,7 @@ namespace Gato_Exploso
 
                     }
 
-                    tiles[i, j].bombExploded = false;
+                    
                     if (tiles[i, j].isActive())
                     {
                         coordsToRemove.Add(new Vector2(i, j));
@@ -282,9 +294,10 @@ namespace Gato_Exploso
                         default:
                             break;
                     }
-                    if(i == campX && j == campY)
+                    if (i == campX && j == campY && !Game1.randSeed)
                     {
                         tile = new CampTile();
+                    
                     }
                     tiles[i, j] = tile;
                     tiles[i, j].x = i;
@@ -296,7 +309,7 @@ namespace Gato_Exploso
         }
 
         // Draws all of the tiles relative to the player's position
-        public void Draw(SpriteBatch spritebatch, Vector2 TLPixel, int SWidth, int SHeight, int playerX, int playerY)
+        public void Draw(SpriteBatch spritebatch, Vector2 TLPixel, int SWidth, int SHeight, int playerX, int playerY, string questDot)
         {
             // sets variables for the offset of tiles
             int tileXOffset = 0 - (int)TLPixel.X;
@@ -337,12 +350,21 @@ namespace Gato_Exploso
 
                 }
             }
-            if(campX > 0)
+            if (campX > 0 && questDot == "camp")
             {
-       
-                    int drawX = (campX * tileSide) + tileXOffset;
-                    int drawY = (campY * tileSide) + tileYOffset;
-                    tiles[campX, campY].Draw(spritebatch, drawX, drawY);
+
+                int drawX = (campX * tileSide) + tileXOffset;
+                int drawY = (campY * tileSide) + tileYOffset;
+                tiles[campX, campY].Draw(spritebatch, drawX, drawY);
+                tiles[campX, campY - 1].Draw(spritebatch, drawX, drawY);
+            }
+            if (hammyX > 0 && questDot == "camp")
+            {
+
+                int drawX = (campX * tileSide) + tileXOffset;
+                int drawY = (campY * tileSide) + tileYOffset;
+                tiles[campX, campY].Draw(spritebatch, drawX, drawY);
+                tiles[campX, campY - 1].Draw(spritebatch, drawX, drawY);
             }
         }
         // checks if the coordinate is in bounds
@@ -390,7 +412,7 @@ namespace Gato_Exploso
                     curTile.AddBomb(new MightyBomb(gameTime));
                     break;
                 case 2:
-                    curTile.AddBomb(new LandMine(gameTime));
+                    curTile.AddBomb(new Landmine(gameTime));
                     break;
                 case 3:
                  //   curTile.AddBomb(new Bomb(gameTime));

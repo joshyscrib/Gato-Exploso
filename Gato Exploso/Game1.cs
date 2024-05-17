@@ -16,6 +16,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using System.Reflection.Metadata;
 using System.Net.Http.Headers;
+using System.Data;
+using System.Threading;
 
 namespace Gato_Exploso
 {
@@ -48,10 +50,10 @@ namespace Gato_Exploso
         int targetX = 300;
         int targetY = 300;
 
-        
+
 
         // difficulty
-        public static int difficultyNumber = 1;
+        public static int difficultyNumber = 2;
         // Number for how many rows of tiles there are
         const int tileRows = 256;
         public const int tileSide = 32;
@@ -152,7 +154,7 @@ namespace Gato_Exploso
                 squirrell.x = GetMainPlayer().x - 130;
                 squirrell.y = GetMainPlayer().y - 130;
             }
-            if(which == "timmy")
+            if (which == "timmy")
             {
                 if (!_players.ContainsKey("timmy"))
                 {
@@ -185,6 +187,7 @@ namespace Gato_Exploso
             lastFullUpdateTime.Clear();
             level1.ResetLevel();
             bossFightStarted = false;
+            hammy = null;
             // set players scores to 0
             mobs.Clear();
             for (int i = 0; i < tileRows; i++)
@@ -199,12 +202,18 @@ namespace Gato_Exploso
                 if (p.GetType() != typeof(Turtle))
                 {
                     SpawnPlayer(p);
-                
+
                 }
             }
             paused = false;
-            SpawnTurtle("squirrell");
-
+            if (!randSeed)
+            {
+                SpawnTurtle("squirrell");
+            }
+            mightys = 0;
+            mines = 0;
+            gravs = 0;
+            curDiall = 0;
         }
 
         // spawns players/mobs
@@ -229,10 +238,10 @@ namespace Gato_Exploso
         // spawns players/mobs
         public void SpawnPlayer(Player dude)
         {
-            if (!randSeed  && dude.Name == "gato")
+            if (!randSeed && dude.Name == "gato")
             {
-                dude.x = 200;
-                dude.y = 6000;
+                dude.x = 7500;
+                dude.y = 7800;
             }
             else
             {
@@ -249,7 +258,7 @@ namespace Gato_Exploso
                         _players[dude.Name].y = ny * 32;
                     }
                 }
-               
+
             }
             dude.points = 0;
             _players[dude.Name].hp = 100;
@@ -278,7 +287,7 @@ namespace Gato_Exploso
                 curPlayer.X = player.x;
                 curPlayer.Y = player.y;
                 list.Add(curPlayer);
-       
+
                 curPlayer.Health = (int)player.hp;
                 curPlayer.Facing = player.facing;
                 curPlayer.Points = player.points;
@@ -342,6 +351,11 @@ namespace Gato_Exploso
 
                         objectInfoStrings.Add(objectInfo.CreateInfoString(tile.x, tile.y));
                     }
+                    if (tile.GetTileObjects().Count == 0)
+                    {
+                        String noObject = String.Format("{0},{1},{2}", tile.x, tile.y, 0);
+                        objectInfoStrings.Add(noObject);
+                    }
                     information.ObjectInfos = objectInfos;
                     tileInfos.Add(information);
 
@@ -350,37 +364,37 @@ namespace Gato_Exploso
                 //  if (fullUpdate)
                 {
                     tileInfos.Add(information);
-                   // tileInfoStrings.Add(information.CreateInfoString());
+                    // tileInfoStrings.Add(information.CreateInfoString());
                 }
             }
-            
+
             List<MobInfo> mobInfos = new List<MobInfo>();
             var mobInfoStrings = new List<string>();
-            
-           foreach (var curMob in mobs)
+
+            foreach (var curMob in mobs)
             {
-               // if (FindDistance(curMob.x, curMob.y, _players[playerName].x, _players[playerName].y) < 600)
+                // if (FindDistance(curMob.x, curMob.y, _players[playerName].x, _players[playerName].y) < 600)
                 {
-                MobInfo mobInfo = new MobInfo();
-                mobInfo.X = curMob.x;
-                mobInfo.Y = curMob.y;
-                mobInfo.Id = curMob.id;
-                if (curMob.GetType() == typeof(BouncyTriangle))
-                {
+                    MobInfo mobInfo = new MobInfo();
+                    mobInfo.X = curMob.x;
+                    mobInfo.Y = curMob.y;
+                    mobInfo.Id = curMob.id;
+                    if (curMob.GetType() == typeof(BouncyTriangle))
+                    {
                         mobInfo.Type = MobType.Triangle;
-                }
-                if (curMob.GetType() == typeof(Porcupine))
-                {
+                    }
+                    if (curMob.GetType() == typeof(Porcupine))
+                    {
                         mobInfo.Type = MobType.Porcupine;
-                }
+                    }
 
 
                     mobInfos.Add(mobInfo);
                     mobInfoStrings.Add(mobInfo.CreateInfoString());
                 }
-                
+
             }
-            
+
 
             List<ProjectileInfo> eggInfos = new List<ProjectileInfo>();
             for (int i = eggs.Count - 1; i >= 0; i--)
@@ -411,13 +425,13 @@ namespace Gato_Exploso
                 eggInfos.Add(pInfo);
             }
             info.ProjectileInfos = eggInfos;
-          //  info.TileInfos = tileInfos;
-          //  info.MobInfos = mobInfos;
-          //  info.PlayerInfos = list;
+            //  info.TileInfos = tileInfos;
+            //  info.MobInfos = mobInfos;
+            //  info.PlayerInfos = list;
             info.GameTime = (int)currentTime;
 
-         
-            
+
+
             StringBuilder tileInfoBuilder = new StringBuilder();
             for (int i = 0; i < tileInfoStrings.Count; i++)
             {
@@ -473,7 +487,8 @@ namespace Gato_Exploso
         public List<Player> GetPlayers()
         {
             List<Player> li = new List<Player>();
-            try {
+            try
+            {
                 foreach (Player p in _players.Values)
                 {
                     li.Add(p);
@@ -494,7 +509,7 @@ namespace Gato_Exploso
             server.PlayerRegister += Server_PlayerRegister;
             if (!randSeed)
             {
-                SpawnPlayer(GetMainPlayer(),7810, 7112);
+                SpawnPlayer(GetMainPlayer(), 7810, 7112);
             }
             else
             {
@@ -514,13 +529,17 @@ namespace Gato_Exploso
             switch (curDiall)
             {
                 case 4:
-                    PauseGame("introDial2");
+                    PauseGame("QintroDial2");
+                    SpawnTurtle("squirrell");
                     break;
                 case 6:
-                    PauseGame("timmyDial2");
+                    PauseGame("QtimmyDial2");
+                    SpawnTurtle("squirrell");
                     break;
                 case 7:
-                    PauseGame("bossDial");
+                    PauseGame("QbossDial");
+                    SpawnTurtle("squirrell");
+
                     break;
                 default:
                     break;
@@ -530,6 +549,10 @@ namespace Gato_Exploso
         {
             switch (curDiall)
             {
+                case 0:
+                    PauseGame("introDial");
+                    curDiall = 2;
+                    return;
                 case 1:
                     PauseGame("introDial");
                     curDiall = 2;
@@ -546,147 +569,164 @@ namespace Gato_Exploso
 
 
                 case 4:
-                    PauseGame("timmyDial");
-                    curDiall = 5;
-                    return;
-                case 5:
-                    PauseGame("timmyDial2");
-                    curDiall = 6;
-                    return;
-
-
-                case 6:
-                    PauseGame("bossDial");
-                    curDiall = 7;
-                    return;
-
-            }
-        }
-        public HashSet<Entity> GetCollidingEntities(Rectangle rect, Player play)
-        {
-            HashSet<Entity> entities = new HashSet<Entity>();
-            if (CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, play))
-            {
-                entities.Add(play);
-            }
-            /* foreach (Player ost in _players.Values)
-            {
-                if (ost.GetType() != typeof(MainPlayer) && CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, ost))
-                {
-                    entities.Add(ost);
-                }
-
-            }
-            */
-            return entities;
-        }
-        // registers players on the web
-        private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
-        {
-            // gives players information
-            string playerName = args.Name;
-            if (_players.ContainsKey(playerName))
-            {
-                return;
-            }
-            Ostrich ost = new Ostrich(Content, currentTime);
-            ost.Name = playerName;
-            ost.Load();
-
-            // adds new player to the list of player
-            _players.Add(playerName, ost);
-            SpawnPlayer(ost);
-
-        }
-        // handles player action like moving and attacking
-        private void Server_PlayerAction(object sender, PlayerActionArgs args)
-        {
-            if (_players.ContainsKey(args.name))
-            {
-                Player pl = _players[args.name];
-                if (args.direction != null && args.direction.IsDirectionSet())
-                {
-                    pl.StartMoving();
-                    pl.FacePlayer(args.direction);
-                }
-                else
-                {
-                    pl.StopMoving();
-                }
-                //      MovePlayer(pl);
-                if (args.attack)
-                {
-                    Attack(pl);
-                }
-                if (args.shoot)
-                {
-                    Shoot(pl);
-                }
-            }
-        }
-        // ostrich attack
-        public void Attack(Player player)
-        {
-            HashSet<Vector2> attackCoords = new HashSet<Vector2>();
-            // decides which tiles to attack based on which direction the player is facing
-            if (player.facing.Up)
-            {
-                attackCoords.Add(new Vector2(player.x / 32, (player.y / 32) - 1));
-                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
-                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
-            }
-            if (player.facing.Left)
-            {
-                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
-                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32)));
-                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
-            }
-            if (player.facing.Down)
-            {
-                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
-                attackCoords.Add(new Vector2((player.x / 32), (player.y / 32) + 1));
-                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
-            }
-            if (player.facing.Right)
-            {
-                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
-                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
-                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
-            }
-
-            foreach (Player play in _players.Values)
-            {
-                if (play != player)
-                {
-                    // 
-                    HashSet<Vector2> playerCoords = GetPlayerTiles(play);
-                    if (attackCoords.Intersect(playerCoords).Count() > 0)
+                    if (GetMainPlayer().points >= 10)
                     {
-                        /* remove*/
-                        play.hp -= 6;
-                        if (play.Name == "gato")
-                        {
-                            play.hp -= 10;
-                        }
+                        PauseGame("bossDial");
+                        curDiall = 7;
+                        return;
+                    }
+                    else
+                    {
+                        PauseGame("timmyDial");
+                        curDiall = 5;
+                        return;
+                    }
+                case 5:
+                    if (GetMainPlayer().points >= 10)
+                    {
+                        PauseGame("bossDial");
+                        curDiall = 7;
+                        return;
+                    }
+                    else
+                    {
+                        PauseGame("timmyDial2");
+                        curDiall = 6;
+                        return;
                     }
 
+                case 6:
+                        PauseGame("bossDial");
+                        curDiall = 7;
+                        return;
+
+            }
+        }
+            public HashSet<Entity> GetCollidingEntities(Rectangle rect, Player play)
+            {
+                HashSet<Entity> entities = new HashSet<Entity>();
+                if (CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, play))
+                {
+                    entities.Add(play);
+                }
+                /* foreach (Player ost in _players.Values)
+                {
+                    if (ost.GetType() != typeof(MainPlayer) && CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, ost))
+                    {
+                        entities.Add(ost);
+                    }
 
                 }
+                */
+                return entities;
             }
-        }
-        public void Shoot(Player player)
-        {
-            // sets cooldown between shots
-            if (Instance.currentTime - player.lastTimeFired >= 400)
+            // registers players on the web
+            private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
             {
-                player.lastTimeFired = Instance.currentTime;
-                Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000, player.Name);
-                // sets egg's location, direction and speed to match the player that shot it
+                // gives players information
+                string playerName = args.Name;
+                if (_players.ContainsKey(playerName))
+                {
+                    return;
+                }
+                Ostrich ost = new Ostrich(Content, currentTime);
+                ost.Name = playerName;
+                ost.Load();
 
-                eggs.Add(egg);
+                // adds new player to the list of player
+                _players.Add(playerName, ost);
+                SpawnPlayer(ost);
+
             }
+            // handles player action like moving and attacking
+            private void Server_PlayerAction(object sender, PlayerActionArgs args)
+            {
+                if (_players.ContainsKey(args.name))
+                {
+                    Player pl = _players[args.name];
+                    if (args.direction != null && args.direction.IsDirectionSet())
+                    {
+                        pl.StartMoving();
+                        pl.FacePlayer(args.direction);
+                    }
+                    else
+                    {
+                        pl.StopMoving();
+                    }
+                    //      MovePlayer(pl);
+                    if (args.attack)
+                    {
+                        Attack(pl);
+                    }
+                    if (args.shoot)
+                    {
+                        Shoot(pl);
+                    }
+                }
+            }
+            // ostrich attack
+            public void Attack(Player player)
+            {
+                HashSet<Vector2> attackCoords = new HashSet<Vector2>();
+                // decides which tiles to attack based on which direction the player is facing
+                if (player.facing.Up)
+                {
+                    attackCoords.Add(new Vector2(player.x / 32, (player.y / 32) - 1));
+                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
+                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
+                }
+                if (player.facing.Left)
+                {
+                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
+                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32)));
+                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
+                }
+                if (player.facing.Down)
+                {
+                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
+                    attackCoords.Add(new Vector2((player.x / 32), (player.y / 32) + 1));
+                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
+                }
+                if (player.facing.Right)
+                {
+                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
+                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
+                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
+                }
 
-        }
+                foreach (Player play in _players.Values)
+                {
+                    if (play != player)
+                    {
+                        // 
+                        HashSet<Vector2> playerCoords = GetPlayerTiles(play);
+                        if (attackCoords.Intersect(playerCoords).Count() > 0)
+                        {
+                            /* remove*/
+                            play.hp -= 6;
+                            if (play.Name == "gato")
+                            {
+                                play.hp -= 10;
+                            }
+                        }
+
+
+                    }
+                }
+            }
+            public void Shoot(Player player)
+            {
+                // sets cooldown between shots
+                if (Instance.currentTime - player.lastTimeFired >= 400)
+                {
+                    player.lastTimeFired = Instance.currentTime;
+                    Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000, player.Name);
+                    // sets egg's location, direction and speed to match the player that shot it
+
+                    eggs.Add(egg);
+                }
+
+            }
 
         // loads images for different classes
         protected override void LoadContent()
@@ -705,7 +745,10 @@ namespace Gato_Exploso
             MediaPlayer.IsRepeating = true;
             PauseGame("splash");
             MediaPlayer.Volume = (float).5;
-            SpawnTurtle("timmy");
+            if (!randSeed)
+            {
+                SpawnTurtle("timmy");
+            }
         }
 
         public bool IsPassableCoord(int x, int y)
@@ -795,9 +838,9 @@ namespace Gato_Exploso
                 // updates the offset between screen and world coordinates
                 if (gato is MainPlayer)
                 {
-                    if(gato.x < 1500 && gato.y > 6500)
+                    if (gato.x < 1500 && gato.y > 6500)
                     {
-                        if(curSong != campSong)
+                        if (curSong != campSong)
                         {
                             MediaPlayer.Play(campSong);
                             curSong = campSong;
@@ -805,7 +848,7 @@ namespace Gato_Exploso
                     }
                     else
                     {
-                        if(curSong != music)
+                        if (curSong != music)
                         {
                             MediaPlayer.Play(music);
                             curSong = music;
@@ -952,62 +995,66 @@ namespace Gato_Exploso
                 {
                     MoveMobTowardPlayer(curMob, GetMainPlayer());
                 }
-                if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
+                try
                 {
-                    if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
+                    if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
                     {
-                        GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).startExplosion();
+                        if (getTileAt((int)curMob.x, (int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
+                        }
+                    }
+                    else if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects().Count > 0)
+                    {
+                        if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)(curMob.x + 32), (int)curMob.y).bombExploded = true;
+                        }
+                    }
+                    else if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects().Count > 0)
+                    {
+                        if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)curMob.x, (int)(curMob.y + 32)).bombExploded = true;
+                        }
+                    }
+                    else if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects().Count > 0)
+                    {
+                        if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).bombExploded = true;
+                        }
+                    }
+                    else if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
+                    {
+                        if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
+                        }
+                    }
+                    else if ((getTileAt(curMob.x + 64, curMob.y).GetTileObjects().Count > 0))
+                    {
+                        if (getTileAt(curMob.x + 64, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt(curMob.x + 64, curMob.y).bombExploded = true;
+                        }
+                    }
+                    else if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects().Count > 0)
+                    {
+                        if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)curMob.x, (int)(curMob.y + 64)).bombExploded = true;
+                        }
+                    }
+                    else if (getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).GetTileObjects().Count > 0)
+                    {
+                        if (getTileAt(curMob.x + 64, curMob.y + 64).GetTileObjects()[0].GetType() == typeof(Landmine))
+                        {
+                            getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).bombExploded = true;
+                        }
                     }
                 }
-                else if((GetTileAt((int)curMob.x + 32) / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
-                {
-                    if((GetTileAt((int)curMob.x + 32) / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
-                    {
-                        GetTileAt((int)curMob.x + 32) / 32,(int)curMob.y / 32).GetTileObjects().startExplosion();
-                    }
-                }
-                else if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 32) / 32).GetTileObjects().Count > 0)
-                {
-                    if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 32) / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
-                    {
-                        GetTileAt((int)curMob.x / 32,(int)(curMob.y + 32) / 32).GetTileObjects().startExplosion();
-                    }
-                }
-                else if(GetTileAt((int)(curMob.x + 32) / 32,(int)(curMob.y + 32) / 32).GetTileObjects().Count > 0)
-                {
-                    if(GetTileAt((int)(curMob.x + 32) / 32,(int)(curMob.y + 32) / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
-                    {
-                        GetTileAt((int)(curMob.x + 32) / 32,(int)(curMob.y + 32) / 32).GetTileObjects().startExplosion();
-                    }
-                }
-                else if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
-                {
-                    if(GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
-                    {
-                        GetTileAt((int)curMob.x / 32,(int)curMob.y / 32).startExplosion();
-                    }
-                }
-                else if((GetTileAt((int)curMob.x + 64) / 32,(int)curMob.y / 32).GetTileObjects().Count > 0)
-                {
-                    if(((GetTileAt((int)curMob.x + 64) / 32,(int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
-                    {
-                        (GetTileAt((int)curMob.x + 64) / 32,(int)curMob.y / 32).GetTileObjects().startExplosion();
-                    }
-                }
-                else if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 64) / 32).GetTileObjects().Count > 0)
-                {
-                    if(GetTileAt((int)curMob.x / 32,(int)(curMob.y + 64) / 32).GetTileObjects()[0].GetType() == typeof(LandMine))
-                    {
-                        GetTileAt((int)curMob.x / 32,(int)(curMob.y + 64) / 32).GetTileObjects().startExplosion();
-                    }
-                }
-                else if(GetTileAt((int)(curMob.x + 64) / 32,(int)(curMob.y + 64) / 32).GetTileObjects().Count > 0)
-                {
-                    if(GetTileAt((int)(curMob.x + 64) / 32,(int)(curMob.y + 64) / 32)[0].GetType() == typeof(LandMine))
-                    {
-                        GetTileAt((int)(curMob.x + 64) / 32,(int)(curMob.y + 64) / 32).startExplosion();
-                    }
-                }
+                catch (Exception e) { }
 
             }
         }
@@ -1074,10 +1121,32 @@ namespace Gato_Exploso
         {
             int tileX = x / 32;
             int tileY = y / 32;
+            if (tileY >= 256)
+            {
+                tileY = 255;
+            }
+
+            if (tileX >= 256)
+            {
+                tileX = 255;
+            }
+
+            if (tileX < 0)
+            {
+                tileX = 0;
+            }
+
+            if (tileY < 0)
+            {
+                tileY = 0;
+            }
+
             if (tileX >= 0 && tileY >= 0 && tileX < tileRows && tileY < tileRows)
             {
                 return level1.tiles[tileX, tileY];
             }
+
+
 
             return null;
         }
@@ -1109,7 +1178,7 @@ namespace Gato_Exploso
             }
             else if (hud.scrollAmt < 0)
             {
-                hud.scrollAmt += 3;
+                hud.scrollAmt += 4;
                 ResetScrollAmt();
             }
             else
@@ -1123,7 +1192,7 @@ namespace Gato_Exploso
             bool hasBeenTouched = false;
             MouseState cursor = new MouseState();
             cursor = Mouse.GetState();
-            hud.scrollAmt = cursor.ScrollWheelValue / 120;
+            hud.scrollAmt = -cursor.ScrollWheelValue / 120;
             ResetScrollAmt();
             var state = Keyboard.GetState();
             if (state.IsKeyDown(Keys.Escape) && gameTime.TotalGameTime.TotalMilliseconds - lastPausedTime > 250)
@@ -1131,7 +1200,7 @@ namespace Gato_Exploso
                 lastPausedTime = gameTime.TotalGameTime.TotalMilliseconds;
                 if (paused)
                 {
-                    if(menu.menuType != "splash")
+                    if (menu.menuType != "splash" && menu.menuType != "dead")
                     {
                         ResumeGame();
                     }
@@ -1142,6 +1211,18 @@ namespace Gato_Exploso
                     if (menu.menuType == "timmyDial2" && _players.ContainsKey("timmy"))
                     {
                         _players.Remove("timmy");
+                    }
+                    if (menu.menuType == "QintroDial2" && _players.ContainsKey("squirrell"))
+                    {
+                        _players.Remove("squirrell");
+                    }
+                    if (menu.menuType == "QtimmyDial2" && _players.ContainsKey("squirrell"))
+                    {
+                        _players.Remove("squirrell");
+                    }
+                    if (menu.menuType == "bossDial" && _players.ContainsKey("squirrell"))
+                    {
+                        _players.Remove("squirrell");
                     }
                 }
                 else
@@ -1167,7 +1248,7 @@ namespace Gato_Exploso
             }
             if (mobs.Count < 6 * (1 + (difficultyNumber / 2)))
             {
-                
+
                 BouncyTriangle tri = new BouncyTriangle(Content);
                 SpawnMob(tri);
                 mobs.Add(tri);
@@ -1175,7 +1256,7 @@ namespace Gato_Exploso
                 Porcupine pork = new Porcupine(Content);
                 SpawnMob(pork);
                 mobs.Add(pork);
-                
+
             }
 
 
@@ -1192,12 +1273,12 @@ namespace Gato_Exploso
                 {
                     hams.Add(hammy.ShootHam(GetMainPlayer().x, GetMainPlayer().y, Content));
                 }
-              
-                    for(int i = hams.Count - 1; i >= 0; i--)
-                    {
-                        Ham ham = hams[i];
-                  
-                        ham.Move();
+
+                for (int i = hams.Count - 1; i >= 0; i--)
+                {
+                    Ham ham = hams[i];
+
+                    ham.Move();
                     if (CollisionDetection.AreRectsInEachOther(GetMainPlayer().x, GetMainPlayer().y, GetMainPlayer().width, GetMainPlayer().height, ham))
                     {
                         hams.Remove(ham);
@@ -1242,7 +1323,10 @@ namespace Gato_Exploso
                     GetMainPlayer().points++;
                     if (GetMainPlayer().points >= 10)
                     {
-                        SpawnTurtle("squirrell");
+                        if (!randSeed)
+                        {
+                            SpawnTurtle("squirrell");
+                        }
                         beginBossFight = true;
                     }
                     int br = bombRand.Next(1, 10);
@@ -1498,11 +1582,11 @@ namespace Gato_Exploso
                         if (mightys > 0)
                         {
                             hasEnoughBombs = true;
-                            if(currentTime - lastBombTime >= 1000)
+                            if (currentTime - lastBombTime >= 1000)
                             {
                                 mightys--;
                             }
-                            
+
                         }
                         break;
                     case 2:
@@ -1513,7 +1597,7 @@ namespace Gato_Exploso
                             {
                                 mines--;
                             }
-                            
+
                         }
                         break;
                     case 3:
@@ -1524,7 +1608,7 @@ namespace Gato_Exploso
                             {
                                 gravs--;
                             }
-                            
+
                         }
                         break;
                 }
@@ -1597,9 +1681,16 @@ namespace Gato_Exploso
             // finding top-left pixel of the screen
             var topLeftPixel = new Vector2(p.x - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2), p.y - (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2));
             _spriteBatch.Begin();
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.SeaGreen);
 
-            level1.Draw(_spriteBatch, topLeftPixel, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, p.x, p.y);
+            if (curDiall < 2)
+            {
+                level1.Draw(_spriteBatch, topLeftPixel, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, p.x, p.y, "camp");
+            }
+            else
+            {
+                level1.Draw(_spriteBatch, topLeftPixel, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height, p.x, p.y, "boss");
+            }
 
             foreach (Player play in _players.Values)
             {
@@ -1633,7 +1724,7 @@ namespace Gato_Exploso
             // draws ham
             foreach (Ham hum in hams)
             {
-                hum.Draw(_spriteBatch,  -(int)topLeftPixel.X,  -(int)topLeftPixel.Y);
+                hum.Draw(_spriteBatch, -(int)topLeftPixel.X, -(int)topLeftPixel.Y);
             }
             MainPlayer player = new MainPlayer(Content);
             if (p.GetType() == typeof(MainPlayer))
@@ -1646,16 +1737,16 @@ namespace Gato_Exploso
             {
                 if (_players.ContainsKey("squirrell"))
                 {
-                    foreach(Player pp in _players.Values)
+                    foreach (Player pp in _players.Values)
                     {
-                            playerL.Add(pp);
-                        
+                        playerL.Add(pp);
+
                     }
                     menu.Draw(_spriteBatch, new Vector2(_players["squirrell"].x - topLeftPixel.X, _players["squirrell"].y - topLeftPixel.Y), level1.randSeedDisp, playerL, topLeftPixel);
                 }
                 else
                 {
-                    menu.Draw(_spriteBatch, new Vector2(3000, 3000),  level1.randSeedDisp, playerL, topLeftPixel);
+                    menu.Draw(_spriteBatch, new Vector2(3000, 3000), level1.randSeedDisp, playerL, topLeftPixel);
                 }
             }
 

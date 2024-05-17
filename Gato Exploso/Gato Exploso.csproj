@@ -60,7 +60,7 @@
     <None Update="Content\Content.mgcb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Content\cReDiTsSs.png">
+    <None Update="Content\Credits.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Egg.png">

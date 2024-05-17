@@ -11,7 +11,13 @@ namespace Gato_Exploso.Mobs
     {
         protected ContentManager Content;
         protected Texture2D texture;
+        protected Texture2D texture2;
+        protected Texture2D texture3;
+        protected Texture2D texture4;
         protected Texture2D oppTexture;
+        protected Texture2D oppTexture2;
+        protected Texture2D oppTexture3;
+        protected Texture2D oppTexture4;
         protected Texture2D curTexture;
 
         // bouncy triangle is good during the day
@@ -50,7 +56,13 @@ namespace Gato_Exploso.Mobs
         public void Load()
         {
             texture = Content.Load<Texture2D>("BouncyTriangle");
+            texture2 = Content.Load<Texture2D>("BouncyTriangle2");
+            texture3 = Content.Load<Texture2D>("BouncyTriangle3");
+            texture4 = Content.Load<Texture2D>("BouncyTriangle4");
             oppTexture = Content.Load<Texture2D>("BadBouncyTriangle");
+            oppTexture2 = Content.Load<Texture2D>("BadBouncyTriangle2");
+            oppTexture3 = Content.Load<Texture2D>("BadBouncyTriangle3");
+            oppTexture4 = Content.Load<Texture2D>("BadBouncyTriangle4");
         }
 
 

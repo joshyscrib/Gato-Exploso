@@ -53,7 +53,7 @@ namespace Gato_Exploso.HUD
         }
         public void Tick()
         {
-            time += 0.1d;
+            time += 0.13d;
             if (time > 359)
             {
                 time -= 360;

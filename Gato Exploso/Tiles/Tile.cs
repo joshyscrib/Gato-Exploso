@@ -139,6 +139,10 @@ namespace Gato_Exploso.Tiles
                 {
                     range = 2;
                 }
+                else if (tileObj.GetType() == typeof(Landmine))
+                {
+                    range = 3;
+                }
             }
             lastModifiedTime = Game1.Instance.GetTime();
         }
@@ -175,9 +179,9 @@ namespace Gato_Exploso.Tiles
                     MightyBomb b = tileObj as MightyBomb;
                     b.DetonateBomb();
                 }
-                else if (tileObj.GetType() == typeof(LandMine))
+                else if (tileObj.GetType() == typeof(Landmine))
                 {
-                    LandMine b = tileObj as LandMine;
+                    Landmine b = tileObj as Landmine;
                     b.DetonateBomb();
                 }
                 else

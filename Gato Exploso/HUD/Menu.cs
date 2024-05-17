@@ -73,7 +73,7 @@ namespace Gato_Exploso.HUD
             font = Content.Load<SpriteFont>("Norm");
             titleFont = Content.Load<SpriteFont>("Title");
             splashTexture = Content.Load<Texture2D>("GatoPosterMenu");
-            credits = Content.Load<Texture2D>("cReDiTsSs");
+            credits = Content.Load<Texture2D>("Credits");
             i1 = Content.Load<Texture2D>("IntroD");
             i2 = Content.Load<Texture2D>("IntroD2");
             i3 = Content.Load<Texture2D>("IntroD3");
@@ -128,7 +128,7 @@ namespace Gato_Exploso.HUD
                 new Vector2(55, 25),
                 Color.Black
                 );
-                if (Game1.randSeed)
+                if (!Game1.randSeed)
                 {
                     spriteBatch.Draw(texture, new Rectangle(2060, 820, 155, 155), new Color(12, 174, 0));
                 }
@@ -235,6 +235,17 @@ namespace Gato_Exploso.HUD
                 Color.Black
                 );
             }
+            if (menuType == "QintroDial2")
+            {
+                spriteBatch.Draw(i2, new Vector2(turtle.X - 490, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 350, turtle.Y - 70),
+                Color.Black
+                );
+            }
             if (menuType == "introDial3")
             {
                 spriteBatch.Draw(i3, new Vector2(turtle.X - 500, turtle.Y - 50), Color.White);
@@ -268,7 +279,29 @@ namespace Gato_Exploso.HUD
                 Color.Black
                 );
             }
+            if (menuType == "QtimmyDial2")
+            {
+                spriteBatch.Draw(t2, new Vector2(turtleTim.X - 400 - (int)offsetpix.X, turtleTim.Y - 50 - (int)offsetpix.Y), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtleTim.X - 295, turtleTim.Y - 70),
+                Color.Black
+                );
+            }
             if (menuType == "bossDial")
+            {
+                spriteBatch.Draw(m1, new Vector2(turtle.X - 480, turtle.Y - 50), Color.White);
+                spriteBatch.DrawString
+                (
+                font,
+                "Press esc to continue",
+                new Vector2(turtle.X - 295, turtle.Y - 70),
+                Color.Black
+                );
+            }
+            if (menuType == "QbossDial")
             {
                 spriteBatch.Draw(m1, new Vector2(turtle.X - 480, turtle.Y - 50), Color.White);
                 spriteBatch.DrawString
