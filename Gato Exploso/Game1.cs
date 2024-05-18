@@ -1488,7 +1488,7 @@ namespace Gato_Exploso
             }
 
 
-            if (beginBossFight && !bossFightStarted)
+            if (beginBossFight && !bossFightStarted && !randSeed)
             {
                 StartBossFight();
             }
