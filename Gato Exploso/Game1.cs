@@ -31,6 +31,7 @@ namespace Gato_Exploso
         public Song menuMusic;
         public Song curSong;
         public Song campSong;
+        public Song hammySong;
 
         // private Player gato;
         private Dictionary<string, Player> _players = new Dictionary<string, Player>();
@@ -182,12 +183,19 @@ namespace Gato_Exploso
 
         public void ResetGame()
         {
-
+            hud.clock.time = 270;
+            hud.clock.rotation = 0;
+            foreach(Player p in _players.Values)
+            {
+                SpawnPlayer(p);
+            }
+            beginBossFight = false;
             turtleIntroStarted = false;
             lastFullUpdateTime.Clear();
             level1.ResetLevel();
             bossFightStarted = false;
             hammy = null;
+            hams.Clear();
             // set players scores to 0
             mobs.Clear();
             for (int i = 0; i < tileRows; i++)
@@ -243,7 +251,7 @@ namespace Gato_Exploso
                 dude.x = 7500;
                 dude.y = 7800;
             }
-            else
+            else if(dude.GetType() != typeof(Turtle))
             {
                 bool landFound = false;
                 Random random = new Random();
@@ -569,7 +577,7 @@ namespace Gato_Exploso
 
 
                 case 4:
-                    if (GetMainPlayer().points >= 10)
+                    if (GetMainPlayer().points >= (10 * difficultyNumber))
                     {
                         PauseGame("bossDial");
                         curDiall = 7;
@@ -582,7 +590,7 @@ namespace Gato_Exploso
                         return;
                     }
                 case 5:
-                    if (GetMainPlayer().points >= 10)
+                    if (GetMainPlayer().points >= (10 * difficultyNumber))
                     {
                         PauseGame("bossDial");
                         curDiall = 7;
@@ -596,137 +604,137 @@ namespace Gato_Exploso
                     }
 
                 case 6:
-                        PauseGame("bossDial");
-                        curDiall = 7;
-                        return;
+                    PauseGame("bossDial");
+                    curDiall = 7;
+                    return;
 
             }
         }
-            public HashSet<Entity> GetCollidingEntities(Rectangle rect, Player play)
+        public HashSet<Entity> GetCollidingEntities(Rectangle rect, Player play)
+        {
+            HashSet<Entity> entities = new HashSet<Entity>();
+            if (CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, play))
             {
-                HashSet<Entity> entities = new HashSet<Entity>();
-                if (CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, play))
-                {
-                    entities.Add(play);
-                }
-                /* foreach (Player ost in _players.Values)
-                {
-                    if (ost.GetType() != typeof(MainPlayer) && CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, ost))
-                    {
-                        entities.Add(ost);
-                    }
-
-                }
-                */
-                return entities;
+                entities.Add(play);
             }
-            // registers players on the web
-            private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
+            /* foreach (Player ost in _players.Values)
             {
-                // gives players information
-                string playerName = args.Name;
-                if (_players.ContainsKey(playerName))
+                if (ost.GetType() != typeof(MainPlayer) && CollisionDetection.AreRectsInEachOther(rect.X, rect.Y, rect.Width, rect.Height, ost))
                 {
-                    return;
+                    entities.Add(ost);
                 }
-                Ostrich ost = new Ostrich(Content, currentTime);
-                ost.Name = playerName;
-                ost.Load();
-
-                // adds new player to the list of player
-                _players.Add(playerName, ost);
-                SpawnPlayer(ost);
 
             }
-            // handles player action like moving and attacking
-            private void Server_PlayerAction(object sender, PlayerActionArgs args)
+            */
+            return entities;
+        }
+        // registers players on the web
+        private void Server_PlayerRegister(object sender, RegisterPlayerArgs args)
+        {
+            // gives players information
+            string playerName = args.Name;
+            if (_players.ContainsKey(playerName))
             {
-                if (_players.ContainsKey(args.name))
+                return;
+            }
+            Ostrich ost = new Ostrich(Content, currentTime);
+            ost.Name = playerName;
+            ost.Load();
+
+            // adds new player to the list of player
+            _players.Add(playerName, ost);
+            SpawnPlayer(ost);
+
+        }
+        // handles player action like moving and attacking
+        private void Server_PlayerAction(object sender, PlayerActionArgs args)
+        {
+            if (_players.ContainsKey(args.name))
+            {
+                Player pl = _players[args.name];
+                if (args.direction != null && args.direction.IsDirectionSet())
                 {
-                    Player pl = _players[args.name];
-                    if (args.direction != null && args.direction.IsDirectionSet())
-                    {
-                        pl.StartMoving();
-                        pl.FacePlayer(args.direction);
-                    }
-                    else
-                    {
-                        pl.StopMoving();
-                    }
-                    //      MovePlayer(pl);
-                    if (args.attack)
-                    {
-                        Attack(pl);
-                    }
-                    if (args.shoot)
-                    {
-                        Shoot(pl);
-                    }
+                    pl.StartMoving();
+                    pl.FacePlayer(args.direction);
+                }
+                else
+                {
+                    pl.StopMoving();
+                }
+                //      MovePlayer(pl);
+                if (args.attack)
+                {
+                    Attack(pl);
+                }
+                if (args.shoot)
+                {
+                    Shoot(pl);
                 }
             }
-            // ostrich attack
-            public void Attack(Player player)
+        }
+        // ostrich attack
+        public void Attack(Player player)
+        {
+            HashSet<Vector2> attackCoords = new HashSet<Vector2>();
+            // decides which tiles to attack based on which direction the player is facing
+            if (player.facing.Up)
             {
-                HashSet<Vector2> attackCoords = new HashSet<Vector2>();
-                // decides which tiles to attack based on which direction the player is facing
-                if (player.facing.Up)
-                {
-                    attackCoords.Add(new Vector2(player.x / 32, (player.y / 32) - 1));
-                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
-                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
-                }
-                if (player.facing.Left)
-                {
-                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
-                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32)));
-                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
-                }
-                if (player.facing.Down)
-                {
-                    attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
-                    attackCoords.Add(new Vector2((player.x / 32), (player.y / 32) + 1));
-                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
-                }
-                if (player.facing.Right)
-                {
-                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
-                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
-                    attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
-                }
+                attackCoords.Add(new Vector2(player.x / 32, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
+            }
+            if (player.facing.Left)
+            {
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32)));
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
+            }
+            if (player.facing.Down)
+            {
+                attackCoords.Add(new Vector2((player.x / 32) - 1, (player.y / 32) + 1));
+                attackCoords.Add(new Vector2((player.x / 32), (player.y / 32) + 1));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
+            }
+            if (player.facing.Right)
+            {
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) - 1));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32)));
+                attackCoords.Add(new Vector2((player.x / 32) + 1, (player.y / 32) + 1));
+            }
 
-                foreach (Player play in _players.Values)
+            foreach (Player play in _players.Values)
+            {
+                if (play != player)
                 {
-                    if (play != player)
+                    // 
+                    HashSet<Vector2> playerCoords = GetPlayerTiles(play);
+                    if (attackCoords.Intersect(playerCoords).Count() > 0)
                     {
-                        // 
-                        HashSet<Vector2> playerCoords = GetPlayerTiles(play);
-                        if (attackCoords.Intersect(playerCoords).Count() > 0)
+                        /* remove*/
+                        play.hp -= 6;
+                        if (play.Name == "gato")
                         {
-                            /* remove*/
-                            play.hp -= 6;
-                            if (play.Name == "gato")
-                            {
-                                play.hp -= 10;
-                            }
+                            play.hp -= 10;
                         }
-
-
                     }
+
+
                 }
             }
-            public void Shoot(Player player)
+        }
+        public void Shoot(Player player)
+        {
+            // sets cooldown between shots
+            if (Instance.currentTime - player.lastTimeFired >= 400)
             {
-                // sets cooldown between shots
-                if (Instance.currentTime - player.lastTimeFired >= 400)
-                {
-                    player.lastTimeFired = Instance.currentTime;
-                    Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000, player.Name);
-                    // sets egg's location, direction and speed to match the player that shot it
+                player.lastTimeFired = Instance.currentTime;
+                Egg egg = new Egg(player.x, player.y, player.facing, player.speed + 7, 3000, player.Name);
+                // sets egg's location, direction and speed to match the player that shot it
 
-                    eggs.Add(egg);
-                }
-
+                eggs.Add(egg);
             }
+
+        }
 
         // loads images for different classes
         protected override void LoadContent()
@@ -740,6 +748,7 @@ namespace Gato_Exploso
             music = Content.Load<Song>("ExplosoFields");
             menuMusic = Content.Load<Song>("MenuMusic");
             campSong = Content.Load<Song>("CampSite");
+            hammySong = Content.Load<Song>("HamMusica");
             curSong = music;
             MediaPlayer.Play(menuMusic);
             MediaPlayer.IsRepeating = true;
@@ -967,94 +976,206 @@ namespace Gato_Exploso
         // moves all mobs
         public void MoveMobs()
         {
+
+            // moves mobs toward gravity bomb(if it is near)
             for (int i = 0; i < mobs.Count; i++)
             {
-                Mob curMob = mobs[i];
                 // changes whether the mob is good or bad mased on day/night
                 if (day)
                 {
-                    curMob.good = curMob.defaultGood;
+                    mobs[i].good = mobs[i].defaultGood;
                 }
                 else
                 {
-                    curMob.good = !curMob.defaultGood;
+                    mobs[i].good = !mobs[i].defaultGood;
                 }
-                // moves mobs if they are in range of the player
-                if (curMob.GetType() == typeof(BouncyTriangle) || curMob.GetType() == typeof(Porcupine))
+                bool isGravNearMob = false;
+                int gravX = 0;
+                int gravY = 0;
+                HashSet<Vector2> gravCoords = level1.GetCoordsAroundTile(mobs[i].x / 32, mobs[i].y / 32, 15);
+                foreach(Vector2 cord in gravCoords)
                 {
-                    if (!curMob.good)
+                    if (level1.GetTile(cord).GetTileObjects().Count > 0)
+                    {
+                        if (level1.GetTile(cord).GetTileObjects()[0].GetType() == typeof(GravityBomb))
+                        {
+                            isGravNearMob = true;
+                            gravX = (int)cord.X * 32;
+                            gravY = (int)cord.Y * 32;
+                        }
+                    }
+                }
+                if (isGravNearMob)
+                {
+                    Mob curMob = mobs[i];
+                    if (gravX > mobs[i].x)
+                    {
+                        mobs[i].x += 3;
+                    }
+                    if (gravX < mobs[i].x)
+                    {
+                        mobs[i].x -= 3;
+                    }
+                    if (gravY > mobs[i].y)
+                    {
+                        mobs[i].y += 3;
+                    }
+                    if (gravY < mobs[i].y)
+                    {
+                        mobs[i].y -= 3;
+                    }
+                    if (CollisionDetection.AreRectsInEachOther(curMob.x, curMob.y, 64, 64, GetMainPlayer()))
+                    {
+                        GetMainPlayer().TakeDamage(curMob.strength);
+                    }
+                    try
+                    {
+                        if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)(curMob.x + 32), (int)curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)(curMob.y + 32)).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if ((getTileAt(curMob.x + 64, curMob.y).GetTileObjects().Count > 0))
+                        {
+                            if (getTileAt(curMob.x + 64, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt(curMob.x + 64, curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)(curMob.y + 64)).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt(curMob.x + 64, curMob.y + 64).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).bombExploded = true;
+                            }
+                        }
+                    }
+                    catch (Exception e) { }
+
+
+
+                }
+                else
+                {
+                    Mob curMob = mobs[i];
+                    
+                    try
+                    {
+                        if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)(curMob.x + 32), (int)curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)(curMob.y + 32)).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if ((getTileAt(curMob.x + 64, curMob.y).GetTileObjects().Count > 0))
+                        {
+                            if (getTileAt(curMob.x + 64, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt(curMob.x + 64, curMob.y).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)curMob.x, (int)(curMob.y + 64)).bombExploded = true;
+                            }
+                        }
+                        else if (getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).GetTileObjects().Count > 0)
+                        {
+                            if (getTileAt(curMob.x + 64, curMob.y + 64).GetTileObjects()[0].GetType() == typeof(Landmine))
+                            {
+                                getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).bombExploded = true;
+                            }
+                        }
+                    }
+                    catch (Exception e) { }
+                    {
+                    }
+                    // moves mobs if they are in range of the player
+                    if (curMob.GetType() == typeof(BouncyTriangle) || curMob.GetType() == typeof(Porcupine))
+                    {
+                        if (!curMob.good)
+                        {
+                            MoveMobTowardPlayer(curMob, GetMainPlayer());
+                        }
+                        else
+                        {
+                            MoveMobTowardSpawn(curMob);
+                        }
+                    }
+                    if (curMob.GetType() == typeof(Hammy))
                     {
                         MoveMobTowardPlayer(curMob, GetMainPlayer());
                     }
-                    else
-                    {
-                        MoveMobTowardSpawn(curMob);
-                    }
+                    
                 }
-                if (curMob.GetType() == typeof(Hammy))
-                {
-                    MoveMobTowardPlayer(curMob, GetMainPlayer());
-                }
-                try
-                {
-                    if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt((int)curMob.x, (int)curMob.y / 32).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
-                        }
-                    }
-                    else if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt(curMob.x + 32, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)(curMob.x + 32), (int)curMob.y).bombExploded = true;
-                        }
-                    }
-                    else if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt((int)curMob.x, (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)curMob.x, (int)(curMob.y + 32)).bombExploded = true;
-                        }
-                    }
-                    else if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)(curMob.x + 32), (int)(curMob.y + 32)).bombExploded = true;
-                        }
-                    }
-                    else if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt((int)curMob.x, (int)curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)curMob.x, (int)curMob.y).bombExploded = true;
-                        }
-                    }
-                    else if ((getTileAt(curMob.x + 64, curMob.y).GetTileObjects().Count > 0))
-                    {
-                        if (getTileAt(curMob.x + 64, curMob.y).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt(curMob.x + 64, curMob.y).bombExploded = true;
-                        }
-                    }
-                    else if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt((int)curMob.x, (int)(curMob.y + 64)).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)curMob.x, (int)(curMob.y + 64)).bombExploded = true;
-                        }
-                    }
-                    else if (getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).GetTileObjects().Count > 0)
-                    {
-                        if (getTileAt(curMob.x + 64, curMob.y + 64).GetTileObjects()[0].GetType() == typeof(Landmine))
-                        {
-                            getTileAt((int)(curMob.x + 64), (int)(curMob.y + 64)).bombExploded = true;
-                        }
-                    }
-                }
-                catch (Exception e) { }
 
             }
         }
@@ -1320,8 +1441,8 @@ namespace Gato_Exploso
                 if (mm.hp <= 0)
                 {
                     mobsToDie.Add(mm);
-                    GetMainPlayer().points++;
-                    if (GetMainPlayer().points >= 10)
+                    GetMainPlayer().points += difficultyNumber;
+                    if (GetMainPlayer().points >= (10 * difficultyNumber))
                     {
                         if (!randSeed)
                         {
@@ -1346,9 +1467,6 @@ namespace Gato_Exploso
                             mines++;
                             break;
                         case 5:
-                            gravs++;
-                            break;
-                        case 6:
                             gravs++;
                             break;
                         case 7:
@@ -1392,7 +1510,7 @@ namespace Gato_Exploso
             {
 
                 Random ry = new Random();
-                SpawnPlayer(_players[s]);
+                
             }
             currentTime = gameTime.TotalGameTime.TotalMilliseconds;
             if (_players["gato"].hp < 100)
@@ -1447,6 +1565,14 @@ namespace Gato_Exploso
                 if (!isMousePressed)
                 {
                     actionArgs.placeBomb = true;
+                }
+                isMousePressed = true;
+            }
+            if (cursor.RightButton == ButtonState.Pressed)
+            {
+                if (!isMousePressed)
+                {
+                    actionArgs.placeRock = true;
                 }
                 isMousePressed = true;
             }
@@ -1570,6 +1696,31 @@ namespace Gato_Exploso
         bool hasEnoughBombs = false;
         public void ExexutePlayerAction(PlayerActionArgs act)
         {
+            // place rock
+            if (act.placeRock)
+            {
+                if (currentTime - lastBombTime >= 1000)
+                {
+                    if (_players[mainPlayerName].facing.Down)
+                    {
+                        level1.PlaceRock(_players[mainPlayerName].x + 16, _players[mainPlayerName].y - 16);
+                    }
+                    else if (_players[mainPlayerName].facing.Right)
+                    {
+                        level1.PlaceRock(_players[mainPlayerName].x - 16, _players[mainPlayerName].y + 48);
+
+                    }
+                    else if (_players[mainPlayerName].facing.Up)
+                    {
+                        level1.PlaceRock(_players[mainPlayerName].x + 16, _players[mainPlayerName].y + 80);
+                    }
+                    else if (_players[mainPlayerName].facing.Left)
+                    {
+                        level1.PlaceRock(_players[mainPlayerName].x + 48, _players[mainPlayerName].y + 48);
+                    }
+                    lastBombTime = currentTime;
+                }
+            }
             // places bomb when space is pressed
             if (act.placeBomb)
             {
@@ -1612,7 +1763,6 @@ namespace Gato_Exploso
                         }
                         break;
                 }
-
                 if (currentTime - lastBombTime >= 1000 && hasEnoughBombs)
                 {
                     if (_players[mainPlayerName].facing.Up)
@@ -1642,9 +1792,10 @@ namespace Gato_Exploso
         {
             bossFightStarted = true;
             hammy = new Hammy(Content);
-            hammy.x = 90;
-            hammy.y = 90;
+            hammy.x = 7800;
+            hammy.y = 200;
             mobs.Add(hammy);
+            MediaPlayer.Play(hammySong);
         }
         // returns the full list of tiles in a string
         public string GetGameWorld()
@@ -1732,7 +1883,14 @@ namespace Gato_Exploso
                 player = (MainPlayer)p;
             }
             // draws HUD
-            hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest, mobs, GetPlayers(), mightys, mines, gravs);
+            if (bossFightStarted)
+            {
+                hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest, mobs, GetPlayers(), mightys, mines, gravs, true);
+            }
+            else
+            {
+                hud.Draw(_spriteBatch, (int)_players[mainPlayerName].hp, _players["gato"].x, _players["gato"].y, curQuest, mobs, GetPlayers(), mightys, mines, gravs, false);
+            }
             if (paused)
             {
                 if (_players.ContainsKey("squirrell"))

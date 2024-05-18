@@ -71,8 +71,15 @@ namespace Gato_Exploso.HUD
         {
 
         }
-        public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest, List<Mobs.Mob> mobList, List<Player> playerList, int mig, int land, int grav)
+     
+        Color campColor = new Color(255, 255, 0);
+    public void Draw(SpriteBatch spriteBatch, int health, int gatoX, int gatoY, string quest, List<Mobs.Mob> mobList, List<Player> playerList, int mig, int land, int grav, bool boss)
         {
+            campColor = new Color(255, 255, 0);
+            if (Game1.Instance.GetTime() % 500 < 250)
+            {
+                campColor = new Color(111, 111, 0);
+            }
             int minimapWidth = 270;
             int minimapHeight = 295;
             int minimapLeft = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - minimapWidth;
@@ -87,6 +94,8 @@ namespace Gato_Exploso.HUD
             Color miniColor;
             int campX = -1;
             int campY = -1;
+            int hammyX = -1;
+            int hammyY = -1;
             for (int i = 0; i < miniMapData.GetLength(0); i++)
             {
                 for (int j = 0; j < miniMapData.GetLength(1); j++)
@@ -110,6 +119,11 @@ namespace Gato_Exploso.HUD
                             campY = j;
                             miniColor = new Color(0, 0, 0);
                             break;
+                        case 6:
+                            hammyX = i;
+                            hammyY = j;
+                            miniColor = new Color(0, 0, 0);
+                            break;
                         default:
                             miniColor = new Color(255, 255, 255);
                             break;
@@ -118,14 +132,9 @@ namespace Gato_Exploso.HUD
                 }
             }
 
-            if (campX >= 0)
+            if (campX >= 0 && !boss)
             {
-                Color campColor = new Color(255, 255, 255); ;
-                if (Game1.Instance.GetTime() % 500 < 250)
-                {
-                    campColor = new Color(111, 111, 0);
-                }
-               
+
                 spriteBatch.Draw(texture, new Rectangle(campX + (minimapLeft) + 14, campY + (minimapTop) + 11, 7, 7), campColor);
             }
 
@@ -139,7 +148,7 @@ namespace Gato_Exploso.HUD
                 spriteBatch.Draw(texture, new Rectangle(mob.x / 32 + (minimapLeft) - 1, mob.y / 32 + (minimapTop) - 1, 3, 3), Color.Red);
                 if(mob.GetType() == typeof(Mobs.Hammy))
                 {
-                    spriteBatch.Draw(texture, new Rectangle(mob.x / 32 + (minimapLeft) - 3, mob.y / 32 + (minimapTop) - 3, 6, 6), Color.Gold);
+                    spriteBatch.Draw(texture, new Rectangle(mob.x / 32 + (minimapLeft) - 3, mob.y / 32 + (minimapTop) - 3, 6, 6), campColor);
                 
                 }
             }

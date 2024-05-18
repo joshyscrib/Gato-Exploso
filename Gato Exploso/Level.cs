@@ -16,6 +16,7 @@ using Gato_Exploso.Tiles;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 using System.Reflection.Metadata;
+using System.Xml.Linq;
 
 namespace Gato_Exploso
 {
@@ -73,6 +74,8 @@ namespace Gato_Exploso
                 noise = new FastNoise(presetSeed);
                 campX = 5;
                 campY = 205;
+                hammyX = 240;
+                hammyY = 7;
             }
             noise.SetNoiseType(FastNoise.NoiseType.Simplex);
             noise.SetFrequency(0.0078f);
@@ -153,23 +156,46 @@ namespace Gato_Exploso
         // returns the tile at a given position
         public Tile GetTile(int x, int y)
         {
-            if (x < 0)
+            if (x < 0 && y > -1 && y < yTiles && x < xTiles)
             {
                 return tiles[0, y];
             }
-            if (x > xTiles - 1)
+            if (x > xTiles - 1 && y < xTiles && x > 0 && y > 0)
             {
                 return tiles[xTiles - 1, y];
             }
-            if (y < 0)
+            if (y < 0 && x > -1 && x < xTiles && y < yTiles)
             {
                 return tiles[x, 0];
             }
-            if (y > yTiles - 1)
+            if (y > yTiles - 1 && x < yTiles && x > 0 && y > 0)
             {
                 return tiles[x, yTiles - 1];
             }
-            return tiles[x, y];
+            if (x < 0 && y <  0&& y < yTiles && x < xTiles)
+            {
+                return tiles[0, 0];
+            }
+            if (x > xTiles - 1 && y > xTiles - 1 && x > 0 && y > 0)
+            {
+                return tiles[xTiles - 1, yTiles - 1];
+            }
+            if (y < 0 && x < 0 && y < yTiles && x < xTiles)
+            {
+                return tiles[0, 0];
+            }
+            if (y > yTiles - 1 && x > yTiles - 1 && x > 0 && y > 0)
+            {
+                return tiles[xTiles - 1, yTiles - 1];
+            }
+            if(x > 0 && y > 0 && x < xTiles - 1 && y < yTiles - 1)
+            {
+                return tiles[x, y];
+            }
+            else
+            {
+                return tiles[0, 0];
+            }
         }
         public Tile GetTile(Vector2 loc)
         {
@@ -189,7 +215,7 @@ namespace Gato_Exploso
                 if (tiles[i, j].bombExploded)
                 {
                     tiles[i, j].bombExploded = false;
-                    if(Game1.Instance.GetTime() - lastMineSoundTime > 100 && tiles[i, j].range == 3)
+                    if(Game1.Instance.GetTime() - lastMineSoundTime > 200 && tiles[i, j].range == 3)
                     {
                         lastMineSoundTime = Game1.Instance.GetTime();
                         bombSound.Play();
@@ -297,7 +323,12 @@ namespace Gato_Exploso
                     if (i == campX && j == campY && !Game1.randSeed)
                     {
                         tile = new CampTile();
-                    
+
+                    }
+                    if (i == hammyX && j == hammyY && !Game1.randSeed)
+                    {
+                        tile = new HammyTile();
+
                     }
                     tiles[i, j] = tile;
                     tiles[i, j].x = i;
@@ -350,7 +381,7 @@ namespace Gato_Exploso
 
                 }
             }
-            if (campX > 0 && questDot == "camp")
+            if (campX > 0)
             {
 
                 int drawX = (campX * tileSide) + tileXOffset;
@@ -358,13 +389,12 @@ namespace Gato_Exploso
                 tiles[campX, campY].Draw(spritebatch, drawX, drawY);
                 tiles[campX, campY - 1].Draw(spritebatch, drawX, drawY);
             }
-            if (hammyX > 0 && questDot == "camp")
+            if (hammyX > 0 && questDot == "boss")
             {
 
-                int drawX = (campX * tileSide) + tileXOffset;
-                int drawY = (campY * tileSide) + tileYOffset;
-                tiles[campX, campY].Draw(spritebatch, drawX, drawY);
-                tiles[campX, campY - 1].Draw(spritebatch, drawX, drawY);
+                int drawX = (hammyX * tileSide) + tileXOffset;
+                int drawY = (hammyY * tileSide) + tileYOffset;
+                tiles[hammyX, hammyY].Draw(spritebatch, drawX, drawY);
             }
         }
         // checks if the coordinate is in bounds
@@ -385,10 +415,10 @@ namespace Gato_Exploso
             return true;
         }
         // places a new rock tile
-        public void PlaceRock()
+        public void PlaceRock(int xc, int yc)
         {
 
-            Vector2 vec = GetTileUnderMouse();
+            Vector2 vec = new Vector2(xc/32,yc/32);
             if (!IsCoordInBounds(vec)) { return; }
             
 
@@ -415,7 +445,7 @@ namespace Gato_Exploso
                     curTile.AddBomb(new Landmine(gameTime));
                     break;
                 case 3:
-                 //   curTile.AddBomb(new Bomb(gameTime));
+                    curTile.AddBomb(new GravityBomb(gameTime));
                     break;
             }
             activeTileCoords.Add(vec);

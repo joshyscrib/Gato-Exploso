@@ -33,6 +33,9 @@ namespace Gato_Exploso.Mobs
         // when the mob hit a player
         double knockBackStartTime = 0;
 
+        // if the mob(porcupine) is facing left
+        protected bool left = false;
+
         // spawnpoint of mob
         public int spawnX = 0;
         public int spawnY = 0;
@@ -55,27 +58,35 @@ namespace Gato_Exploso.Mobs
 
         public void Move(double angle)
         {
-            
-            if(Game1.Instance.GetTime()- lastChangeDirectionTime > moveReactionDelay)
+
+            if (Game1.Instance.GetTime() - lastChangeDirectionTime > moveReactionDelay)
             {
                 lastChangeDirectionTime = Game1.Instance.GetTime();
                 angle2 = angle;
                 moveReactionDelay = 100 + rand.Next(800);
             }
             int curSpeed = speed;
-            if(Game1.Instance.GetTime() - knockBackStartTime < 100)
+            if (Game1.Instance.GetTime() - knockBackStartTime < 100)
             {
                 curSpeed = 35;
             }
             // uses formula to decide where to move the mob
             dy = curSpeed * Math.Sin(angle2);
             dx = curSpeed * Math.Cos(angle2);
+            if (dx < 0)
+            {
+                left = true;
+            }
+            else
+            {
+                left = false;
+            }
             // moves the mob accordingly
-            int proposedX = x+  (int)dx;
+            int proposedX = x + (int)dx;
             int proposedY = y + (int)dy;
 
 
-            foreach(Player curPlayer in Game1.Instance.GetPlayers())
+            foreach (Player curPlayer in Game1.Instance.GetPlayers())
             {
                 HashSet<Entity> colldingEntities = Game1.Instance.GetCollidingEntities(new Rectangle(x, y, width, height), curPlayer);
 
@@ -130,11 +141,83 @@ namespace Gato_Exploso.Mobs
 
                 }
             }
-           
 
-                x = proposedX;
-                y = proposedY;
-         
+
+            x = proposedX;
+            y = proposedY;
+
+
+
+        }
+        public void Move(double angle, bool boolean)
+        {
+            int proposedX = x + (int)dx;
+            int proposedY = y + (int)dy;
+
+            foreach (Player curPlayer in Game1.Instance.GetPlayers())
+            {
+                HashSet<Entity> colldingEntities = Game1.Instance.GetCollidingEntities(new Rectangle(x, y, width, height), curPlayer);
+
+                foreach (Entity entity in colldingEntities)
+                {
+                    if (Game1.Instance.GetTime() - lastKnockTime > 600)
+                    {
+                        if (entity.GetType() == typeof(MainPlayer) && !good)
+                        {
+                            knockBackStartTime = Game1.Instance.GetTime();
+                            lastChangeDirectionTime = Game1.Instance.GetTime();
+                            moveReactionDelay = 140 - (Game1.difficultyNumber * 13);
+
+                            if (entity.GetType() == typeof(MainPlayer))
+                            {
+                                MainPlayer p = entity as MainPlayer;
+                                p.TakeDamage(strength);
+                            }
+                            double reverseAngle = angle2 + 3;
+                            angle2 += 3;
+                            // reverses the angle(makes it face away from the player)
+                            dy = 20 * Math.Sin(reverseAngle);
+                            dx = 20 * Math.Cos(reverseAngle);
+                            // moves the mob accordingly
+                            proposedX = x + (int)dx;
+                            proposedY = y + (int)dy;
+                        }
+                        if (entity.GetType() == typeof(Ostrich) && good)
+                        {
+                            knockBackStartTime = Game1.Instance.GetTime();
+                            lastChangeDirectionTime = Game1.Instance.GetTime();
+                            moveReactionDelay = 140 - (Game1.difficultyNumber * 13);
+
+                            if (entity.GetType() == typeof(Ostrich))
+                            {
+                                Ostrich p = entity as Ostrich;
+                                p.TakeDamage(strength);
+                            }
+                            double reverseAngle = angle2 + 3;
+                            angle2 += 3;
+                            // reverses the angle(makes it face away from the player)
+                            dy = 20 * Math.Sin(reverseAngle);
+                            dx = 20 * Math.Cos(reverseAngle);
+                            // moves the mob accordingly
+                            proposedX = x + (int)dx;
+                            proposedY = y + (int)dy;
+                        }
+
+
+                    }
+
+
+                }
+            }
+
+
+            
+
+
+            x = proposedX;
+            y = proposedY;
+
+
 
         }
         public abstract void Draw(SpriteBatch spritebatch, int offX, int offY);

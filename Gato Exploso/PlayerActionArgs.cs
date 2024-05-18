@@ -13,5 +13,6 @@ namespace Gato_Exploso
         public string name { get; set; }
         public bool attack { get; set; }
         public bool shoot { get; set; }
+        public bool placeRock { get; set; }
     }
 }

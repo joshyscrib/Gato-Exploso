@@ -15,7 +15,7 @@ namespace Gato_Exploso.HUD
         ContentManager Content;
         // rotation to draw the clock at
         public double time = 270;
-        double rotation = 0;
+        public double rotation = 0;
         Texture2D clockTexture;
         Texture2D arrowTexture;
         public Clock(ContentManager context)

@@ -62,7 +62,14 @@ namespace Gato_Exploso.Tiles
             // draw each object
             foreach (var obj in objects)
             {
-                obj.Draw(spriteBatch, x, y);
+                if (obj.GetType() != typeof(GravityBomb))
+                {
+                    obj.Draw(spriteBatch, x, y);
+                }
+                else
+                {
+                    obj.Draw(spriteBatch, x - 32, y - 32);
+                }
             }
         }
         // returns list of tile objects
@@ -184,7 +191,7 @@ namespace Gato_Exploso.Tiles
                     Landmine b = tileObj as Landmine;
                     b.DetonateBomb();
                 }
-                else
+                else if(tileObj.GetType() != typeof(GravityBomb) && tileObj.GetType() != typeof(Landmine))
                 {
                     objects.RemoveAt(i);
                 }
