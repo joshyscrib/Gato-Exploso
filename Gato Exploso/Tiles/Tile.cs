@@ -223,6 +223,14 @@ namespace Gato_Exploso.Tiles
                             lastModifiedTime = Game1.Instance.GetTime();
                         }
                         break;
+                    case "grav":
+                        GravityBomb grav = (GravityBomb)bmb;
+                        if (Game1.Instance.GetTime() - 6000 > grav.createTime)
+                        {
+                            bombsToDelete.Add(grav);
+                            lastModifiedTime = Game1.Instance.GetTime();
+                        }
+                        break;
                         
                 }
                     

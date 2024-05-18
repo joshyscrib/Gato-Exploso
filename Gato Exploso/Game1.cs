@@ -1450,7 +1450,7 @@ namespace Gato_Exploso
                         }
                         beginBossFight = true;
                     }
-                    int br = bombRand.Next(1, 10);
+                    int br = bombRand.Next(1, 4);
 
                     switch (br)
                     {
@@ -1458,19 +1458,10 @@ namespace Gato_Exploso
                             mightys++;
                             break;
                         case 2:
-                            mightys++;
+                            mines++;
                             break;
                         case 3:
-                            mines++;
-                            break;
-                        case 4:
-                            mines++;
-                            break;
-                        case 5:
                             gravs++;
-                            break;
-                        case 7:
-                            mightys++;
                             break;
                         default: break;
 

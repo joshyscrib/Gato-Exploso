@@ -5,6 +5,7 @@ namespace Gato_Exploso.TileObjects
 {
     public class GravityBomb : Bomb
     {
+        public int startTime = 0;
         public GravityBomb(double ticks) : base(ticks)
         {
 
